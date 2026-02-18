@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DSA Interview Roadmap — C# Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #7c6aff;
+    --accent2: #ff6a6a;
+    --accent3: #6affb8;
+    --text: #e8e8f0;
+    --muted: #666680;
+    --card: #13131c;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,106,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,106,255,.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: .5;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 28px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 96px 0 72px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124,106,255,.12);
+    border: 1px solid rgba(124,106,255,.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    animation: fadeUp .6s ease both;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .4; transform: scale(.8); }
+  }
+
+  .hero h1 {
+    font-size: clamp(42px, 7vw, 84px);
+    font-weight: 800;
+    line-height: .95;
+    letter-spacing: -.03em;
+    animation: fadeUp .6s .1s ease both;
+  }
+
+  .hero h1 span.grad {
+    background: linear-gradient(135deg, var(--accent) 0%, #b06aff 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero h1 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .hero-sub {
+    margin-top: 24px;
+    color: var(--muted);
+    font-size: 17px;
+    max-width: 540px;
+    line-height: 1.6;
+    font-weight: 400;
+    animation: fadeUp .6s .2s ease both;
+  }
+
+  .hero-meta {
+    margin-top: 40px;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    animation: fadeUp .6s .3s ease both;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meta-item .num {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+  }
+  .meta-item .label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── NAV DOTS ── */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    animation: fadeDown .5s ease both;
+  }
+  .nav-bar::-webkit-scrollbar { display: none; }
+
+  .nav-item {
+    white-space: nowrap;
+    padding: 14px 16px;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+    letter-spacing: .04em;
+  }
+  .nav-item:hover {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-top: 72px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  .section.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(124,106,255,.1);
+    border: 1px solid rgba(124,106,255,.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-top: 4px;
+    flex-shrink: 0;
+    letter-spacing: .06em;
+  }
+
+  .section-title-block {}
+
+  .section-title {
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+  }
+
+  .section-why {
+    margin-top: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-why::before {
+    content: '→';
+    color: var(--accent3);
+    flex-shrink: 0;
+  }
+
+  /* ── PROBLEMS GRID ── */
+  .problems {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .problems { grid-template-columns: 1fr; }
+    .hero-meta { gap: 24px; }
+  }
+
+  .problem-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: border-color .2s, transform .2s, background .2s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .problem-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(124,106,255,.05) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity .2s;
+  }
+
+  .problem-card:hover {
+    border-color: rgba(124,106,255,.4);
+    transform: translateY(-2px);
+    background: #16161f;
+  }
+
+  .problem-card:hover::before { opacity: 1; }
+
+  .problem-idx {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    background: rgba(124,106,255,.1);
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .problem-info {}
+
+  .problem-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .problem-lc {
+    margin-top: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .lc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--accent3);
+    text-decoration: none;
+    opacity: .7;
+    transition: opacity .2s;
+  }
+  .lc-link:hover { opacity: 1; }
+
+  /* ── WEEK TABLE ── */
+  .week-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  .week-table th {
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .week-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    vertical-align: top;
+  }
+
+  .week-table tr:last-child td { border-bottom: none; }
+
+  .week-table tr:hover td { background: rgba(255,255,255,.02); }
+
+  .week-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(124,106,255,.1);
+    border: 1px solid rgba(124,106,255,.2);
+    padding: 3px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  /* ── TIPS ── */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 640px) { .tips-grid { grid-template-columns: 1fr; } }
+
+  .tip-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color .2s;
+  }
+
+  .tip-card:hover { border-color: rgba(106,255,184,.25); }
+
+  .tip-icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .tip-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent3);
+    margin-bottom: 6px;
+  }
+
+  .tip-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  /* ── HOW TO USE ── */
+  .how-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .how-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(124,106,255,.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 4px;
+  }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(124,106,255,.15);
+    border: 1px solid rgba(124,106,255,.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .step-text {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    padding-top: 4px;
+  }
+
+  .step-text strong { color: var(--text); }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 96px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .04em;
+  }
+
+  .footer .quote {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--text);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 56px 0 0;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* ── EMOJI ICON ── */
+  .section-icon {
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .section-header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex: 1;
+  }
+
+  /* Accent color variations per section */
+  .s1 .section-num, .s1 .problem-idx { color: #7c6aff; background: rgba(124,106,255,.1); border-color: rgba(124,106,255,.2); }
+  .s2 .section-num, .s2 .problem-idx { color: #ff9f6a; background: rgba(255,159,106,.1); border-color: rgba(255,159,106,.2); }
+  .s3 .section-num, .s3 .problem-idx { color: #6affb8; background: rgba(106,255,184,.1); border-color: rgba(106,255,184,.2); }
+  .s4 .section-num, .s4 .problem-idx { color: #ff6ab2; background: rgba(255,106,178,.1); border-color: rgba(255,106,178,.2); }
+  .s5 .section-num, .s5 .problem-idx { color: #6ac8ff; background: rgba(106,200,255,.1); border-color: rgba(106,200,255,.2); }
+  .s6 .section-num, .s6 .problem-idx { color: #ffe46a; background: rgba(255,228,106,.1); border-color: rgba(255,228,106,.2); }
+  .s7 .section-num, .s7 .problem-idx { color: #d06aff; background: rgba(208,106,255,.1); border-color: rgba(208,106,255,.2); }
+  .s8 .section-num, .s8 .problem-idx { color: #ff6a6a; background: rgba(255,106,106,.1); border-color: rgba(255,106,106,.2); }
+  .s9 .section-num, .s9 .problem-idx { color: #6affd4; background: rgba(106,255,212,.1); border-color: rgba(106,255,212,.2); }
+  .s10 .section-num, .s10 .problem-idx { color: #a8ff6a; background: rgba(168,255,106,.1); border-color: rgba(168,255,106,.2); }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">C# Developer · Product Company Prep · 50 Problems</div>
+    <h1>
+      <em class="grad">DSA</em> Interview<br/>
+      Roadmap
+    </h1>
+    <p class="hero-sub">A pattern-first preparation guide for C# developers targeting product-based companies. Master the pattern, not the solution.</p>
+    <div class="hero-meta">
+      <div class="meta-item"><span class="num">10</span><span class="label">Patterns</span></div>
+      <div class="meta-item"><span class="num">50</span><span class="label">Problems</span></div>
+      <div class="meta-item"><span class="num">6</span><span class="label">Weeks</span></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a class="nav-item" href="#s1">Arrays</a>
+  <a class="nav-item" href="#s2">Sliding Window</a>
+  <a class="nav-item" href="#s3">Hashing</a>
+  <a class="nav-item" href="#s4">Linked List</a>
+  <a class="nav-item" href="#s5">Trees</a>
+  <a class="nav-item" href="#s6">Binary Search</a>
+  <a class="nav-item" href="#s7">Stack</a>
+  <a class="nav-item" href="#s8">Heap</a>
+  <a class="nav-item" href="#s9">Backtracking</a>
+  <a class="nav-item" href="#s10">DP</a>
+  <a class="nav-item" href="#guide">Guide</a>
+</nav>
+
+<div class="wrapper">
+
+  <!-- SECTION 1 -->
+  <section class="section s1" id="s1">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">📊</span>
+        <div class="section-title-block">
+          <div class="section-title">Arrays &amp; Prefix Sum</div>
+          <div class="section-why">Most fundamental structure; prefix sums eliminate redundant iteration for range-query problems.</div>
+        </div>
+      </div>
+      <div class="section-num">01</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Two Sum</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/two-sum/" target="_blank">↗ LeetCode #1</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">Range Sum Query - Immutable</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/range-sum-query-immutable/" target="_blank">↗ LeetCode #303</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Subarray Sum Equals K</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/subarray-sum-equals-k/" target="_blank">↗ LeetCode #560</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Product of Array Except Self</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/product-of-array-except-self/" target="_blank">↗ LeetCode #238</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Find Pivot Index</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/find-pivot-index/" target="_blank">↗ LeetCode #724</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 2 -->
+  <section class="section s2" id="s2">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🪟</span>
+        <div class="section-title-block">
+          <div class="section-title">Sliding Window</div>
+          <div class="section-why">Converts O(n²) brute-force into O(n) by maintaining a dynamic window over sequential data.</div>
+        </div>
+      </div>
+      <div class="section-num">02</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Best Time to Buy and Sell Stock</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock/" target="_blank">↗ LeetCode #121</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">Longest Substring Without Repeating Characters</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/longest-substring-without-repeating-characters/" target="_blank">↗ LeetCode #3</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Minimum Size Subarray Sum</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/minimum-size-subarray-sum/" target="_blank">↗ LeetCode #209</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Longest Repeating Character Replacement</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/longest-repeating-character-replacement/" target="_blank">↗ LeetCode #424</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Minimum Window Substring</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/minimum-window-substring/" target="_blank">↗ LeetCode #76</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 3 -->
+  <section class="section s3" id="s3">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🗂️</span>
+        <div class="section-title-block">
+          <div class="section-title">Hashing</div>
+          <div class="section-why">O(1) average lookups turn complex search problems into elegant linear passes.</div>
+        </div>
+      </div>
+      <div class="section-num">03</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Contains Duplicate</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/contains-duplicate/" target="_blank">↗ LeetCode #217</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">Group Anagrams</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/group-anagrams/" target="_blank">↗ LeetCode #49</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Top K Frequent Elements</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/top-k-frequent-elements/" target="_blank">↗ LeetCode #347</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Longest Consecutive Sequence</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/longest-consecutive-sequence/" target="_blank">↗ LeetCode #128</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Valid Anagram</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/valid-anagram/" target="_blank">↗ LeetCode #242</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 4 -->
+  <section class="section s4" id="s4">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🔗</span>
+        <div class="section-title-block">
+          <div class="section-title">Linked List</div>
+          <div class="section-why">Tests pointer manipulation and in-place operations — skills critical for memory-efficient design.</div>
+        </div>
+      </div>
+      <div class="section-num">04</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Reverse Linked List</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/reverse-linked-list/" target="_blank">↗ LeetCode #206</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">Merge Two Sorted Lists</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/merge-two-sorted-lists/" target="_blank">↗ LeetCode #21</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Linked List Cycle</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/linked-list-cycle/" target="_blank">↗ LeetCode #141</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Remove Nth Node From End of List</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/remove-nth-node-from-end-of-list/" target="_blank">↗ LeetCode #19</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Reorder List</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/reorder-list/" target="_blank">↗ LeetCode #143</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 5 -->
+  <section class="section s5" id="s5">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🌳</span>
+        <div class="section-title-block">
+          <div class="section-title">Trees</div>
+          <div class="section-why">Appear in databases, file systems, and compilers; DFS/BFS traversal is a universal interview requirement.</div>
+        </div>
+      </div>
+      <div class="section-num">05</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Invert Binary Tree</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/invert-binary-tree/" target="_blank">↗ LeetCode #226</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">Maximum Depth of Binary Tree</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/maximum-depth-of-binary-tree/" target="_blank">↗ LeetCode #104</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Lowest Common Ancestor of a BST</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/" target="_blank">↗ LeetCode #235</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Binary Tree Level Order Traversal</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/binary-tree-level-order-traversal/" target="_blank">↗ LeetCode #102</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Validate Binary Search Tree</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/validate-binary-search-tree/" target="_blank">↗ LeetCode #98</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 6 -->
+  <section class="section s6" id="s6">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🔍</span>
+        <div class="section-title-block">
+          <div class="section-title">Binary Search</div>
+          <div class="section-why">Reduces search space to O(log n) and applies far beyond sorted arrays — including answer-space problems.</div>
+        </div>
+      </div>
+      <div class="section-num">06</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Binary Search</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/binary-search/" target="_blank">↗ LeetCode #704</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">Find Minimum in Rotated Sorted Array</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/" target="_blank">↗ LeetCode #153</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Search in Rotated Sorted Array</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/search-in-rotated-sorted-array/" target="_blank">↗ LeetCode #33</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Koko Eating Bananas</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/koko-eating-bananas/" target="_blank">↗ LeetCode #875</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Time Based Key-Value Store</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/time-based-key-value-store/" target="_blank">↗ LeetCode #981</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 7 -->
+  <section class="section s7" id="s7">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">📚</span>
+        <div class="section-title-block">
+          <div class="section-title">Stack &amp; Monotonic Stack</div>
+          <div class="section-why">Monotonic stacks solve "next greater/smaller element" problems in linear time.</div>
+        </div>
+      </div>
+      <div class="section-num">07</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Valid Parentheses</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/valid-parentheses/" target="_blank">↗ LeetCode #20</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">Min Stack</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/min-stack/" target="_blank">↗ LeetCode #155</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Daily Temperatures</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/daily-temperatures/" target="_blank">↗ LeetCode #739</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Car Fleet</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/car-fleet/" target="_blank">↗ LeetCode #853</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Largest Rectangle in Histogram</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/largest-rectangle-in-histogram/" target="_blank">↗ LeetCode #84</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 8 -->
+  <section class="section s8" id="s8">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🏔️</span>
+        <div class="section-title-block">
+          <div class="section-title">Heap / Priority Queue</div>
+          <div class="section-why">Efficiently manages dynamic ordering — essential for scheduling, streaming, and top-K problems.</div>
+        </div>
+      </div>
+      <div class="section-num">08</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Kth Largest Element in an Array</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/kth-largest-element-in-an-array/" target="_blank">↗ LeetCode #215</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">K Closest Points to Origin</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/k-closest-points-to-origin/" target="_blank">↗ LeetCode #973</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Task Scheduler</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/task-scheduler/" target="_blank">↗ LeetCode #621</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Find Median from Data Stream</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/find-median-from-data-stream/" target="_blank">↗ LeetCode #295</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Merge K Sorted Lists</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/merge-k-sorted-lists/" target="_blank">↗ LeetCode #23</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 9 -->
+  <section class="section s9" id="s9">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🔄</span>
+        <div class="section-title-block">
+          <div class="section-title">Backtracking</div>
+          <div class="section-why">Systematically explores all possibilities while pruning dead ends — essential for combinatorics problems.</div>
+        </div>
+      </div>
+      <div class="section-num">09</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Subsets</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/subsets/" target="_blank">↗ LeetCode #78</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">Permutations</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/permutations/" target="_blank">↗ LeetCode #46</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Combination Sum</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/combination-sum/" target="_blank">↗ LeetCode #39</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Word Search</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/word-search/" target="_blank">↗ LeetCode #79</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Palindrome Partitioning</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/palindrome-partitioning/" target="_blank">↗ LeetCode #131</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 10 -->
+  <section class="section s10" id="s10">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🧩</span>
+        <div class="section-title-block">
+          <div class="section-title">Dynamic Programming</div>
+          <div class="section-why">Eliminates redundant computation via memoization/tabulation — the most tested advanced pattern at FAANG.</div>
+        </div>
+      </div>
+      <div class="section-num">10</div>
+    </div>
+    <div class="problems">
+      <div class="problem-card"><div class="problem-idx">1</div><div class="problem-info"><div class="problem-name">Climbing Stairs</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/climbing-stairs/" target="_blank">↗ LeetCode #70</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">2</div><div class="problem-info"><div class="problem-name">House Robber</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/house-robber/" target="_blank">↗ LeetCode #198</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">3</div><div class="problem-info"><div class="problem-name">Coin Change</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/coin-change/" target="_blank">↗ LeetCode #322</a></div></div></div>
+      <div class="problem-card"><div class="problem-idx">4</div><div class="problem-info"><div class="problem-name">Longest Common Subsequence</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/longest-common-subsequence/" target="_blank">↗ LeetCode #1143</a></div></div></div>
+      <div class="problem-card" style="grid-column: 1 / -1;"><div class="problem-idx">5</div><div class="problem-info"><div class="problem-name">Partition Equal Subset Sum</div><div class="problem-lc"><a class="lc-link" href="https://leetcode.com/problems/partition-equal-subset-sum/" target="_blank">↗ LeetCode #416</a></div></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- GUIDE -->
+  <section class="section" id="guide" style="margin-top: 72px;">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">📖</span>
+        <div class="section-title-block">
+          <div class="section-title">How to Use This Roadmap</div>
+          <div class="section-why">Work through each category in order — Arrays and Hashing build intuition for everything else.</div>
+        </div>
+      </div>
+    </div>
+    <div class="how-card">
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Attempt independently</strong> — Spend 20–30 minutes on each problem before looking anything up. Struggle is where learning happens.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Read the hint, not the solution</strong> — If stuck, find only the pattern/approach hint. Preserve the "aha" moment.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Review complexity</strong> — After solving, document the time and space complexity explicitly before moving on.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Rewrite from scratch the next day</strong> — Active recall beats passive re-reading by 4×. Close your editor and rewrite without notes.</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Write idiomatic C#</strong> — Use <code style="background:rgba(124,106,255,.15);padding:2px 6px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;">Dictionary&lt;K,V&gt;</code>, <code style="background:rgba(124,106,255,.15);padding:2px 6px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;">PriorityQueue&lt;T,P&gt;</code>, <code style="background:rgba(124,106,255,.15);padding:2px 6px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;">SortedSet&lt;T&gt;</code> — interviewers expect BCL fluency.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🗓️</span>
+        <div class="section-title-block">
+          <div class="section-title">6-Week Schedule</div>
+          <div class="section-why">Aim for 2–3 problems per day. Consistency over volume.</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:20px;">
+      <table class="week-table">
+        <thead>
+          <tr>
+            <th>Week</th>
+            <th>Focus</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="week-badge">Week 1</span></td><td>Arrays &amp; Prefix Sum + Hashing</td></tr>
+          <tr><td><span class="week-badge">Week 2</span></td><td>Sliding Window + Binary Search</td></tr>
+          <tr><td><span class="week-badge">Week 3</span></td><td>Linked List + Stack &amp; Monotonic Stack</td></tr>
+          <tr><td><span class="week-badge">Week 4</span></td><td>Trees + Heap / Priority Queue</td></tr>
+          <tr><td><span class="week-badge">Week 5</span></td><td>Backtracking + Dynamic Programming</td></tr>
+          <tr><td><span class="week-badge">Week 6</span></td><td>Full revision — revisit hard problems, mock interviews</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TIPS -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">💡</span>
+        <div class="section-title-block">
+          <div class="section-title">Interview Tips for Beginners</div>
+          <div class="section-why">What separates a good solution from a great interview performance.</div>
+        </div>
+      </div>
+    </div>
+    <div class="tips-grid">
+      <div class="tip-card"><span class="tip-icon">🗣️</span><div class="tip-title">Talk Before You Type</div><div class="tip-body">Explain your thought process aloud before writing code. Interviewers evaluate reasoning, not just the final answer.</div></div>
+      <div class="tip-card"><span class="tip-icon">❓</span><div class="tip-title">Clarify Constraints First</div><div class="tip-body">Always ask about input size, edge cases (empty input, negatives, duplicates), and expected output format before starting.</div></div>
+      <div class="tip-card"><span class="tip-icon">🪜</span><div class="tip-title">Start With Brute Force</div><div class="tip-body">State the naive approach and its complexity, then optimize. Never jump to the clever solution without acknowledging it.</div></div>
+      <div class="tip-card"><span class="tip-icon">📖</span><div class="tip-title">Name Variables Clearly</div><div class="tip-body">Use names like <code style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent3);">left, right, windowSum, visited</code>. Readable code signals professionalism to your interviewer.</div></div>
+      <div class="tip-card"><span class="tip-icon">🧪</span><div class="tip-title">Test With Edge Cases</div><div class="tip-body">Walk through with the given example, then test an edge case — empty array, single element, all same values — before declaring done.</div></div>
+      <div class="tip-card"><span class="tip-icon">⏱️</span><div class="tip-title">Always State Complexity</div><div class="tip-body">State Big-O time and space complexity before finishing your answer — even if the interviewer does not explicitly ask for it.</div></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p class="quote">"The goal is not to memorize solutions — it is to recognize patterns.<br/>Once you see the pattern, the code writes itself."</p>
+    <p>C# DSA Interview Roadmap · 10 Patterns · 50 Problems · 6 Weeks</p>
+  </footer>
+
+</div>
+
+<script>
+  // Intersection observer for section reveal
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  sections.forEach(s => observer.observe(s));
+
+  // Active nav highlight
+  const navItems = document.querySelectorAll('.nav-item');
+  const sectionEls = document.querySelectorAll('section[id]');
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navItems.forEach(n => n.style.borderBottomColor = '');
+        navItems.forEach(n => n.style.color = '');
+        const match = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+        if (match) {
+          match.style.color = '#e8e8f0';
+          match.style.borderBottomColor = '#7c6aff';
+        }
+      }
+    });
+  }, { threshold: 0.5 });
+  sectionEls.forEach(s => navObserver.observe(s));
+</script>
+</body>
+</html>
