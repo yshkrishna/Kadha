@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>C# Interview Prep — Complete Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --bg2: #161b27;
+  --bg3: #1d2436;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #e8eaf0;
+  --muted: #8892a4;
+  --dim: #4a5568;
+  --accent: #f6c90e;
+  --accent2: #e8703a;
+  --teal: #2dd4bf;
+  --pink: #f472b6;
+  --blue: #60a5fa;
+  --green: #4ade80;
+  --red: #f87171;
+  --eli5: #fef3c7;
+  --eli5-text: #78350f;
+  --interview: #dbeafe;
+  --interview-text: #1e3a5f;
+  --exam: #d1fae5;
+  --exam-text: #064e3b;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Outfit',sans-serif;
+  font-size:15px;
+  line-height:1.7;
+  overflow-x:hidden;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* HEADER */
+.header{
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  padding:16px 20px 12px;
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.logo{
+  font-family:'Fraunces',serif;
+  font-size:18px;
+  color:var(--accent);
+  letter-spacing:-0.3px;
+}
+.header-badge{
+  font-size:11px;
+  background:rgba(246,201,14,0.12);
+  color:var(--accent);
+  border:1px solid rgba(246,201,14,0.25);
+  padding:3px 10px;border-radius:20px;
+  font-family:'DM Mono',monospace;
+}
+.progress-row{display:flex;align-items:center;gap:10px}
+.progress-track{
+  flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:2px;transition:width .4s ease;width:0%
+}
+.progress-txt{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;min-width:40px;text-align:right}
+
+/* NAV TABS (horizontal scroll) */
+.nav-bar{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;white-space:nowrap;
+  scrollbar-width:none;
+  padding:0 12px;
+  position:sticky;top:65px;z-index:99;
+}
+.nav-bar::-webkit-scrollbar{display:none}
+.nav-tab{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:12px 14px;
+  font-size:13px;font-weight:500;
+  color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.nav-tab:hover:not(.active){color:var(--text)}
+.nav-dot{
+  width:7px;height:7px;border-radius:50%;
+  flex-shrink:0;
+}
+
+/* SEARCH */
+.search-wrap{padding:14px 16px 0}
+.search-input{
+  width:100%;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 16px 10px 38px;
+  color:var(--text);
+  font-size:14px;
+  font-family:'Outfit',sans-serif;
+  outline:none;
+  transition:border-color .2s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238892a4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:12px center;
+}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--dim)}
+
+/* MAIN */
+.main{padding:14px 16px 100px}
+
+/* SECTION HEADING */
+.section-label{
+  font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--muted);
+  margin:20px 0 12px;
+  font-family:'DM Mono',monospace;
+}
+
+/* QUESTION CARD */
+.q-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  margin-bottom:12px;
+  overflow:hidden;
+  transition:border-color .2s;
+}
+.q-card:hover{border-color:var(--border2)}
+.q-card.solved{border-color:rgba(74,222,128,0.2)}
+
+.q-header{
+  padding:16px;
+  cursor:pointer;
+  display:flex;align-items:flex-start;gap:12px;
+  user-select:none;
+}
+.q-num{
+  font-family:'DM Mono',monospace;
+  font-size:11px;font-weight:500;
+  color:var(--bg);
+  background:var(--accent);
+  min-width:26px;height:26px;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+}
+.q-num.bonus{background:var(--teal)}
+.q-meta{flex:1;min-width:0}
+.q-cat{
+  font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:3px;
+}
+.q-title{
+  font-size:15px;font-weight:500;
+  color:var(--text);line-height:1.4;
+}
+.q-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.q-diff{
+  font-size:10px;padding:2px 8px;border-radius:10px;
+  font-family:'DM Mono',monospace;font-weight:500;
+}
+.diff-easy{background:rgba(74,222,128,0.12);color:var(--green)}
+.diff-medium{background:rgba(251,191,36,0.12);color:#fbbf24}
+.diff-hard{background:rgba(248,113,113,0.12);color:var(--red)}
+.q-chevron{
+  font-size:14px;color:var(--muted);
+  transition:transform .3s;margin-top:2px;
+}
+.q-card.open .q-chevron{transform:rotate(180deg)}
+.q-card.solved .q-num{background:var(--green)}
+
+/* BODY */
+.q-body{display:none;border-top:1px solid var(--border);padding:0}
+.q-card.open .q-body{display:block}
+
+/* TIER TABS */
+.tier-tabs{
+  display:flex;
+  background:var(--bg3);
+  border-bottom:1px solid var(--border);
+}
+.tier-tab{
+  flex:1;padding:10px 4px;
+  text-align:center;
+  font-size:12px;font-weight:500;
+  color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.tier-tab.active{color:var(--text);border-bottom-color:var(--accent)}
+.tier-emoji{font-size:14px}
+
+.tier-content{display:none;padding:16px}
+.tier-content.active{display:block}
+
+/* ELI5 */
+.eli5-box{
+  background:rgba(254,243,199,0.06);
+  border:1px solid rgba(246,201,14,0.2);
+  border-radius:12px;
+  padding:16px;
+}
+.eli5-title{
+  font-family:'Fraunces',serif;
+  font-size:16px;color:var(--accent);
+  margin-bottom:8px;
+}
+.eli5-analogy{
+  font-size:14px;color:var(--text);line-height:1.7;
+  margin-bottom:12px;
+}
+.eli5-emoji-row{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.eli5-emoji-tag{
+  background:rgba(246,201,14,0.1);
+  color:var(--accent);
+  font-size:12px;padding:4px 10px;border-radius:20px;
+}
+.eli5-point{
+  background:rgba(255,255,255,0.04);
+  border-left:3px solid var(--accent);
+  border-radius:0 8px 8px 0;
+  padding:10px 14px;
+  font-size:13px;color:var(--text);
+  margin-bottom:8px;line-height:1.6;
+}
+
+/* INTERVIEW DEPTH */
+.interview-section{margin-bottom:16px}
+.interview-title{
+  font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--blue);font-family:'DM Mono',monospace;
+  margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.interview-title::before{
+  content:'';width:3px;height:14px;
+  background:var(--blue);border-radius:2px;
+}
+.interview-title.green::before{background:var(--green)}
+.interview-title.teal::before{background:var(--teal)}
+.interview-title.amber::before{background:#fbbf24}
+.interview-title.pink::before{background:var(--pink)}
+
+pre{
+  background:#0d1117;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  overflow-x:auto;
+  margin:8px 0;
+  font-size:12.5px;
+}
+code{
+  font-family:'DM Mono',monospace;
+  font-size:12.5px;
+  line-height:1.8;
+  color:#cdd6f4;
+}
+.kw{color:#cba6f7}
+.str{color:#a6e3a1}
+.num{color:#fab387}
+.cm{color:#6c7086;font-style:italic}
+.ty{color:#89b4fa}
+.fn{color:#89dceb}
+.ic{
+  font-family:'DM Mono',monospace;
+  font-size:12px;
+  background:rgba(96,165,250,0.1);
+  color:var(--blue);
+  padding:2px 7px;border-radius:5px;
+}
+
+.complexity-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;margin:8px 0;
+}
+.cx-card{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px;text-align:center;
+}
+.cx-label{font-size:10px;color:var(--muted);margin-bottom:4px}
+.cx-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--text)}
+
+.table-wrap{overflow-x:auto;margin:8px 0}
+table{
+  width:100%;border-collapse:collapse;
+  font-size:12.5px;min-width:280px;
+}
+th{
+  background:var(--bg3);color:var(--blue);
+  font-family:'DM Mono',monospace;font-size:11px;
+  padding:8px 10px;text-align:left;
+  border:1px solid var(--border);
+}
+td{padding:8px 10px;border:1px solid var(--border);color:var(--text)}
+tr:hover td{background:var(--bg3)}
+
+.callout{
+  border-radius:10px;padding:12px 14px;margin:8px 0;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.callout-tip{background:rgba(45,212,191,0.07);border:1px solid rgba(45,212,191,0.2)}
+.callout-warn{background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2)}
+.callout-danger{background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.2)}
+.callout-info{background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2)}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.callout-text{font-size:13px;color:var(--text);line-height:1.6}
+.callout-text strong{display:block;margin-bottom:2px;font-size:12px;letter-spacing:0.5px}
+
+.dryrun{
+  background:#0d1117;border:1px solid var(--border);
+  border-radius:10px;padding:14px;
+  font-family:'DM Mono',monospace;font-size:12px;
+  color:var(--green);white-space:pre;
+  overflow-x:auto;margin:8px 0;line-height:1.8;
+}
+
+.steps{margin:8px 0}
+.step{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.step-n{
+  background:var(--accent2);color:white;
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:500;
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;
+}
+.step-b{font-size:13px;color:var(--text);line-height:1.6;padding-top:1px}
+
+/* EXAM SUMMARY */
+.exam-box{
+  background:rgba(74,222,128,0.04);
+  border:1px solid rgba(74,222,128,0.15);
+  border-radius:12px;padding:16px;
+}
+.exam-title{
+  font-family:'Fraunces',serif;
+  font-size:15px;color:var(--green);margin-bottom:12px;
+  display:flex;align-items:center;gap:6px;
+}
+.exam-point{
+  display:flex;gap:8px;margin-bottom:10px;
+  align-items:flex-start;
+}
+.exam-bullet{
+  color:var(--green);font-weight:600;
+  flex-shrink:0;font-size:14px;margin-top:1px;
+}
+.exam-txt{font-size:13px;color:var(--text);line-height:1.6}
+.exam-txt strong{color:var(--green)}
+.exam-divider{height:1px;background:rgba(74,222,128,0.1);margin:10px 0}
+.exam-tip{
+  background:rgba(246,201,14,0.07);
+  border:1px solid rgba(246,201,14,0.2);
+  border-radius:8px;padding:10px 12px;
+  font-size:13px;color:var(--accent);
+  margin-top:10px;
+}
+.exam-tip strong{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+
+.followup{
+  background:var(--bg3);border-radius:10px;
+  padding:12px 14px;margin-top:12px;
+}
+.followup-title{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'DM Mono',monospace}
+.followup-item{
+  font-size:13px;color:var(--text);
+  padding:6px 0;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:6px;
+}
+.followup-item:last-child{border-bottom:none}
+.followup-arrow{color:var(--teal);flex-shrink:0;font-family:'DM Mono',monospace;margin-top:1px}
+
+/* SOLVE BUTTON */
+.solve-row{
+  padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--border);
+}
+.solve-btn{
+  font-size:12px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  color:var(--muted);
+  padding:7px 14px;border-radius:8px;
+  cursor:pointer;font-family:'Outfit',sans-serif;
+  transition:all .2s;display:flex;align-items:center;gap:6px;
+}
+.solve-btn:hover{border-color:var(--green);color:var(--green)}
+.q-card.solved .solve-btn{background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.3);color:var(--green)}
+.solve-tag{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(15,17,23,0.95);
+  border-top:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  display:flex;
+  padding:8px 0 env(safe-area-inset-bottom,0px);
+  z-index:200;
+}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;gap:3px;cursor:pointer;
+  padding:6px 4px;transition:opacity .2s;
+}
+.bnav-item:hover{opacity:.8}
+.bnav-icon{font-size:20px}
+.bnav-label{font-size:10px;color:var(--muted)}
+.bnav-item.active .bnav-label{color:var(--accent)}
+
+/* CATEGORY PAGE */
+.page{display:none}
+.page.active{display:block}
+
+/* STATS STRIP */
+.stats-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:8px;margin-bottom:16px;
+}
+.stat-box{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:10px;text-align:center;
+}
+.stat-n{font-size:20px;font-weight:500;color:var(--text)}
+.stat-l{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* TOAST */
+.toast{
+  position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);
+  background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text);font-size:13px;
+  padding:10px 20px;border-radius:20px;
+  z-index:1000;opacity:0;pointer-events:none;
+  transition:all .3s;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* RESPONSIVE TWEAKS */
+@media(min-width:640px){
+  .main{padding:16px 20px 100px;max-width:720px;margin:0 auto}
+  .header{padding:16px 24px 12px}
+  .complexity-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+p{font-size:13px;color:#a8b2c4;margin-bottom:8px;line-height:1.7}
+strong{color:var(--text)}
+ul{padding-left:18px;margin:6px 0}
+li{font-size:13px;color:#a8b2c4;margin-bottom:4px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo">C# Interview Prep</div>
+    <div class="header-badge" id="solved-count">0 / 12 core</div>
+  </div>
+  <div class="progress-row">
+    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <div class="progress-txt" id="prog-txt">0%</div>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-bar" id="nav-bar">
+  <div class="nav-tab active" onclick="switchPage('core')" data-page="core">
+    <span class="nav-dot" style="background:#f6c90e"></span> 12 Core Qs
+  </div>
+  <div class="nav-tab" onclick="switchPage('csharp')" data-page="csharp">
+    <span class="nav-dot" style="background:#60a5fa"></span> C# Language
+  </div>
+  <div class="nav-tab" onclick="switchPage('async')" data-page="async">
+    <span class="nav-dot" style="background:#2dd4bf"></span> Async
+  </div>
+  <div class="nav-tab" onclick="switchPage('oop')" data-page="oop">
+    <span class="nav-dot" style="background:#e8703a"></span> OOP &amp; SOLID
+  </div>
+  <div class="nav-tab" onclick="switchPage('dsa')" data-page="dsa">
+    <span class="nav-dot" style="background:#4ade80"></span> DSA
+  </div>
+  <div class="nav-tab" onclick="switchPage('sql')" data-page="sql">
+    <span class="nav-dot" style="background:#f472b6"></span> SQL
+  </div>
+  <div class="nav-tab" onclick="switchPage('patterns')" data-page="patterns">
+    <span class="nav-dot" style="background:#a78bfa"></span> Patterns
+  </div>
+</div>
+
+<!-- PAGES WRAPPER -->
+<div class="main">
+
+<!-- SEARCH -->
+<div class="search-wrap" style="padding:0 0 4px">
+  <input class="search-input" placeholder="Search questions..." id="search-box" oninput="filterSearch(this.value)">
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: CORE 12 QUESTIONS -->
+<!-- ============================================================ -->
+<div class="page active" id="page-core">
+<div class="section-label">12 Questions from your interview</div>
+
+<div class="stats-strip">
+  <div class="stat-box"><div class="stat-n" id="stat-solved">0</div><div class="stat-l">Solved</div></div>
+  <div class="stat-box"><div class="stat-n" style="color:var(--green)">4</div><div class="stat-l">Easy</div></div>
+  <div class="stat-box"><div class="stat-n" style="color:#fbbf24">5</div><div class="stat-l">Medium</div></div>
+  <div class="stat-box"><div class="stat-n" style="color:var(--red)">3</div><div class="stat-l">Hard</div></div>
+</div>
+
+<!-- Q1 -->
+<div class="q-card" id="qcard-1">
+  <div class="q-header" onclick="toggleCard(1)">
+    <div class="q-num" id="qnum-1">1</div>
+    <div class="q-meta">
+      <div class="q-cat">String Manipulation · DSA</div>
+      <div class="q-title">Run-Length Encoding — "aaabbcccc" → "a3b2c4"</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-easy">easy</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,1,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,1,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,1,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t1-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🍭 Imagine you're counting candies in a jar</div>
+        <div class="eli5-analogy">Instead of writing "red red red blue blue", you write "3 red, 2 blue." That's it! Run-Length Encoding is just counting consecutive same-colored candies and writing the count next to the color. <br><br>So <strong>aaabbc</strong> becomes <strong>a3b2c1</strong> — you read each character, count how many times it repeats in a row, and write character + count.</div>
+        <div class="eli5-point">🍬 Walk through the string. When the character changes, write down what you had and how many times.</div>
+        <div class="eli5-point">⚠️ Watch out: "a1b1c1" is longer than "abc"! RLE only helps when there are many repeats.</div>
+        <div class="eli5-point">🔧 Use <strong>StringBuilder</strong> not string +=, because strings in C# are immutable — each += creates a new string in memory.</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t1-depth">
+      <div class="interview-section">
+        <div class="interview-title green">Algorithm</div>
+        <div class="steps">
+          <div class="step"><div class="step-n">1</div><div class="step-b">Start pointer <span class="ic">i=0</span>. Loop while i &lt; length.</div></div>
+          <div class="step"><div class="step-n">2</div><div class="step-b">Save current char. Inner loop counts consecutive matches, advances <span class="ic">i</span>.</div></div>
+          <div class="step"><div class="step-n">3</div><div class="step-b">Append <span class="ic">char + count</span> to StringBuilder. Outer loop continues.</div></div>
+        </div>
+        <div class="dryrun">Input:  a a a b b c c c c e e a a
+        0 1 2 3 4 5 6 7 8 9 ...
+
+i=0: char='a', count=3  → sb="a3"
+i=3: char='b', count=2  → sb="a3b2"
+i=5: char='c', count=4  → sb="a3b2c4"
+i=9: char='e', count=2  → sb="a3b2c4e2"
+i=11:char='a', count=2  → sb="a3b2c4e2a2" ✓</div>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title">C# Code</div>
+<pre><code><span class="kw">public static</span> <span class="ty">string</span> <span class="fn">Encode</span>(<span class="ty">string</span> s)
+{
+    <span class="kw">if</span> (<span class="ty">string</span>.IsNullOrEmpty(s)) <span class="kw">return</span> s;
+    <span class="kw">var</span> sb = <span class="kw">new</span> <span class="ty">StringBuilder</span>();
+    <span class="kw">int</span> i = 0;
+    <span class="kw">while</span> (i &lt; s.Length)
+    {
+        <span class="kw">char</span> c = s[i]; <span class="kw">int</span> count = 0;
+        <span class="kw">while</span> (i &lt; s.Length &amp;&amp; s[i] == c) { count++; i++; }
+        sb.Append(c).Append(count);
+    }
+    <span class="kw">return</span> sb.ToString();
+}</code></pre>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title amber">Complexity</div>
+        <div class="complexity-grid">
+          <div class="cx-card"><div class="cx-label">Time</div><div class="cx-val">O(n)</div></div>
+          <div class="cx-card"><div class="cx-label">Space</div><div class="cx-val">O(n)</div></div>
+          <div class="cx-card"><div class="cx-label">Passes</div><div class="cx-val">1</div></div>
+        </div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-text"><strong>Common Pitfall</strong>Never use <span class="ic">s += char</span> — string concatenation inside a loop is O(n²) because strings are immutable. Always use StringBuilder.</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t1-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Definition:</strong> Replace consecutive repeated chars with char+count. "aaabb" → "a3b2"</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Algorithm:</strong> Two nested while loops — outer moves through string, inner counts consecutive chars</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Complexity:</strong> O(n) time, O(n) space — single pass, StringBuilder output</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Must use StringBuilder</strong> — string += is O(n²) due to immutability</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Edge cases:</strong> empty string, single char, all unique (output is 2x input size)</div></div>
+        <div class="exam-divider"></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"I'd use StringBuilder for O(1) append operations, two-pointer scanning for O(n) time."</div>
+        <div class="followup">
+          <div class="followup-title">Follow-up questions</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>Decode "a3b2c4" back to "aaabbcccc"</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>What if the string already contains digits?</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>2D run-length encoding on a matrix</div>
+        </div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q1 · String</span>
+      <button class="solve-btn" onclick="markSolved(1,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="q-card" id="qcard-2">
+  <div class="q-header" onclick="toggleCard(2)">
+    <div class="q-num" id="qnum-2">2</div>
+    <div class="q-meta">
+      <div class="q-cat">Arrays · HashSet</div>
+      <div class="q-title">Remove duplicates from [1,2,3,1,2,4,5] → [1,2,3,4,5]</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-easy">easy</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,2,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,2,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,2,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t2-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🎒 Imagine sorting stickers from a pile</div>
+        <div class="eli5-analogy">You have a pile of stickers and you want to keep only one of each. You grab a blank notepad (HashSet). For each sticker, you check if it's already on your notepad. If NOT on the notepad, you write it down AND keep the sticker. If it IS already there, you throw it away.</div>
+        <div class="eli5-point">📓 The notepad is a HashSet — checking "is this in my set?" takes O(1) constant time, no matter how many stickers you have.</div>
+        <div class="eli5-point">🔄 Preserves order of first appearance — you encounter 1 first, then 2, then 3... so the result maintains that order.</div>
+        <div class="eli5-point">⚡ LINQ's <strong>.Distinct()</strong> does this internally — it's not magic, it's using a HashSet under the hood.</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t2-depth">
+      <div class="interview-section">
+        <div class="interview-title green">3 Approaches</div>
+<pre><code><span class="cm">// ✅ Approach 1: HashSet — O(n) time, O(n) space, preserves order</span>
+<span class="kw">public static int</span>[] <span class="fn">RemoveDuplicates</span>(<span class="kw">int</span>[] arr)
+{
+    <span class="kw">var</span> seen = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;<span class="kw">int</span>&gt;();
+    <span class="kw">var</span> result = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="kw">int</span>&gt;();
+    <span class="kw">foreach</span> (<span class="kw">var</span> n <span class="kw">in</span> arr)
+        <span class="kw">if</span> (seen.Add(n)) result.Add(n); <span class="cm">// Add returns false if duplicate</span>
+    <span class="kw">return</span> result.ToArray();
+}
+
+<span class="cm">// ✅ Approach 2: LINQ one-liner (internally uses HashSet)</span>
+<span class="kw">var</span> unique = arr.Distinct().ToArray();
+
+<span class="cm">// ✅ Approach 3: Sort + Two-pointer — O(n log n), O(1) space, loses order</span>
+<span class="ty">Array</span>.Sort(arr);
+<span class="kw">int</span> write = 1;
+<span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt; arr.Length; i++)
+    <span class="kw">if</span> (arr[i] != arr[i-1]) arr[write++] = arr[i];</code></pre>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title amber">Comparison Table</div>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Approach</th><th>Time</th><th>Space</th><th>Order?</th></tr>
+            <tr><td>HashSet</td><td>O(n)</td><td>O(n)</td><td>✅ Yes</td></tr>
+            <tr><td>LINQ .Distinct()</td><td>O(n)</td><td>O(n)</td><td>✅ Yes</td></tr>
+            <tr><td>Sort + TwoPtr</td><td>O(n log n)</td><td>O(1)</td><td>❌ No</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="dryrun">Input: [1, 2, 3, 1, 2, 4, 5]
+
+1 → seen={1}    result=[1]
+2 → seen={1,2}  result=[1,2]
+3 → seen={1,2,3}result=[1,2,3]
+1 → already in seen, skip
+2 → already in seen, skip
+4 → seen+={4}   result=[1,2,3,4]
+5 → seen+={5}   result=[1,2,3,4,5] ✓</div>
+    </div>
+    <div class="tier-content" id="t2-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Best solution:</strong> HashSet — O(n) time, O(n) space, preserves insertion order</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>HashSet.Add()</strong> returns false if element already exists — use this as your duplicate check</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>LINQ .Distinct()</strong> is idiomatic C# but same O(n) complexity internally</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Space-constrained?</strong> Sort first (O(n log n)) then two-pointer in O(1) extra space — loses original order</div></div>
+        <div class="exam-divider"></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Start with HashSet for O(n). If memory is a constraint and order doesn't matter, sort + two-pointer gives O(1) extra space."</div>
+        <div class="followup">
+          <div class="followup-title">Follow-up questions</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>Remove duplicates in-place (modify original array)</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>Keep elements appearing exactly once (remove ALL duplicates)</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>Find the duplicate in an array of size n with values 1..n</div>
+        </div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q2 · Array</span>
+      <button class="solve-btn" onclick="markSolved(2,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="q-card" id="qcard-3">
+  <div class="q-header" onclick="toggleCard(3)">
+    <div class="q-num" id="qnum-3">3</div>
+    <div class="q-meta">
+      <div class="q-cat">SOLID Principles · OOP</div>
+      <div class="q-title">What's wrong with ReportGenerator? (SRP + OCP violations)</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-medium">medium</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,3,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,3,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,3,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t3-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🍕 Imagine a chef who also does the dishes AND delivers the food</div>
+        <div class="eli5-analogy">A great restaurant splits jobs: chef cooks, dishwasher cleans, delivery person delivers. If one person does ALL THREE jobs and the delivery van breaks — you have to call the chef! That's wrong. <br><br>ReportGenerator has the same problem. It generates reports, saves files, AND sends emails. Three unrelated jobs in one class.</div>
+        <div class="eli5-point">🔴 <strong>SRP violation:</strong> "One class should have only one reason to change." If email server changes, why should the report-generation class change?</div>
+        <div class="eli5-point">🔴 <strong>OCP violation:</strong> Adding a "Word" report type means editing the if/else chain — you're modifying existing code instead of adding new code.</div>
+        <div class="eli5-point">✅ <strong>Fix:</strong> Make an interface IReportGenerator. Each report type is its own class. Email is a separate class. File saving is a separate class.</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t3-depth">
+      <div class="interview-section">
+        <div class="interview-title teal">Two Violations Diagnosed</div>
+        <div class="callout callout-danger"><div class="callout-icon">❌</div><div class="callout-text"><strong>SRP: Single Responsibility Principle</strong>ReportGenerator has 3 responsibilities: generate, save, email. Each is a separate reason to change.</div></div>
+        <div class="callout callout-danger"><div class="callout-icon">❌</div><div class="callout-text"><strong>OCP: Open/Closed Principle</strong>Adding new report type = editing the if/else block = modifying existing code. Should extend, not modify.</div></div>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title green">Fixed Design</div>
+<pre><code><span class="cm">// OCP Fix: interface — open for extension</span>
+<span class="kw">public interface</span> <span class="ty">IReportGenerator</span> { <span class="kw">void</span> <span class="fn">Generate</span>(); }
+
+<span class="kw">public class</span> <span class="ty">PdfReport</span> : <span class="ty">IReportGenerator</span> {
+    <span class="kw">public void</span> <span class="fn">Generate</span>() => Console.WriteLine(<span class="str">"PDF..."</span>);
+}
+<span class="kw">public class</span> <span class="ty">ExcelReport</span> : <span class="ty">IReportGenerator</span> {
+    <span class="kw">public void</span> <span class="fn">Generate</span>() => Console.WriteLine(<span class="str">"Excel..."</span>);
+}
+<span class="cm">// Add WordReport? Create new class. Don't touch existing!</span>
+
+<span class="cm">// SRP Fix: each concern in its own class</span>
+<span class="kw">public class</span> <span class="ty">ReportSaver</span> {
+    <span class="kw">public void</span> <span class="fn">Save</span>(<span class="ty">string</span> data) => File.WriteAllText(<span class="str">"r.txt"</span>, data);
+}
+<span class="kw">public class</span> <span class="ty">ReportEmailer</span> {
+    <span class="kw">public void</span> <span class="fn">Send</span>(<span class="ty">string</span> to, <span class="ty">string</span> body) => Console.WriteLine(body);
+}</code></pre>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title amber">All 5 SOLID — Quick Reference</div>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Principle</th><th>Rule</th><th>Smell</th></tr>
+            <tr><td><strong>S</strong>RP</td><td>One reason to change</td><td>God class</td></tr>
+            <tr><td><strong>O</strong>CP</td><td>Extend, don't modify</td><td>if/else for types</td></tr>
+            <tr><td><strong>L</strong>SP</td><td>Subclass substitutable</td><td>NotImplementedException</td></tr>
+            <tr><td><strong>I</strong>SP</td><td>Small interfaces</td><td>Empty implementations</td></tr>
+            <tr><td><strong>D</strong>IP</td><td>Depend on abstractions</td><td>new ConcreteClass()</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="tier-content" id="t3-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>SRP violated:</strong> class has 3 responsibilities — generation, file I/O, email. Three separate reasons to change.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>OCP violated:</strong> if/else chain must be edited every time a new report type is added.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Fix SRP:</strong> separate classes — ReportGenerator, ReportSaver, ReportEmailer.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Fix OCP:</strong> IReportGenerator interface + one class per format. New format = new class, zero existing edits.</div></div>
+        <div class="exam-divider"></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"SRP: more than one reason to change. OCP: if/else for types means you must modify existing code when extending."</div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q3 · SOLID</span>
+      <button class="solve-btn" onclick="markSolved(3,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="q-card" id="qcard-4">
+  <div class="q-header" onclick="toggleCard(4)">
+    <div class="q-num" id="qnum-4">4</div>
+    <div class="q-meta">
+      <div class="q-cat">Async/Await · Concurrency</div>
+      <div class="q-title">How long does each async version take? Sequential vs Parallel</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-medium">medium</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,4,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,4,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,4,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t4-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">☕ Imagine making breakfast</div>
+        <div class="eli5-analogy">
+          <strong>Approach 1 (sequential await):</strong> You put bread in toaster → wait 2 min → take it out → put egg in pan → wait 3 min... You do one thing at a time. Total = 6 minutes.<br><br>
+          <strong>Approach 2 (normal sync):</strong> Same but no async magic. Same 6 minutes.<br><br>
+          <strong>Approach 3 (fire-and-forget):</strong> You start the toaster AND the egg AND the coffee simultaneously — but walk out of the kitchen immediately! Timer reads 0, but breakfast might not be ready.<br><br>
+          <strong>Correct way (Task.WhenAll):</strong> Start all three simultaneously, then WAIT for all to finish. Total = 3 minutes (the longest task).
+        </div>
+        <div class="eli5-point">🚨 Version 3 (fire-and-forget) is a BUG — tasks start but nobody waits for them. The app might end before they complete.</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t4-depth">
+      <div class="interview-section">
+        <div class="interview-title teal">Assume: task1=1s, task2=2s, task3=3s</div>
+        <div class="dryrun">Version 1 — Sequential await
+[1s]──[2s]──[3s] = 6 seconds ❌ no concurrency
+
+Version 2 — Normal sync  
+[1s]──[2s]──[3s] = 6 seconds (blocking)
+
+Version 3 — Fire-and-forget (BUG!)
+[t1][t2][t3] started → timer stops ~0ms
+Tasks run in background, nobody awaits them 🚨
+
+✅ Correct — Task.WhenAll
+[task1:1s]─────────────────────┐
+[task2:2s]──────────────────────┤  = 3s
+[task3:3s]──────────────────────┘</div>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title green">The Right Way</div>
+<pre><code><span class="kw">public async</span> <span class="ty">Task</span> <span class="fn">DoParallelAsync</span>()
+{
+    <span class="kw">var</span> sw = <span class="ty">Stopwatch</span>.StartNew();
+
+    <span class="cm">// Start ALL tasks before awaiting any</span>
+    <span class="ty">Task</span> t1 = <span class="fn">TaskAsync1</span>(); <span class="cm">// kicks off immediately</span>
+    <span class="ty">Task</span> t2 = <span class="fn">TaskAsync2</span>(); <span class="cm">// kicks off immediately</span>
+    <span class="ty">Task</span> t3 = <span class="fn">TaskAsync3</span>(); <span class="cm">// kicks off immediately</span>
+
+    <span class="kw">await</span> <span class="ty">Task</span>.WhenAll(t1, t2, t3); <span class="cm">// wait for all 3</span>
+
+    Console.WriteLine(<span class="str">$"{sw.Elapsed.TotalSeconds:F1}s"</span>);
+    <span class="cm">// Prints: ~3.0s (max of all tasks)</span>
+}</code></pre>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title amber">Summary Table</div>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Version</th><th>Time</th><th>Issue</th></tr>
+            <tr><td>Sequential await</td><td>6s</td><td>No concurrency</td></tr>
+            <tr><td>Normal sync</td><td>6s</td><td>Blocking</td></tr>
+            <tr><td>Fire-and-forget</td><td>~0ms measured</td><td>🚨 Bug!</td></tr>
+            <tr><td>Task.WhenAll ✅</td><td>3s</td><td>Correct</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="tier-content" id="t4-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Sequential await:</strong> 6 seconds — each task waits for the previous to complete</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Fire-and-forget (no await):</strong> ~0ms measured but tasks run in background — BUG, app may exit first</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Task.WhenAll:</strong> 3 seconds — max of all individual tasks, true concurrency</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Rule:</strong> Start tasks FIRST (don't await immediately), then WhenAll to gather results</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>async void</strong> is a fire-and-forget bug pattern — always use <strong>async Task</strong></div></div>
+        <div class="exam-divider"></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"await each task sequentially = no concurrency benefit. Task.WhenAll = run all in parallel, total time = max(individual times)."</div>
+        <div class="followup">
+          <div class="followup-title">Follow-up questions</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>WhenAll vs WhenAny — what's the difference?</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>What if one task in WhenAll throws an exception?</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>What is ConfigureAwait(false) and why use it?</div>
+        </div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q4 · Async</span>
+      <button class="solve-btn" onclick="markSolved(4,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q5 -->
+<div class="q-card" id="qcard-5">
+  <div class="q-header" onclick="toggleCard(5)">
+    <div class="q-num" id="qnum-5">5</div>
+    <div class="q-meta">
+      <div class="q-cat">Array · Two-Pointer</div>
+      <div class="q-title">Shift all zeroes to end without disturbing non-zero order</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-easy">easy</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,5,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,5,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,5,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t5-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🧹 Imagine sweeping marbles on a table</div>
+        <div class="eli5-analogy">You have colored marbles and empty spaces (zeros) mixed together. You want to push all the empty spaces to the right without changing the order of the colored marbles.<br><br>Use a "write pointer" — imagine it as a hand pointing to the next empty slot on the left side. Walk through the array. Every time you see a non-zero marble, place it at the write pointer position and move the pointer one step right. After you've gone through everything, fill the rest with zeros.</div>
+        <div class="eli5-point">👆 The write pointer is the secret. It tracks where the next non-zero value should go.</div>
+        <div class="eli5-point">📍 This is in-place — you're rearranging the same array, using O(1) extra space.</div>
+        <div class="eli5-point">🔗 This is the same idea as the Partition step in QuickSort!</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t5-depth">
+      <div class="interview-section">
+        <div class="interview-title green">Algorithm + Dry Run</div>
+        <div class="dryrun">Input: [0, 1, 0, 3, 12]
+writePtr = 0
+
+i=0: 0   → skip
+i=1: 1≠0 → arr[0]=1, writePtr=1 → [1,1,0,3,12]
+i=2: 0   → skip
+i=3: 3≠0 → arr[1]=3, writePtr=2 → [1,3,0,3,12]
+i=4: 12≠0→ arr[2]=12,writePtr=3 → [1,3,12,3,12]
+
+Fill positions 3..4 with 0:
+Result: [1, 3, 12, 0, 0] ✓</div>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title">Code</div>
+<pre><code><span class="kw">public static void</span> <span class="fn">MoveZeroes</span>(<span class="kw">int</span>[] arr)
+{
+    <span class="kw">int</span> write = 0;
+    <span class="cm">// Pass 1: move non-zeros forward</span>
+    <span class="kw">foreach</span> (<span class="kw">var</span> n <span class="kw">in</span> arr)
+        <span class="kw">if</span> (n != 0) arr[write++] = n;
+    <span class="cm">// Pass 2: fill remaining with zero</span>
+    <span class="kw">while</span> (write &lt; arr.Length)
+        arr[write++] = 0;
+}</code></pre>
+      </div>
+      <div class="complexity-grid">
+        <div class="cx-card"><div class="cx-label">Time</div><div class="cx-val">O(n)</div></div>
+        <div class="cx-card"><div class="cx-label">Space</div><div class="cx-val">O(1)</div></div>
+        <div class="cx-card"><div class="cx-label">In-place</div><div class="cx-val">✅ Yes</div></div>
+      </div>
+      <div class="callout callout-tip"><div class="callout-icon">💡</div><div class="callout-text"><strong>Key Insight</strong>This is the same as QuickSort partition — you're partitioning non-zeros to the front. Mention this to impress!</div></div>
+    </div>
+    <div class="tier-content" id="t5-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Technique:</strong> Write-pointer. Walk array, place non-zeros at write position, advance write pointer</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Two passes:</strong> Pass 1 = compact non-zeros left. Pass 2 = fill tail with zeros</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>O(n) time, O(1) space</strong> — in-place, no extra array needed</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Order preserved:</strong> non-zeros keep their relative order because we walk left-to-right</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Same as QuickSort partition — separating zeros (false partition) from non-zeros (true partition)."</div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q5 · Array</span>
+      <button class="solve-btn" onclick="markSolved(5,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q6 -->
+<div class="q-card" id="qcard-6">
+  <div class="q-header" onclick="toggleCard(6)">
+    <div class="q-num" id="qnum-6">6</div>
+    <div class="q-meta">
+      <div class="q-cat">Data Structures · System Design</div>
+      <div class="q-title">Implement LRU (Least Recently Used) Cache</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-hard">hard</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,6,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,6,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,6,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t6-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">📚 Imagine a small desk with only 3 book slots</div>
+        <div class="eli5-analogy">You have a tiny desk that fits only 3 books. When you read a book, it goes on the desk. The book you haven't touched in the longest time is always on the right (least recently used). When the desk is full and you need a new book, you remove the rightmost (oldest) one.<br><br>Your bookshelf index (dictionary) tells you instantly which slot a book is in. The desk order (linked list) tracks recency.</div>
+        <div class="eli5-point">📖 Dictionary = O(1) lookup by key (like finding a book number in an index)</div>
+        <div class="eli5-point">🔗 Doubly Linked List = O(1) insert/delete of nodes (move a book to front instantly)</div>
+        <div class="eli5-point">🧠 Combined: O(1) Get AND O(1) Put — the magic of this data structure</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t6-depth">
+      <div class="interview-section">
+        <div class="interview-title teal">Data Structure Design</div>
+        <div class="dryrun">Dictionary: key → Node (O(1) lookup)
+DoublyLinkedList: tracks recency
+
+HEAD ↔ [most recent] ↔ ... ↔ [LRU] ↔ TAIL
+                                        ↑ evict this
+
+Get(key): find in dict → move node to HEAD
+Put(key): if exists: update + move to HEAD
+          if new: add at HEAD
+          if full: evict TAIL.Prev node</div>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title green">Implementation</div>
+<pre><code><span class="kw">public class</span> <span class="ty">LRUCache</span>
+{
+    <span class="kw">class</span> <span class="ty">Node</span> { <span class="kw">public int</span> Key, Val; <span class="kw">public</span> <span class="ty">Node</span> Prev, Next; }
+
+    <span class="kw">private int</span> _cap;
+    <span class="kw">private</span> <span class="ty">Dictionary</span>&lt;<span class="kw">int</span>,<span class="ty">Node</span>&gt; _map = <span class="kw">new</span>();
+    <span class="kw">private</span> <span class="ty">Node</span> _head = <span class="kw">new</span>(), _tail = <span class="kw">new</span>(); <span class="cm">// sentinels</span>
+
+    <span class="kw">public</span> LRUCache(<span class="kw">int</span> cap) {
+        _cap = cap; _head.Next=_tail; _tail.Prev=_head;
+    }
+
+    <span class="kw">public int</span> Get(<span class="kw">int</span> key) {
+        <span class="kw">if</span> (!_map.ContainsKey(key)) <span class="kw">return</span> -1;
+        MoveToFront(_map[key]);
+        <span class="kw">return</span> _map[key].Val;
+    }
+
+    <span class="kw">public void</span> Put(<span class="kw">int</span> key, <span class="kw">int</span> val) {
+        <span class="kw">if</span> (_map.ContainsKey(key)) {
+            _map[key].Val=val; MoveToFront(_map[key]); <span class="kw">return</span>;
+        }
+        <span class="kw">if</span> (_map.Count==_cap) {
+            _map.Remove(_tail.Prev.Key); Remove(_tail.Prev);
+        }
+        <span class="kw">var</span> node = <span class="kw">new</span> <span class="ty">Node</span>{Key=key,Val=val};
+        AddFront(node); _map[key]=node;
+    }
+
+    <span class="kw">void</span> Remove(<span class="ty">Node</span> n){ n.Prev.Next=n.Next; n.Next.Prev=n.Prev; }
+    <span class="kw">void</span> AddFront(<span class="ty">Node</span> n){
+        n.Next=_head.Next; n.Prev=_head;
+        _head.Next.Prev=n; _head.Next=n;
+    }
+    <span class="kw">void</span> MoveToFront(<span class="ty">Node</span> n){ Remove(n); AddFront(n); }
+}</code></pre>
+      </div>
+      <div class="complexity-grid">
+        <div class="cx-card"><div class="cx-label">Get</div><div class="cx-val">O(1)</div></div>
+        <div class="cx-card"><div class="cx-label">Put</div><div class="cx-val">O(1)</div></div>
+        <div class="cx-card"><div class="cx-label">Space</div><div class="cx-val">O(cap)</div></div>
+      </div>
+    </div>
+    <div class="tier-content" id="t6-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Data structure:</strong> Dictionary (O(1) lookup) + Doubly Linked List (O(1) insert/delete)</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>HEAD = most recent, TAIL = least recent.</strong> Sentinel nodes avoid null checks.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Get:</strong> find node in dict → move to HEAD → return value. O(1).</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Put:</strong> if full, evict TAIL.Prev → add new node at HEAD. O(1).</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Both Get and Put must be O(1)</strong> — this is the core requirement.</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"HashMap gives O(1) lookup, Doubly Linked List gives O(1) reorder. Together they achieve O(1) for both operations."</div>
+        <div class="followup">
+          <div class="followup-title">Follow-up questions</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>Make it thread-safe (ReaderWriterLockSlim)</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>Implement LFU (Least Frequently Used) cache</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>Add TTL expiry to cached items</div>
+        </div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q6 · Cache · Hard</span>
+      <button class="solve-btn" onclick="markSolved(6,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q7 -->
+<div class="q-card" id="qcard-7">
+  <div class="q-header" onclick="toggleCard(7)">
+    <div class="q-num" id="qnum-7">7</div>
+    <div class="q-meta">
+      <div class="q-cat">OOP Design · ISP</div>
+      <div class="q-title">Design Reports A,B,C with Display + Print/Export capabilities</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-medium">medium</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,7,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,7,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,7,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t7-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🧩 Think of phone plans: Basic, Standard, Premium</div>
+        <div class="eli5-analogy">A Basic phone plan has calls. Standard has calls + texts. Premium has calls + texts + data. You wouldn't make a Basic plan customer "pay" for a data feature they can't use — that's confusing!<br><br>Same for our reports: don't force Report B (print-only) to implement an Export method that throws "Not supported." Instead, use small, focused contracts (interfaces).</div>
+        <div class="eli5-point">📄 IReport → everyone can Display(). Base behavior shared.</div>
+        <div class="eli5-point">🖨️ IPrintable → only A and B implement Print().</div>
+        <div class="eli5-point">📤 IExportable → only A and C implement Export().</div>
+        <div class="eli5-point">🔑 This is ISP — Interface Segregation Principle. Small interfaces are better than one fat interface.</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t7-depth">
+      <div class="interview-section">
+        <div class="interview-title teal">Design Matrix</div>
+        <div class="dryrun">           Display   Print   Export
+Report A:    ✅       ✅      ✅
+Report B:    ✅       ✅      ❌
+Report C:    ✅       ❌      ✅</div>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title green">ISP-Compliant Code</div>
+<pre><code><span class="cm">// Small focused interfaces (ISP)</span>
+<span class="kw">public interface</span> <span class="ty">IReport</span>       { <span class="kw">void</span> Display(); }
+<span class="kw">public interface</span> <span class="ty">IPrintable</span>    { <span class="kw">void</span> Print(); }
+<span class="kw">public interface</span> <span class="ty">IExportable</span>   { <span class="kw">void</span> Export(); }
+
+<span class="cm">// Abstract base: shared Display logic</span>
+<span class="kw">public abstract class</span> <span class="ty">ReportBase</span> : <span class="ty">IReport</span>
+{
+    <span class="kw">public virtual void</span> Display()
+        => Console.WriteLine(<span class="str">$"{GetType().Name}: Displaying"</span>);
+}
+
+<span class="cm">// Report A: all capabilities</span>
+<span class="kw">public class</span> <span class="ty">ReportA</span> : <span class="ty">ReportBase</span>, <span class="ty">IPrintable</span>, <span class="ty">IExportable</span>
+{
+    <span class="kw">public void</span> Print()  => Console.WriteLine(<span class="str">"A: Print"</span>);
+    <span class="kw">public void</span> Export() => Console.WriteLine(<span class="str">"A: Export"</span>);
+}
+<span class="cm">// Report B: print only — no Export imposed!</span>
+<span class="kw">public class</span> <span class="ty">ReportB</span> : <span class="ty">ReportBase</span>, <span class="ty">IPrintable</span>
+{
+    <span class="kw">public void</span> Print() => Console.WriteLine(<span class="str">"B: Print"</span>);
+}
+<span class="cm">// Report C: export only</span>
+<span class="kw">public class</span> <span class="ty">ReportC</span> : <span class="ty">ReportBase</span>, <span class="ty">IExportable</span>
+{
+    <span class="kw">public void</span> Export() => Console.WriteLine(<span class="str">"C: Export"</span>);
+}
+
+<span class="cm">// Polymorphic usage</span>
+<span class="kw">var</span> reports = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">IReport</span>&gt;{<span class="kw">new</span> ReportA(), <span class="kw">new</span> ReportB(), <span class="kw">new</span> ReportC()};
+reports.ForEach(r => r.Display());
+reports.OfType&lt;<span class="ty">IPrintable</span>&gt;().ToList().ForEach(r => r.Print());
+reports.OfType&lt;<span class="ty">IExportable</span>&gt;().ToList().ForEach(r => r.Export());</code></pre>
+      </div>
+      <div class="callout callout-danger"><div class="callout-icon">❌</div><div class="callout-text"><strong>ISP Violation (don't do this)</strong>One fat interface IReport with Display+Print+Export forces ReportB to implement Export() with NotImplementedException. That's a code smell.</div></div>
+    </div>
+    <div class="tier-content" id="t7-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Principle used:</strong> ISP — Interface Segregation. Split IReport into IReport + IPrintable + IExportable</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Abstract base class</strong> provides default Display() implementation, inheritors extend it</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>OfType&lt;T&gt;()</strong> for polymorphic dispatch — call Print only on printable reports</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Fat interface smell:</strong> NotImplementedException in interface methods = ISP violation</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"I'd use ISP — split into small interfaces so no class is forced to implement methods it doesn't use."</div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q7 · ISP · Design</span>
+      <button class="solve-btn" onclick="markSolved(7,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q8 -->
+<div class="q-card" id="qcard-8">
+  <div class="q-header" onclick="toggleCard(8)">
+    <div class="q-num" id="qnum-8">8</div>
+    <div class="q-meta">
+      <div class="q-cat">C# Language Feature</div>
+      <div class="q-title">Add GetData() to Employee class from a DLL without modifying it</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-easy">easy</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,8,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,8,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,8,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t8-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🔧 Like adding an accessory to a phone without opening it</div>
+        <div class="eli5-analogy">You have a locked phone (the Employee class in a DLL). You can't open it to add features. But you can attach a phone case with extra buttons (extension methods)! The phone owner doesn't even know the case added features — they just call <span class="ic">emp.GetData()</span> and it works.</div>
+        <div class="eli5-point">📦 Extension methods live in a <strong>static class</strong>, in a <strong>static method</strong>, where the first parameter starts with the keyword <strong>this</strong>.</div>
+        <div class="eli5-point">🔍 The consumer calls it as if it's an instance method, but it's just a clever static call under the hood.</div>
+        <div class="eli5-point">⚡ LINQ is built entirely on extension methods! .Where(), .Select(), .OrderBy() are all extensions on IEnumerable&lt;T&gt;.</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t8-depth">
+      <div class="interview-section">
+        <div class="interview-title green">Extension Method Rules</div>
+<pre><code><span class="cm">// From DLL — you cannot modify this</span>
+<span class="kw">public class</span> <span class="ty">Employee</span> { <span class="kw">public int</span> Id; <span class="kw">public string</span> Name; }
+
+<span class="cm">// ✅ Extension method — static class, static method, 'this' keyword</span>
+<span class="kw">public static class</span> <span class="ty">EmployeeExtensions</span>
+{
+    <span class="kw">public static string</span> GetData(<span class="kw">this</span> <span class="ty">Employee</span> emp)
+        => <span class="str">$"ID:{emp.Id} Name:{emp.Name}"</span>;
+
+    <span class="kw">public static bool</span> IsValid(<span class="kw">this</span> <span class="ty">Employee</span> emp)
+        => emp.Id > 0 &amp;&amp; !<span class="ty">string</span>.IsNullOrEmpty(emp.Name);
+}
+
+<span class="cm">// Usage — looks like instance methods!</span>
+<span class="kw">var</span> e = <span class="kw">new</span> <span class="ty">Employee</span> { Id=1, Name=<span class="str">"Alice"</span> };
+e.GetData();  <span class="cm">// "ID:1 Name:Alice"</span>
+e.IsValid();  <span class="cm">// true</span>
+
+<span class="cm">// These are identical under the hood:</span>
+e.GetData();
+<span class="ty">EmployeeExtensions</span>.GetData(e);</code></pre>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title amber">Rules Table</div>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Rule</th><th>Detail</th></tr>
+            <tr><td>Containing class</td><td>Must be static</td></tr>
+            <tr><td>Method</td><td>Must be static</td></tr>
+            <tr><td>First param</td><td>Must have <span class="ic">this</span> keyword</td></tr>
+            <tr><td>Private access</td><td>❌ Cannot access privates</td></tr>
+            <tr><td>Override instance</td><td>❌ Instance methods win</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="tier-content" id="t8-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Extension Methods</strong> add methods to existing types without modifying or subclassing them</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Requirements:</strong> static class + static method + first param = <span class="ic">this TargetType</span></div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Cannot</strong> access private members, add instance fields, or override existing instance methods</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Real-world:</strong> ALL of LINQ is extension methods on IEnumerable&lt;T&gt;</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Alternative:</strong> Decorator pattern if you need to add state (fields)</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Extension methods are syntactic sugar — compiler rewrites emp.GetData() to EmployeeExtensions.GetData(emp) internally."</div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q8 · C# Language</span>
+      <button class="solve-btn" onclick="markSolved(8,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q9 -->
+<div class="q-card" id="qcard-9">
+  <div class="q-header" onclick="toggleCard(9)">
+    <div class="q-num" id="qnum-9">9</div>
+    <div class="q-meta">
+      <div class="q-cat">SOLID Principles</div>
+      <div class="q-title">How to intentionally violate all 5 SOLID principles (with examples)</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-medium">medium</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,9,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,9,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,9,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t9-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🏠 5 Ways to build a terrible house</div>
+        <div class="eli5-analogy">
+          <strong>S (SRP):</strong> Your kitchen also serves as bedroom, bathroom, and office. One room, all responsibilities. Hard to renovate.<br><br>
+          <strong>O (OCP):</strong> Every time you get a new guest, you tear down a wall and rebuild. Can't just add a new room.<br><br>
+          <strong>L (LSP):</strong> You advertise "house with fireplace" but half the rooms say "fireplace not working here."<br><br>
+          <strong>I (ISP):</strong> Your rental contract forces every tenant to sign "I agree to maintain the pool" — even those in apartments with no pool.<br><br>
+          <strong>D (DIP):</strong> Your house's electricity is hardwired to only one specific power company. Can't switch providers.
+        </div>
+      </div>
+    </div>
+    <div class="tier-content" id="t9-depth">
+<pre><code><span class="cm">// ❌ SRP: God class — too many reasons to change</span>
+<span class="kw">class</span> <span class="ty">OrderProcessor</span> {
+    <span class="kw">void</span> ProcessOrder() {}  <span class="cm">// business</span>
+    <span class="kw">void</span> SaveToDb() {}      <span class="cm">// data</span>
+    <span class="kw">void</span> SendEmail() {}     <span class="cm">// notification</span>
+}
+
+<span class="cm">// ❌ OCP: if/else must be modified for new types</span>
+<span class="kw">double</span> Discount(<span class="kw">string</span> type) {
+    <span class="kw">if</span>(type==<span class="str">"Regular"</span>) <span class="kw">return</span> 0.05;
+    <span class="kw">if</span>(type==<span class="str">"VIP"</span>) <span class="kw">return</span> 0.20; <span class="cm">// edit here for new types ❌</span>
+    <span class="kw">return</span> 0;
+}
+
+<span class="cm">// ❌ LSP: Subclass breaks parent contract</span>
+<span class="kw">class</span> <span class="ty">Penguin</span> : <span class="ty">Bird</span> {
+    <span class="kw">public override void</span> Fly()
+        <span class="kw">throw new</span> NotImplementedException(); <span class="cm">// ❌ Liskov violated</span>
+}
+
+<span class="cm">// ❌ ISP: Fat interface forces empty impls</span>
+<span class="kw">interface</span> <span class="ty">IWorker</span> { <span class="kw">void</span> Work(); <span class="kw">void</span> Eat(); <span class="kw">void</span> Sleep(); }
+<span class="kw">class</span> <span class="ty">Robot</span> : <span class="ty">IWorker</span> {
+    <span class="kw">public void</span> Work() {}
+    <span class="kw">public void</span> Eat() <span class="kw">throw new</span> NotImplementedException();  <span class="cm">// ❌</span>
+    <span class="kw">public void</span> Sleep() <span class="kw">throw new</span> NotImplementedException(); <span class="cm">// ❌</span>
+}
+
+<span class="cm">// ❌ DIP: Depends on concrete class, not abstraction</span>
+<span class="kw">class</span> <span class="ty">OrderService</span> {
+    <span class="kw">private</span> <span class="ty">SqlDatabase</span> _db = <span class="kw">new</span> SqlDatabase(); <span class="cm">// ❌ tight coupling</span>
+    <span class="kw">void</span> Place(<span class="ty">Order</span> o) => _db.Save(o); <span class="cm">// can't swap DB, can't unit test</span>
+}</code></pre>
+    </div>
+    <div class="tier-content" id="t9-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary — One Line Each</div>
+        <div class="exam-point"><div class="exam-bullet">S</div><div class="exam-txt"><strong>SRP violated by:</strong> God class with multiple responsibilities (multiple reasons to change)</div></div>
+        <div class="exam-point"><div class="exam-bullet">O</div><div class="exam-txt"><strong>OCP violated by:</strong> if/switch that must be edited when adding new types</div></div>
+        <div class="exam-point"><div class="exam-bullet">L</div><div class="exam-txt"><strong>LSP violated by:</strong> subclass throws NotImplementedException on inherited method</div></div>
+        <div class="exam-point"><div class="exam-bullet">I</div><div class="exam-txt"><strong>ISP violated by:</strong> fat interface forcing classes to implement methods they don't use</div></div>
+        <div class="exam-point"><div class="exam-bullet">D</div><div class="exam-txt"><strong>DIP violated by:</strong> <span class="ic">new ConcreteClass()</span> inside a class — hardcoded dependency</div></div>
+        <div class="exam-tip"><strong>💡 Memory Trick</strong>SRP=GodClass. OCP=if/else. LSP=NotImplemented. ISP=EmptyImpls. DIP=new keyword.</div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q9 · SOLID</span>
+      <button class="solve-btn" onclick="markSolved(9,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q10 -->
+<div class="q-card" id="qcard-10">
+  <div class="q-header" onclick="toggleCard(10)">
+    <div class="q-num" id="qnum-10">10</div>
+    <div class="q-meta">
+      <div class="q-cat">SQL · Aggregation</div>
+      <div class="q-title">Cities where customer count > average customers per city</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-medium">medium</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,10,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,10,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,10,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t10-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🏙️ Finding cities more popular than average</div>
+        <div class="eli5-analogy">Imagine counting how many people live in each city. Then you calculate the average city population. Finally, you only show the cities that have more people than that average.<br><br>In SQL: GROUP BY city to count. Then a subquery finds the average count. HAVING filters groups after aggregation.</div>
+        <div class="eli5-point">📊 WHERE filters individual rows BEFORE grouping. HAVING filters groups AFTER grouping.</div>
+        <div class="eli5-point">🔄 The inner subquery calculates the average of city counts first, then the outer query compares each city's count to it.</div>
+        <div class="eli5-point">💡 CTE version is cleaner and more readable for interviews — use it!</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t10-depth">
+      <div class="interview-section">
+        <div class="interview-title green">Solution with Subquery</div>
+<pre><code><span class="kw">SELECT</span> city, <span class="fn">COUNT</span>(customer_id) <span class="kw">AS</span> customer_count
+<span class="kw">FROM</span>   customer
+<span class="kw">GROUP BY</span> city
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(customer_id) &gt; (
+    <span class="kw">SELECT</span> <span class="fn">AVG</span>(city_count)
+    <span class="kw">FROM</span> (
+        <span class="kw">SELECT</span> <span class="fn">COUNT</span>(customer_id) <span class="kw">AS</span> city_count
+        <span class="kw">FROM</span> customer
+        <span class="kw">GROUP BY</span> city
+    ) <span class="kw">AS</span> city_counts
+)
+<span class="kw">ORDER BY</span> customer_count <span class="kw">DESC</span>;</code></pre>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title teal">Cleaner CTE Version</div>
+<pre><code><span class="kw">WITH</span> city_counts <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> city, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> customer_count
+    <span class="kw">FROM</span>   customer
+    <span class="kw">GROUP BY</span> city
+)
+<span class="kw">SELECT</span> city, customer_count
+<span class="kw">FROM</span>   city_counts
+<span class="kw">WHERE</span>  customer_count &gt; (<span class="kw">SELECT</span> <span class="fn">AVG</span>(customer_count) <span class="kw">FROM</span> city_counts)
+<span class="kw">ORDER BY</span> customer_count <span class="kw">DESC</span>;</code></pre>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title amber">Dry Run</div>
+        <div class="dryrun">City counts:
+  New York   = 2   ← includes Nick + Brad
+  California = 1
+  London     = 2   ← includes Julian + Brad G
+  Paris      = 1
+  Berlin     = 1
+  Moscow     = 1
+
+Average = (2+1+2+1+1+1)/6 = 8/6 ≈ 1.33
+
+Cities with count > 1.33:
+  New York → 2 ✓
+  London   → 2 ✓</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t10-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Step 1:</strong> GROUP BY city + COUNT — get per-city counts</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Step 2:</strong> Subquery computes AVG of those counts</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Step 3:</strong> HAVING filters groups where count > average</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>WHERE vs HAVING:</strong> WHERE filters rows before group. HAVING filters groups after aggregation. Can't use COUNT() in WHERE.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>CTE version</strong> is more readable and preferred in interviews</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"I'd use a CTE for readability — compute counts once, then reference the CTE twice: once for display, once for the AVG subquery."</div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q10 · SQL</span>
+      <button class="solve-btn" onclick="markSolved(10,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q11 -->
+<div class="q-card" id="qcard-11">
+  <div class="q-header" onclick="toggleCard(11)">
+    <div class="q-num" id="qnum-11">11</div>
+    <div class="q-meta">
+      <div class="q-cat">DSA · Modular Arithmetic</div>
+      <div class="q-title">FizzBuzz variant: 3→"a", 5→"b", 15→"ab" for [1..20]</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-easy">easy</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,11,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,11,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,11,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t11-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🎯 Like a game: shout letters if the number has certain factors</div>
+        <div class="eli5-analogy">Count 1 to 20. If your number divides evenly by 3, say "a." If it divides by 5, say "b." If both — say "ab." Otherwise say the number. The trick: build the word piece by piece — check 3 first, then 5. If the string is empty after both checks, use the number.</div>
+        <div class="eli5-point">🔑 Key insight: check 3 AND 5 independently. Append "a" if divisible by 3. Append "b" if divisible by 5. Result naturally handles 15 → "ab".</div>
+        <div class="eli5-point">⚠️ Wrong approach: check 15 first, then 3, then 5 — fragile. Adding a third rule (7→"c") becomes messy.</div>
+        <div class="eli5-point">✅ Right approach: build string by appending. Scales to any number of rules easily.</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t11-depth">
+      <div class="interview-section">
+        <div class="interview-title green">Extensible Approach</div>
+<pre><code><span class="kw">public static</span> <span class="ty">object</span>[] <span class="fn">FizzBuzz</span>(<span class="kw">int</span> n)
+{
+    <span class="kw">var</span> result = <span class="kw">new</span> <span class="ty">object</span>[n];
+    <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt;= n; i++)
+    {
+        <span class="kw">var</span> sb = <span class="kw">new</span> <span class="ty">StringBuilder</span>();
+        <span class="kw">if</span> (i % 3 == 0) sb.Append(<span class="str">"a"</span>);
+        <span class="kw">if</span> (i % 5 == 0) sb.Append(<span class="str">"b"</span>);
+        result[i-1] = sb.Length > 0 ? (<span class="ty">object</span>)sb.ToString() : i;
+    }
+    <span class="kw">return</span> result;
+}
+
+<span class="cm">// LINQ one-liner version:</span>
+<span class="kw">var</span> r = Enumerable.Range(1,20).Select(i => {
+    <span class="kw">var</span> s = (i%3==0?<span class="str">"a"</span>:<span class="str">""</span>)+(i%5==0?<span class="str">"b"</span>:<span class="str">""</span>);
+    <span class="kw">return</span> s.Length>0 ? (<span class="ty">object</span>)s : i;
+}).ToArray();</code></pre>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title teal">Verification</div>
+        <div class="dryrun">3  → 3%3=0 → "a"
+5  → 5%5=0 → "b"
+6  → 6%3=0 → "a"
+10 → 10%5=0 → "b"
+15 → 15%3=0 AND 15%5=0 → "ab" ✓
+1  → neither → 1</div>
+      </div>
+      <div class="callout callout-tip"><div class="callout-icon">💡</div><div class="callout-text"><strong>Extensible to n rules</strong>Pass rules as Dictionary&lt;int,string&gt;: {{3,"a"},{5,"b"},{7,"c"}}. Loop through rules, append if divisible. Zero changes to core logic.</div></div>
+    </div>
+    <div class="tier-content" id="t11-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Key insight:</strong> check 3 and 5 independently, append to string. "ab" for 15 falls out naturally.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>If string is empty</strong> after both checks → use the number itself</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>O(n) time, O(n) space.</strong> One pass through 1..n</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Scalable:</strong> Dictionary&lt;int,string&gt; rules makes it generic for any divisor-to-label mapping</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"I append independently per rule so adding a new rule (like 7→c) requires zero changes to logic — just add to the rules dictionary."</div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q11 · FizzBuzz</span>
+      <button class="solve-btn" onclick="markSolved(11,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+
+<!-- Q12 -->
+<div class="q-card" id="qcard-12">
+  <div class="q-header" onclick="toggleCard(12)">
+    <div class="q-num" id="qnum-12">12</div>
+    <div class="q-meta">
+      <div class="q-cat">OOP Design · System Design</div>
+      <div class="q-title">Design a class for 3 elevators in a 25-floor building</div>
+    </div>
+    <div class="q-right">
+      <span class="q-diff diff-hard">hard</span>
+      <span class="q-chevron">▼</span>
+    </div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,12,'eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,12,'depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,12,'exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="t12-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🏢 Think of a call center with 3 agents</div>
+        <div class="eli5-analogy">A call center manager (ElevatorController) handles incoming calls (floor requests). They look at which agent (Elevator) is free and closest to the caller's location, then assign the call to that agent.<br><br>Each agent (Elevator) has: their current position, whether they're busy/idle, and a queue of calls to handle. The building is just floors numbered 1-25.</div>
+        <div class="eli5-point">🏢 Entities: Building → ElevatorController → Elevators (3) → Floors (25)</div>
+        <div class="eli5-point">🚦 Each elevator has a state: Idle, MovingUp, MovingDown</div>
+        <div class="eli5-point">🧠 Controller uses SCAN algorithm: serve all requests in current direction first, then reverse</div>
+      </div>
+    </div>
+    <div class="tier-content" id="t12-depth">
+      <div class="interview-section">
+        <div class="interview-title teal">Entity Design</div>
+        <div class="dryrun">Building
+  └── ElevatorController
+        ├── Elevator (×3)
+        │     ├── Id, CurrentFloor
+        │     ├── State (Idle/Up/Down)
+        │     ├── Capacity, CurrentLoad
+        │     └── SortedSet requestQueue
+        └── Floor (×25)
+              └── UpButton, DownButton</div>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title green">Core Classes</div>
+<pre><code><span class="kw">public enum</span> <span class="ty">ElevatorState</span> { Idle, MovingUp, MovingDown }
+
+<span class="kw">public class</span> <span class="ty">Elevator</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; }
+    <span class="kw">public int</span> CurrentFloor { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">public</span> <span class="ty">ElevatorState</span> State { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">public int</span> Capacity { <span class="kw">get</span>; } = 10;
+    <span class="kw">private</span> <span class="ty">SortedSet</span>&lt;<span class="kw">int</span>&gt; _queue = <span class="kw">new</span>();
+
+    <span class="kw">public bool</span> IsAvailable =>
+        State == <span class="ty">ElevatorState</span>.Idle;
+
+    <span class="kw">public int</span> DistanceTo(<span class="kw">int</span> floor) =>
+        Math.Abs(CurrentFloor - floor);
+
+    <span class="kw">public void</span> AddRequest(<span class="kw">int</span> floor) =>
+        _queue.Add(floor);
+}
+
+<span class="kw">public class</span> <span class="ty">ElevatorController</span>
+{
+    <span class="kw">private</span> <span class="ty">List</span>&lt;<span class="ty">Elevator</span>&gt; _elevators;
+
+    <span class="kw">public</span> <span class="ty">ElevatorController</span>()
+    {
+        _elevators = Enumerable.Range(1,3)
+            .Select(i => <span class="kw">new</span> <span class="ty">Elevator</span>(i))
+            .ToList();
+    }
+
+    <span class="cm">// Dispatch nearest idle elevator</span>
+    <span class="kw">public</span> <span class="ty">Elevator</span>? Dispatch(<span class="kw">int</span> floor)
+        => _elevators
+            .Where(e => e.IsAvailable)
+            .OrderBy(e => e.DistanceTo(floor))
+            .FirstOrDefault();
+}</code></pre>
+      </div>
+      <div class="interview-section">
+        <div class="interview-title amber">Scheduling Algorithms</div>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Algorithm</th><th>Strategy</th><th>Issue</th></tr>
+            <tr><td>FCFS</td><td>First come first serve</td><td>Inefficient</td></tr>
+            <tr><td>SCAN ✅</td><td>Go up serving all, then down</td><td>Best generally</td></tr>
+            <tr><td>LOOK</td><td>Reverse at last request</td><td>Better than SCAN</td></tr>
+            <tr><td>SSTF</td><td>Nearest floor first</td><td>May starve far floors</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="tier-content" id="t12-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Entities:</strong> Building, ElevatorController (dispatcher), Elevator, Floor</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Elevator state:</strong> Enum — Idle, MovingUp, MovingDown (state machine pattern)</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Request queue:</strong> SortedSet&lt;int&gt; — O(log n) insert, always ordered by floor</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Dispatch:</strong> SCAN/LOOK algorithm — serve all requests in one direction before reversing</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>SRP applied:</strong> Elevator doesn't know about other elevators. Controller handles coordination.</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Start with entities and state, define interfaces, then describe the dispatch algorithm and its trade-offs."</div>
+        <div class="followup">
+          <div class="followup-title">Follow-up questions</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>How to make concurrent request handling thread-safe?</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>How to add emergency/priority mode?</div>
+          <div class="followup-item"><span class="followup-arrow">→</span>Design the DB schema to log all movements</div>
+        </div>
+      </div>
+    </div>
+    <div class="solve-row">
+      <span class="solve-tag">Q12 · System Design · Hard</span>
+      <button class="solve-btn" onclick="markSolved(12,this)">✓ Mark solved</button>
+    </div>
+  </div>
+</div>
+</div><!-- end page-core -->
+
+<!-- ============================================================ -->
+<!-- PAGE: C# LANGUAGE -->
+<!-- ============================================================ -->
+<div class="page" id="page-csharp">
+<div class="section-label">C# Language — Likely Follow-up Questions</div>
+
+<!-- Bonus Q: Value vs Reference Types -->
+<div class="q-card" id="qcard-b1">
+  <div class="q-header" onclick="toggleCard('b1')">
+    <div class="q-num bonus">B1</div>
+    <div class="q-meta">
+      <div class="q-cat">C# Fundamentals</div>
+      <div class="q-title">Value types vs Reference types — stack vs heap</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-easy">easy</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b1','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b1','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b1','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb1-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">📋 Post-it note vs Sticky note on a corkboard</div>
+        <div class="eli5-analogy"><strong>Value type:</strong> Like writing a number on your OWN sticky note. When you give it to someone, they get their own copy. Changing their note doesn't change yours. <br><br><strong>Reference type:</strong> Like pinning a photo to a shared corkboard. You and your friend both hold a string pointing to the SAME photo. If your friend scribbles on it, you see the scribble too.</div>
+        <div class="eli5-point">📦 Value types (int, bool, struct, enum) live on the Stack — fast, auto-cleaned when method returns</div>
+        <div class="eli5-point">🔗 Reference types (class, string, array) live on the Heap — garbage collected, can be null</div>
+        <div class="eli5-point">⚠️ Strings are reference types BUT behave like value types due to immutability</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb1-depth">
+<pre><code><span class="cm">// Value type — copy semantics</span>
+<span class="kw">int</span> a = 5;
+<span class="kw">int</span> b = a;    <span class="cm">// b gets a COPY of the value</span>
+b = 10;
+Console.WriteLine(a); <span class="cm">// still 5 ✓</span>
+
+<span class="cm">// Reference type — reference semantics</span>
+<span class="kw">var</span> list1 = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="kw">int</span>&gt; { 1, 2, 3 };
+<span class="kw">var</span> list2 = list1;   <span class="cm">// list2 points to SAME object</span>
+list2.Add(4);
+Console.WriteLine(list1.Count); <span class="cm">// 4! — shared reference</span>
+
+<span class="cm">// Struct (value type) — copying entire struct</span>
+<span class="kw">struct</span> <span class="ty">Point</span> { <span class="kw">public int</span> X, Y; }
+<span class="ty">Point</span> p1 = <span class="kw">new</span> <span class="ty">Point</span>{X=1,Y=2};
+<span class="ty">Point</span> p2 = p1;  <span class="cm">// complete copy</span>
+p2.X = 99;
+Console.WriteLine(p1.X); <span class="cm">// still 1</span></code></pre>
+      <div class="table-wrap"><table>
+        <tr><th>Property</th><th>Value Type</th><th>Reference Type</th></tr>
+        <tr><td>Storage</td><td>Stack</td><td>Heap</td></tr>
+        <tr><td>Examples</td><td>int, bool, struct, enum</td><td>class, string, array</td></tr>
+        <tr><td>Assignment</td><td>Copies value</td><td>Copies reference</td></tr>
+        <tr><td>Nullable</td><td>Only with int?</td><td>Always nullable</td></tr>
+        <tr><td>GC managed</td><td>No (stack popped)</td><td>Yes</td></tr>
+      </table></div>
+    </div>
+    <div class="tier-content" id="tb1-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Value types:</strong> int, float, bool, char, struct, enum → stack → copied on assignment</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Reference types:</strong> class, string, array, interface → heap → reference copied on assignment</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Boxing:</strong> wrapping a value type in an object (int→object) — heap allocation, avoid in hot paths</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>string is immutable reference type</strong> — behaves like value type because every modification creates new object</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Value types copy data; reference types copy the pointer. Changing through one reference is visible through all references to the same object."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B1 · Fundamentals</span><button class="solve-btn" onclick="markSolved('b1',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+
+<!-- Bonus Q: IDisposable -->
+<div class="q-card" id="qcard-b2">
+  <div class="q-header" onclick="toggleCard('b2')">
+    <div class="q-num bonus">B2</div>
+    <div class="q-meta">
+      <div class="q-cat">Memory Management</div>
+      <div class="q-title">IDisposable, using statement, and the Dispose pattern</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-medium">medium</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b2','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b2','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b2','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb2-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🚿 Like renting a towel at the gym — return it when done</div>
+        <div class="eli5-analogy">Some resources (files, database connections, network sockets) are like rented gym towels. C# garbage collector handles memory automatically, but it doesn't know when to release OTHER resources like file handles. You need to tell it explicitly. IDisposable.Dispose() is your way to return the towel.</div>
+        <div class="eli5-point">🔧 The <span class="ic">using</span> statement is syntactic sugar that calls Dispose() automatically when the block exits — even if an exception occurs.</div>
+        <div class="eli5-point">⚠️ If you forget to Dispose: file locked forever, DB connection pool exhausted, memory leak.</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb2-depth">
+<pre><code><span class="cm">// using statement guarantees Dispose() is called</span>
+<span class="kw">using</span> (<span class="kw">var</span> conn = <span class="kw">new</span> SqlConnection(connStr))
+{
+    conn.Open();
+    <span class="cm">// use connection</span>
+} <span class="cm">// Dispose() called here, even if exception thrown</span>
+
+<span class="cm">// Modern C# 8+ using declaration</span>
+<span class="kw">using var</span> stream = <span class="kw">new</span> FileStream(<span class="str">"file.txt"</span>, FileMode.Open);
+<span class="cm">// stream.Dispose() called at end of enclosing scope</span>
+
+<span class="cm">// Implementing IDisposable correctly</span>
+<span class="kw">public class</span> <span class="ty">ResourceHolder</span> : <span class="ty">IDisposable</span>
+{
+    <span class="kw">private bool</span> _disposed = <span class="kw">false</span>;
+    <span class="kw">private</span> <span class="ty">FileStream</span> _stream;
+
+    <span class="kw">public void</span> Dispose()
+    {
+        Dispose(<span class="kw">true</span>);
+        GC.SuppressFinalize(<span class="kw">this</span>); <span class="cm">// tell GC finalizer not needed</span>
+    }
+
+    <span class="kw">protected virtual void</span> Dispose(<span class="kw">bool</span> disposing)
+    {
+        <span class="kw">if</span> (!_disposed) {
+            <span class="kw">if</span> (disposing) _stream?.Dispose(); <span class="cm">// managed resources</span>
+            _disposed = <span class="kw">true</span>;
+        }
+    }
+}</code></pre>
+    </div>
+    <div class="tier-content" id="tb2-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>IDisposable</strong> — for releasing unmanaged resources (files, DB connections, sockets)</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>using statement</strong> compiles to try/finally — Dispose() always called even on exception</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>GC.SuppressFinalize</strong> — skip finalizer since we already cleaned up in Dispose()</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Dispose pattern:</strong> bool disposed guard to prevent double-dispose</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"GC handles memory but not unmanaged resources. IDisposable + using ensures deterministic cleanup of file handles, connections, etc."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B2 · Memory</span><button class="solve-btn" onclick="markSolved('b2',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+</div><!-- end page-csharp -->
+
+<!-- ============================================================ -->
+<!-- PAGE: ASYNC -->
+<!-- ============================================================ -->
+<div class="page" id="page-async">
+<div class="section-label">Async & Concurrency — Deep Dive Questions</div>
+
+<div class="q-card" id="qcard-b3">
+  <div class="q-header" onclick="toggleCard('b3')">
+    <div class="q-num bonus">B3</div>
+    <div class="q-meta">
+      <div class="q-cat">Async · Deadlock</div>
+      <div class="q-title">What is ConfigureAwait(false) and why does it prevent deadlocks?</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-hard">hard</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b3','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b3','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b3','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb3-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🚪 Imagine a single-door office with one special chair</div>
+        <div class="eli5-analogy">An ASP.NET app has one "UI thread" (the special chair). When you <span class="ic">await</span> something, you get up from the chair and wait to come back to it. But if someone else (the task result) also tries to grab the SAME chair at the same time — deadlock! Both waiting for each other.<br><br><span class="ic">ConfigureAwait(false)</span> means "I don't care which chair I sit in when I come back — any free chair will do." Now there's no competition for the special chair.</div>
+        <div class="eli5-point">🏢 Use <span class="ic">ConfigureAwait(false)</span> in library code and non-UI code</div>
+        <div class="eli5-point">🖥️ In UI apps (WPF/WinForms): do NOT use it in event handlers — you need the UI context to update controls</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb3-depth">
+<pre><code><span class="cm">// ❌ DEADLOCK in ASP.NET (sync over async)</span>
+<span class="kw">public</span> <span class="ty">string</span> GetResult()
+{
+    <span class="cm">// .Result blocks the thread, task tries to resume</span>
+    <span class="cm">// on the same thread → deadlock!</span>
+    <span class="kw">return</span> GetAsync().Result; <span class="cm">// 🔴 DEADLOCK</span>
+}
+
+<span class="cm">// ✅ FIX 1: make caller async too (preferred)</span>
+<span class="kw">public async</span> <span class="ty">Task</span>&lt;<span class="ty">string</span>&gt; GetResult()
+    => <span class="kw">await</span> GetAsync();
+
+<span class="cm">// ✅ FIX 2: ConfigureAwait(false) in library code</span>
+<span class="kw">public async</span> <span class="ty">Task</span>&lt;<span class="ty">string</span>&gt; GetAsync()
+{
+    <span class="kw">var</span> data = <span class="kw">await</span> httpClient.GetStringAsync(url)
+        .ConfigureAwait(<span class="kw">false</span>); <span class="cm">// resume on ANY thread</span>
+    <span class="kw">return</span> data.ToUpper();
+}
+
+<span class="cm">// Summary:
+// Without ConfigureAwait(false): resumes on captured SynchronizationContext
+// With ConfigureAwait(false): resumes on any available thread pool thread
+// Library code should ALWAYS use ConfigureAwait(false)</span></code></pre>
+    </div>
+    <div class="tier-content" id="tb3-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Without ConfigureAwait(false):</strong> continuation resumes on captured SynchronizationContext (UI thread)</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Deadlock cause:</strong> sync blocking (.Result/.Wait()) while continuation needs the same blocked thread</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>ConfigureAwait(false):</strong> resume on any thread pool thread — no context captured, no deadlock</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Rule:</strong> Library/infrastructure code → always use. UI event handlers → never use (need UI context)</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Best solution is async all the way. ConfigureAwait(false) is a defense when you can't make the caller async — common in library code."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B3 · Deadlock</span><button class="solve-btn" onclick="markSolved('b3',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+
+<div class="q-card" id="qcard-b4">
+  <div class="q-header" onclick="toggleCard('b4')">
+    <div class="q-num bonus">B4</div>
+    <div class="q-meta">
+      <div class="q-cat">Async · Cancellation</div>
+      <div class="q-title">How do you cancel an async operation using CancellationToken?</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-medium">medium</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b4','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b4','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b4','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb4-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🚦 Like a car's kill switch passed to all drivers</div>
+        <div class="eli5-analogy">Imagine a race with 3 cars doing an async task. The race director holds a <strong>CancellationTokenSource</strong> (the kill switch). Each car gets a <strong>CancellationToken</strong> (a copy of the switch). When the director presses Cancel, every car's token changes to "cancelled" and each car checks it and stops.</div>
+        <div class="eli5-point">⛽ CancellationTokenSource — the one who decides to cancel</div>
+        <div class="eli5-point">🎫 CancellationToken — passed to tasks; they check IsCancellationRequested</div>
+        <div class="eli5-point">⏱️ CancelAfter(ms) for timeouts — auto-cancel after N milliseconds</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb4-depth">
+<pre><code><span class="kw">var</span> cts = <span class="kw">new</span> <span class="ty">CancellationTokenSource</span>();
+cts.CancelAfter(TimeSpan.FromSeconds(5)); <span class="cm">// auto-cancel after 5s</span>
+
+<span class="kw">try</span>
+{
+    <span class="kw">var</span> result = <span class="kw">await</span> LongRunningAsync(cts.Token);
+}
+<span class="kw">catch</span> (<span class="ty">OperationCanceledException</span>)
+{
+    Console.WriteLine(<span class="str">"Operation was cancelled"</span>);
+}
+
+<span class="cm">// Method that respects cancellation</span>
+<span class="kw">public async</span> <span class="ty">Task</span>&lt;<span class="ty">string</span>&gt; LongRunningAsync(<span class="ty">CancellationToken</span> ct)
+{
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 100; i++)
+    {
+        ct.ThrowIfCancellationRequested(); <span class="cm">// check at each step</span>
+        <span class="kw">await</span> Task.Delay(100, ct); <span class="cm">// delay also cancellable</span>
+    }
+    <span class="kw">return</span> <span class="str">"done"</span>;
+}</code></pre>
+    </div>
+    <div class="tier-content" id="tb4-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>CancellationTokenSource</strong> creates and controls the signal. <strong>CancellationToken</strong> is the read-only signal passed to tasks.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>ThrowIfCancellationRequested()</strong> throws OperationCanceledException when cancelled</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>CancelAfter()</strong> for timeout pattern. Always pass token to Task.Delay() too.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Catch OperationCanceledException</strong> specifically — don't catch it as generic Exception silently</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"CancellationToken is cooperative cancellation — the task checks the token and decides to stop. It's not forceful thread abort."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B4 · CancellationToken</span><button class="solve-btn" onclick="markSolved('b4',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+</div><!-- end page-async -->
+
+<!-- ============================================================ -->
+<!-- PAGE: OOP & SOLID -->
+<!-- ============================================================ -->
+<div class="page" id="page-oop">
+<div class="section-label">OOP & SOLID — Design Questions</div>
+
+<div class="q-card" id="qcard-b5">
+  <div class="q-header" onclick="toggleCard('b5')">
+    <div class="q-num bonus">B5</div>
+    <div class="q-meta">
+      <div class="q-cat">OOP · Design Patterns</div>
+      <div class="q-title">Singleton pattern — implementation and pitfalls</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-medium">medium</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b5','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b5','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b5','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb5-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🌍 There is only ONE President of the country</div>
+        <div class="eli5-analogy">Singleton ensures only ONE instance of a class exists in the entire application. Like how there's only one President — no matter how many times you ask "who's the President," you always get the same person, not a new one each time.</div>
+        <div class="eli5-point">🔒 Private constructor — prevents <span class="ic">new Singleton()</span> from outside</div>
+        <div class="eli5-point">🪟 Static property Instance — returns the one and only instance</div>
+        <div class="eli5-point">⚠️ Drawbacks: hard to unit test (can't mock), violates DIP, global state is a code smell</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb5-depth">
+<pre><code><span class="cm">// Thread-safe Singleton using Lazy&lt;T&gt; (recommended)</span>
+<span class="kw">public sealed class</span> <span class="ty">AppConfig</span>
+{
+    <span class="kw">private static readonly</span> <span class="ty">Lazy</span>&lt;<span class="ty">AppConfig</span>&gt; _instance
+        = <span class="kw">new</span>(() => <span class="kw">new</span> <span class="ty">AppConfig</span>(), isThreadSafe: <span class="kw">true</span>);
+
+    <span class="kw">private</span> AppConfig() { } <span class="cm">// private constructor</span>
+
+    <span class="kw">public static</span> <span class="ty">AppConfig</span> Instance => _instance.Value;
+
+    <span class="kw">public string</span> ConnectionString { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="cm">// Usage</span>
+<span class="kw">var</span> config = <span class="ty">AppConfig</span>.Instance;
+
+<span class="cm">// In .NET DI — prefer Singleton lifetime over hand-rolled Singleton</span>
+services.AddSingleton&lt;<span class="ty">IAppConfig</span>, <span class="ty">AppConfig</span>&gt;();</code></pre>
+      <div class="callout callout-warn"><div class="callout-icon">⚠️</div><div class="callout-text"><strong>Interviewer Hot Take</strong>Singleton is often an anti-pattern. Use DI container with singleton lifetime instead — it's testable, mockable, and doesn't pollute global state.</div></div>
+    </div>
+    <div class="tier-content" id="tb5-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Pattern:</strong> Private constructor + static Instance property → one object for lifetime of app</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Thread-safe:</strong> Use <span class="ic">Lazy&lt;T&gt;</span> — instantiation is deferred and thread-safe by default</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Problems:</strong> Hard to unit test, global state, violates DIP, hidden dependency</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Modern alternative:</strong> DI container with <span class="ic">AddSingleton&lt;T&gt;()</span> — same behavior, testable</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"I prefer DI singleton lifetime over hand-rolled Singleton because it's injectable, mockable in tests, and follows DIP."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B5 · Singleton</span><button class="solve-btn" onclick="markSolved('b5',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+</div><!-- end page-oop -->
+
+<!-- ============================================================ -->
+<!-- PAGE: DSA -->
+<!-- ============================================================ -->
+<div class="page" id="page-dsa">
+<div class="section-label">DSA — Common Interview Algorithms</div>
+
+<div class="q-card" id="qcard-b6">
+  <div class="q-header" onclick="toggleCard('b6')">
+    <div class="q-num bonus">B6</div>
+    <div class="q-meta">
+      <div class="q-cat">String · Sliding Window</div>
+      <div class="q-title">Longest substring without repeating characters</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-medium">medium</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b6','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b6','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b6','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb6-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🪟 Like a sliding window on a train</div>
+        <div class="eli5-analogy">Imagine a window frame sliding along the train. You can only see the characters inside the frame at once. The rule: no repeated letters visible in the window. When a repeated letter enters from the right, you slide the LEFT side of the window past the previous occurrence of that letter. Keep track of the largest window you ever saw.</div>
+        <div class="eli5-point">📌 HashMap stores: character → its last seen index</div>
+        <div class="eli5-point">👈 Left pointer jumps to (lastIndex + 1) when a duplicate is found</div>
+        <div class="eli5-point">📏 maxLen = max(maxLen, right - left + 1) at each step</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb6-depth">
+<pre><code><span class="kw">public static int</span> LongestSubstring(<span class="ty">string</span> s)
+{
+    <span class="kw">var</span> map = <span class="kw">new</span> <span class="ty">Dictionary</span>&lt;<span class="kw">char</span>,<span class="kw">int</span>&gt;();
+    <span class="kw">int</span> maxLen = 0, left = 0;
+
+    <span class="kw">for</span> (<span class="kw">int</span> right = 0; right &lt; s.Length; right++)
+    {
+        <span class="kw">char</span> c = s[right];
+        <span class="cm">// If char already in window, shrink from left</span>
+        <span class="kw">if</span> (map.ContainsKey(c) &amp;&amp; map[c] &gt;= left)
+            left = map[c] + 1;
+
+        map[c] = right; <span class="cm">// update last seen index</span>
+        maxLen = Math.Max(maxLen, right - left + 1);
+    }
+    <span class="kw">return</span> maxLen;
+}
+
+<span class="cm">// "abcabcbb" → 3 ("abc")
+// Dry Run:
+// r=0:'a' left=0 window="a" max=1
+// r=1:'b' left=0 window="ab" max=2
+// r=2:'c' left=0 window="abc" max=3
+// r=3:'a' dup! left=1 window="bca" max=3
+// r=4:'b' dup! left=2 window="cab" max=3
+// r=5:'c' dup! left=3 window="abc" max=3</span></code></pre>
+      <div class="complexity-grid">
+        <div class="cx-card"><div class="cx-label">Time</div><div class="cx-val">O(n)</div></div>
+        <div class="cx-card"><div class="cx-label">Space</div><div class="cx-val">O(k)</div></div>
+        <div class="cx-card"><div class="cx-label">Pattern</div><div class="cx-val">Sliding Window</div></div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb6-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Pattern:</strong> Sliding window with HashMap storing char → last index</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>On duplicate:</strong> move left pointer to max(left, lastIndex+1) — only shrink, never expand left backwards</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>O(n) time</strong> — each char visited at most twice (once right, once left)</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>O(k) space</strong> where k = size of character set (26 for lowercase, 128 for ASCII)</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Sliding window pattern: expand right pointer greedily, shrink left pointer when constraint violated."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B6 · Sliding Window</span><button class="solve-btn" onclick="markSolved('b6',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+
+<div class="q-card" id="qcard-b7">
+  <div class="q-header" onclick="toggleCard('b7')">
+    <div class="q-num bonus">B7</div>
+    <div class="q-meta">
+      <div class="q-cat">Two-Sum · HashMap</div>
+      <div class="q-title">Find two numbers in array that sum to target</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-easy">easy</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b7','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b7','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b7','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb7-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🧩 Looking for the missing puzzle piece</div>
+        <div class="eli5-analogy">You need two numbers that add up to 9. For each number you pick, you check: "does my complement (9-this) already exist in the box?" You keep a box (HashMap) of numbers you've already seen. If the complement is in the box — found! If not — put current number in the box and continue.</div>
+        <div class="eli5-point">🎯 For each element x, the complement is (target - x)</div>
+        <div class="eli5-point">⚡ HashMap lookup is O(1) — checking "have I seen the complement?" is instant</div>
+        <div class="eli5-point">📦 Store both value AND index in the map so you can return the pair of indices</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb7-depth">
+<pre><code><span class="cm">// O(n) time, O(n) space — HashMap approach</span>
+<span class="kw">public static int</span>[] TwoSum(<span class="kw">int</span>[] nums, <span class="kw">int</span> target)
+{
+    <span class="kw">var</span> seen = <span class="kw">new</span> <span class="ty">Dictionary</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;(); <span class="cm">// value → index</span>
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; nums.Length; i++)
+    {
+        <span class="kw">int</span> complement = target - nums[i];
+
+        <span class="kw">if</span> (seen.ContainsKey(complement))
+            <span class="kw">return new int</span>[] { seen[complement], i };
+
+        seen[nums[i]] = i;
+    }
+    <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="str">"No solution"</span>);
+}
+<span class="cm">// TwoSum([2,7,11,15], 9) → [0,1]
+// i=0: 9-2=7, not in seen. seen={2:0}
+// i=1: 9-7=2, found at index 0! → [0,1] ✓</span></code></pre>
+    </div>
+    <div class="tier-content" id="tb7-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Key formula:</strong> complement = target - current. Check if complement already seen.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>O(n) time, O(n) space</strong> using HashMap. Brute force O(n²).</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Map stores:</strong> value → index (need index to return the pair)</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Sorted array variant:</strong> Two pointers from both ends — O(n) time, O(1) space. Only works if sorted.</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Classic complement lookup. For each element, ask: have I already seen what I need to complete the pair? O(n) with HashMap."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B7 · Two-Sum</span><button class="solve-btn" onclick="markSolved('b7',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+</div><!-- end page-dsa -->
+
+<!-- ============================================================ -->
+<!-- PAGE: SQL -->
+<!-- ============================================================ -->
+<div class="page" id="page-sql">
+<div class="section-label">SQL — Advanced Questions</div>
+
+<div class="q-card" id="qcard-b8">
+  <div class="q-header" onclick="toggleCard('b8')">
+    <div class="q-num bonus">B8</div>
+    <div class="q-meta">
+      <div class="q-cat">SQL · Window Functions</div>
+      <div class="q-title">ROW_NUMBER vs RANK vs DENSE_RANK — find Nth highest salary</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-medium">medium</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b8','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b8','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b8','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb8-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">🏅 Imagine a race with tied runners</div>
+        <div class="eli5-analogy">Three runners finish at the same time in 2nd place. How do you number them?<br><br>
+          <strong>ROW_NUMBER:</strong> Arbitrarily 2, 3, 4 — no ties, unique for each row.<br>
+          <strong>RANK:</strong> All three get 2, next runner gets 5 — gap after ties.<br>
+          <strong>DENSE_RANK:</strong> All three get 2, next runner gets 3 — no gap, consecutive.
+        </div>
+        <div class="eli5-point">🔢 Use ROW_NUMBER for pagination</div>
+        <div class="eli5-point">🏆 Use DENSE_RANK for "Nth highest salary" type problems</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb8-depth">
+<pre><code><span class="cm">-- Salaries: 100, 90, 90, 80, 70</span>
+<span class="kw">SELECT</span> salary,
+    ROW_NUMBER() <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>) <span class="kw">AS</span> row_num,
+    RANK()       <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>) <span class="kw">AS</span> rnk,
+    DENSE_RANK() <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>) <span class="kw">AS</span> dense_rnk
+<span class="kw">FROM</span> employees;
+
+<span class="cm">-- Result:
+-- salary | row_num | rank | dense_rank
+-- 100    |    1    |   1  |     1
+--  90    |    2    |   2  |     2  ← tied
+--  90    |    3    |   2  |     2  ← tied
+--  80    |    4    |   4  |     3  ← rank gap vs dense_rank consecutive
+--  70    |    5    |   5  |     4</span>
+
+<span class="cm">-- Find 2nd highest salary (handles duplicates correctly)</span>
+<span class="kw">SELECT</span> salary
+<span class="kw">FROM</span> (
+    <span class="kw">SELECT</span> salary, DENSE_RANK() <span class="kw">OVER</span>(<span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>) <span class="kw">AS</span> dr
+    <span class="kw">FROM</span> employees
+) ranked
+<span class="kw">WHERE</span> dr = 2;</code></pre>
+    </div>
+    <div class="tier-content" id="tb8-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>ROW_NUMBER:</strong> Unique sequential number, no ties. 1,2,3,4,5</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>RANK:</strong> Ties get same rank, next rank skips. 1,2,2,4,5</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>DENSE_RANK:</strong> Ties get same rank, no skips. 1,2,2,3,4</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Nth highest:</strong> Use DENSE_RANK in subquery, filter WHERE dr = N</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Pagination:</strong> ROW_NUMBER() with BETWEEN for page-based results</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"For Nth highest salary, use DENSE_RANK — it handles duplicates correctly. RANK would skip numbers, giving wrong Nth value."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B8 · Window Functions</span><button class="solve-btn" onclick="markSolved('b8',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+</div><!-- end page-sql -->
+
+<!-- ============================================================ -->
+<!-- PAGE: PATTERNS -->
+<!-- ============================================================ -->
+<div class="page" id="page-patterns">
+<div class="section-label">Design Patterns — Most Asked</div>
+
+<div class="q-card" id="qcard-b9">
+  <div class="q-header" onclick="toggleCard('b9')">
+    <div class="q-num bonus">B9</div>
+    <div class="q-meta">
+      <div class="q-cat">DI · IoC</div>
+      <div class="q-title">Singleton vs Scoped vs Transient in .NET DI — lifetimes explained</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-medium">medium</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b9','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b9','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b9','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb9-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">☕ Coffee shop: one kettle, one cup per table, one stirrer per order</div>
+        <div class="eli5-analogy">
+          <strong>Singleton = One kettle for the whole coffee shop.</strong> Created once, shared by everyone, lives forever (app lifetime).<br><br>
+          <strong>Scoped = One cup per table visit.</strong> Each web request gets its own cup. Same cup shared within one request. New cup for new request.<br><br>
+          <strong>Transient = One stirrer per order.</strong> Every time anyone asks for one, they get a brand new one. Never shared.
+        </div>
+        <div class="eli5-point">⚠️ Never inject Transient/Scoped into Singleton — the singleton lives longer and will hold a stale reference!</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb9-depth">
+<pre><code><span class="cm">// Registration in .NET DI</span>
+services.AddSingleton&lt;<span class="ty">ICache</span>, MemoryCache&gt;();    <span class="cm">// one for app</span>
+services.AddScoped&lt;<span class="ty">IDbContext</span>, AppDbContext&gt;();   <span class="cm">// one per request</span>
+services.AddTransient&lt;<span class="ty">IEmailSender</span>, SmtpSender&gt;(); <span class="cm">// new each time</span>
+
+<span class="cm">// ⚠️ Captive Dependency (bug!) — Singleton holds Scoped</span>
+<span class="kw">public class</span> <span class="ty">MySingleton</span>
+{
+    <span class="kw">private readonly</span> <span class="ty">IDbContext</span> _db; <span class="cm">// ❌ scoped injected into singleton</span>
+    <span class="kw">public</span> MySingleton(<span class="ty">IDbContext</span> db) { _db = db; }
+    <span class="cm">// _db is the SAME DbContext forever — EF context leak!</span>
+}</code></pre>
+      <div class="table-wrap"><table>
+        <tr><th>Lifetime</th><th>Created</th><th>Shared</th><th>Use For</th></tr>
+        <tr><td>Singleton</td><td>Once</td><td>Everyone</td><td>Config, Cache, Logger</td></tr>
+        <tr><td>Scoped</td><td>Per request</td><td>Same request</td><td>DbContext, UnitOfWork</td></tr>
+        <tr><td>Transient</td><td>Every inject</td><td>Never</td><td>Stateless services</td></tr>
+      </table></div>
+    </div>
+    <div class="tier-content" id="tb9-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Singleton:</strong> one instance, app lifetime. Use for stateless shared services (cache, config, logging)</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Scoped:</strong> one per HTTP request. Use for DbContext, Unit of Work</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Transient:</strong> new instance every inject. Safest — no shared state</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Captive dependency bug:</strong> Singleton holding Scoped/Transient → stale context, memory leak</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Captive dependency is the biggest pitfall — if a Singleton holds a Scoped service, that Scoped service never gets disposed, causing DbContext to accumulate tracked entities."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B9 · DI Lifetimes</span><button class="solve-btn" onclick="markSolved('b9',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+
+<div class="q-card" id="qcard-b10">
+  <div class="q-header" onclick="toggleCard('b10')">
+    <div class="q-num bonus">B10</div>
+    <div class="q-meta">
+      <div class="q-cat">Design Pattern · Repository</div>
+      <div class="q-title">Repository Pattern — what it is and why you use it</div>
+    </div>
+    <div class="q-right"><span class="q-diff diff-medium">medium</span><span class="q-chevron">▼</span></div>
+  </div>
+  <div class="q-body">
+    <div class="tier-tabs">
+      <div class="tier-tab active" onclick="switchTier(this,'b10','eli5')"><span class="tier-emoji">🍭</span>ELI5</div>
+      <div class="tier-tab" onclick="switchTier(this,'b10','depth')"><span class="tier-emoji">💻</span>Interview</div>
+      <div class="tier-tab" onclick="switchTier(this,'b10','exam')"><span class="tier-emoji">📋</span>Exam</div>
+    </div>
+    <div class="tier-content active" id="tb10-eli5">
+      <div class="eli5-box">
+        <div class="eli5-title">📚 Like a librarian who knows where every book is</div>
+        <div class="eli5-analogy">You don't go into the library stacks yourself and dig through shelves. You ask the librarian (repository): "Get me Harry Potter." The librarian knows whether the book is on shelf A4, in the database, or being fetched from another library. You don't care HOW — you just asked for it.<br><br>The Repository pattern hides all data access logic behind a clean interface.</div>
+        <div class="eli5-point">🧪 Testability: you can mock IEmployeeRepository — no real DB needed in unit tests</div>
+        <div class="eli5-point">🔄 Swappability: change from SQL to MongoDB without touching business logic</div>
+        <div class="eli5-point">🎯 Single place for all data access — LINQ queries don't scatter across the codebase</div>
+      </div>
+    </div>
+    <div class="tier-content" id="tb10-depth">
+<pre><code><span class="cm">// Interface — what you program against</span>
+<span class="kw">public interface</span> <span class="ty">IEmployeeRepository</span>
+{
+    <span class="ty">Employee</span>? GetById(<span class="kw">int</span> id);
+    <span class="ty">IEnumerable</span>&lt;<span class="ty">Employee</span>&gt; GetAll();
+    <span class="kw">void</span> Add(<span class="ty">Employee</span> e);
+    <span class="kw">void</span> Update(<span class="ty">Employee</span> e);
+    <span class="kw">void</span> Delete(<span class="kw">int</span> id);
+}
+
+<span class="cm">// SQL implementation</span>
+<span class="kw">public class</span> <span class="ty">SqlEmployeeRepository</span> : <span class="ty">IEmployeeRepository</span>
+{
+    <span class="kw">private readonly</span> <span class="ty">AppDbContext</span> _ctx;
+    <span class="kw">public</span> SqlEmployeeRepository(<span class="ty">AppDbContext</span> ctx) => _ctx = ctx;
+
+    <span class="kw">public</span> <span class="ty">Employee</span>? GetById(<span class="kw">int</span> id) => _ctx.Employees.Find(id);
+    <span class="cm">// ... other methods</span>
+}
+
+<span class="cm">// Service uses interface, not concrete class (DIP!)</span>
+<span class="kw">public class</span> <span class="ty">EmployeeService</span>
+{
+    <span class="kw">private readonly</span> <span class="ty">IEmployeeRepository</span> _repo;
+    <span class="kw">public</span> EmployeeService(<span class="ty">IEmployeeRepository</span> repo) => _repo = repo;
+
+    <span class="kw">public</span> <span class="ty">Employee</span>? GetEmployee(<span class="kw">int</span> id) => _repo.GetById(id);
+}
+
+<span class="cm">// Unit test — no database needed!</span>
+<span class="kw">var</span> mockRepo = <span class="kw">new</span> Mock&lt;<span class="ty">IEmployeeRepository</span>&gt;();
+mockRepo.Setup(r => r.GetById(1)).Returns(<span class="kw">new</span> <span class="ty">Employee</span>{Id=1});</code></pre>
+    </div>
+    <div class="tier-content" id="tb10-exam">
+      <div class="exam-box">
+        <div class="exam-title">📋 Exam-Ready Summary</div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Purpose:</strong> Abstracts data access behind an interface. Business logic never touches DbContext directly.</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Benefits:</strong> testable (mockable), swappable (SQL→Mongo), single source of queries</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Implements DIP:</strong> Service depends on IRepository abstraction, not SqlRepository concrete class</div></div>
+        <div class="exam-point"><div class="exam-bullet">→</div><div class="exam-txt"><strong>Usually paired with Unit of Work</strong> pattern to coordinate transactions across multiple repositories</div></div>
+        <div class="exam-tip"><strong>💡 Say This</strong>"Repository pattern centralizes data access. Combined with DI, it makes the service layer completely independent of the database technology."</div>
+      </div>
+    </div>
+    <div class="solve-row"><span class="solve-tag">B10 · Repository</span><button class="solve-btn" onclick="markSolved('b10',this)">✓ Mark solved</button></div>
+  </div>
+</div>
+</div><!-- end page-patterns -->
+
+</div><!-- end main -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bnav-item active" onclick="switchPage('core');setActiveNav(this)" id="bnav-core">
+    <span class="bnav-icon">⭐</span>
+    <span class="bnav-label">Core 12</span>
+  </div>
+  <div class="bnav-item" onclick="switchPage('csharp');setActiveNav(this)">
+    <span class="bnav-icon">⚙️</span>
+    <span class="bnav-label">C#</span>
+  </div>
+  <div class="bnav-item" onclick="switchPage('async');setActiveNav(this)">
+    <span class="bnav-icon">⚡</span>
+    <span class="bnav-label">Async</span>
+  </div>
+  <div class="bnav-item" onclick="switchPage('dsa');setActiveNav(this)">
+    <span class="bnav-icon">🧮</span>
+    <span class="bnav-label">DSA</span>
+  </div>
+  <div class="bnav-item" onclick="switchPage('sql');setActiveNav(this)">
+    <span class="bnav-icon">🗄️</span>
+    <span class="bnav-label">SQL</span>
+  </div>
+</div>
+
+<script>
+const solved = {};
+
+function toggleCard(id) {
+  const card = document.getElementById('qcard-'+id);
+  card.classList.toggle('open');
+}
+
+function switchTier(btn, cardId, tier) {
+  const body = document.querySelector(`#qcard-${cardId} .q-body`);
+  body.querySelectorAll('.tier-tab').forEach(t => t.classList.remove('active'));
+  body.querySelectorAll('.tier-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`t${cardId}-${tier}`).classList.add('active');
+}
+
+function markSolved(id, btn) {
+  const card = document.getElementById('qcard-'+id);
+  const num = document.getElementById('qnum-'+id);
+  solved[id] = !solved[id];
+  const on = solved[id];
+  card.classList.toggle('solved', on);
+  btn.textContent = on ? '✓ Solved!' : '✓ Mark solved';
+  if(num) { if(on) num.style.background = 'var(--green)'; else num.style.background = ''; }
+  updateProgress();
+  showToast(on ? '✅ Marked as solved!' : '↩️ Unmarked');
+}
+
+function updateProgress() {
+  const total = Object.keys(solved).length ? Object.values(solved).filter(Boolean).length : 0;
+  const coreSolved = [1,2,3,4,5,6,7,8,9,10,11,12].filter(i => solved[i]).length;
+  const allSolved = Object.values(solved).filter(Boolean).length;
+  const allTotal = 22; // approximate total
+  const pct = Math.round(allSolved/allTotal*100);
+  document.getElementById('prog').style.width = pct+'%';
+  document.getElementById('prog-txt').textContent = pct+'%';
+  document.getElementById('solved-count').textContent = coreSolved+' / 12 core';
+  const stat = document.getElementById('stat-solved');
+  if(stat) stat.textContent = coreSolved;
+}
+
+function switchPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-page="${pageId}"]`)?.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function setActiveNav(el) {
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function filterSearch(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('.q-card').forEach(card => {
+    const title = card.querySelector('.q-title')?.textContent.toLowerCase() || '';
+    const cat = card.querySelector('.q-cat')?.textContent.toLowerCase() || '';
+    card.style.display = (title.includes(q) || cat.includes(q)) ? '' : 'none';
+  });
+}
+
+// Open first card on load
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('qcard-1')?.classList.add('open');
+});
+</script>
+</body>
+</html>
