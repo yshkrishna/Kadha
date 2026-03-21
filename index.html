@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kadha — Navigate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #fdf6ed;
+      --ink: #1c1409;
+      --accent: #b8541a;
+      --muted: #8c6b4a;
+      --card: #fff8f0;
+      --border: #e8d5bc;
+      --glow: rgba(184,84,26,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Decorative background circles */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    body::before {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(184,84,26,0.08) 0%, transparent 70%);
+      top: -120px; right: -120px;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(184,84,26,0.06) 0%, transparent 70%);
+      bottom: -100px; left: -100px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      animation: fadeDown 0.7s ease both;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      margin-top: 0.8rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 300;
+      letter-spacing: 0.01em;
+    }
+
+    /* Ornamental divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      justify-content: center;
+      margin: 0.5rem auto 0;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      max-width: 60px;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider-dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    /* Nav grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      width: 100%;
+      max-width: 780px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem 1.4rem;
+      text-decoration: none;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      animation: fadeUp 0.6s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--glow), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(184,84,26,0.13);
+      border-color: var(--accent);
+    }
+    .card:hover::before { opacity: 1; }
+
+    .card-icon {
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    .card-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .card-url {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .card-arrow {
+      margin-top: auto;
+      font-size: 1rem;
+      color: var(--accent);
+      transition: transform 0.2s ease;
+    }
+    .card:hover .card-arrow { transform: translateX(4px); }
+
+    /* Staggered animation delays */
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.10s; }
+    .card:nth-child(3) { animation-delay: 0.15s; }
+    .card:nth-child(4) { animation-delay: 0.20s; }
+    .card:nth-child(5) { animation-delay: 0.25s; }
+    .card:nth-child(6) { animation-delay: 0.30s; }
+
+    footer {
+      margin-top: 2.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <p class="eyebrow">yshkrishna · GitHub Pages</p>
+    <h1>Ka<span>dha</span></h1>
+    <div class="divider"><span class="divider-dot"></span></div>
+    <p class="subtitle">Choose a page to explore</p>
+  </header>
+
+  <nav class="grid">
+
+    <a class="card" href="https://yshkrishna.github.io/Kadha/index.html">
+      <span class="card-icon">🏠</span>
+      <span class="card-label">Index</span>
+      <span class="card-url">index.html</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card" href="https://yshkrishna.github.io/Kadha/start.html">
+      <span class="card-icon">🚀</span>
+      <span class="card-label">Start</span>
+      <span class="card-url">start.html</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card" href="https://yshkrishna.github.io/Kadha/learn.html">
+      <span class="card-icon">📖</span>
+      <span class="card-label">Learn</span>
+      <span class="card-url">learn.html</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card" href="https://yshkrishna.github.io/Kadha/work.html">
+      <span class="card-icon">🛠️</span>
+      <span class="card-label">Work</span>
+      <span class="card-url">work.html</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card" href="https://yshkrishna.github.io/Kadha/data.html">
+      <span class="card-icon">📊</span>
+      <span class="card-label">Data</span>
+      <span class="card-url">data.html</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="card" href="https://yshkrishna.github.io/Kadha/dsa.html">
+      <span class="card-icon">⚡</span>
+      <span class="card-label">dsa</span>
+      <span class="card-url">dsa.html</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+       <a class="card" href="https://yshkrishna.github.io/Kadha/inter.html">
+      <span class="card-icon">⚡</span>
+      <span class="card-label">Inter</span>
+      <span class="card-url">inter.html</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+  </nav>
+
+  <footer>
+    <a href="https://yshkrishna.github.io/Kadha/" target="_blank">yshkrishna.github.io/Kadha</a>
+    &nbsp;·&nbsp; GitHub Pages
+  </footer>
+
+</body>
+</html>
