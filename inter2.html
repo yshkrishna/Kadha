@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C# Interview Prep — Complete Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #141720;
+    --card: #1a1e2e;
+    --card2: #1e2235;
+    --border: #2a2f45;
+    --accent: #7c6af7;
+    --accent2: #4fc3f7;
+    --accent3: #f7c948;
+    --accent4: #4caf82;
+    --red: #f25f5c;
+    --text: #e0e4f0;
+    --muted: #7a80a0;
+    --code-bg: #0a0c14;
+    --tag-bg: #7c6af720;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #0d0f14 0%, #1a1040 50%, #0d0f14 100%);
+    padding: 60px 20px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, #7c6af720 0%, transparent 70%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--tag-bg);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #7c6af7 50%, #4fc3f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 560px;
+    margin: 0 auto 30px;
+    position: relative;
+  }
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-label { font-size: 12px; color: var(--muted); }
+
+  /* NAV */
+  .toc {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .toc-inner {
+    display: flex;
+    gap: 4px;
+    min-width: max-content;
+    padding: 10px 0;
+  }
+  .toc-btn {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .toc-btn:hover, .toc-btn.active {
+    background: var(--tag-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* MAIN */
+  .main { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 40px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .q-card:hover { border-color: var(--accent); }
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 22px 24px;
+    background: var(--card2);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .q-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .q-title-wrap { flex: 1; }
+  .q-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .q-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .tag-dsa { background: #4fc3f720; color: var(--accent2); border: 1px solid #4fc3f740; }
+  .tag-design { background: #4caf8220; color: var(--accent4); border: 1px solid #4caf8240; }
+  .tag-sql { background: #f7c94820; color: var(--accent3); border: 1px solid #f7c94840; }
+  .tag-oop { background: #f25f5c20; color: var(--red); border: 1px solid #f25f5c40; }
+  .tag-async { background: #7c6af720; color: var(--accent); border: 1px solid #7c6af740; }
+  .tag-hot { background: #f25f5c; color: #fff; font-size: 10px; }
+  .q-toggle {
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.3s;
+    margin-top: 2px;
+  }
+  .q-body { padding: 24px; display: none; }
+  .q-body.open { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTIONS */
+  .section { margin-bottom: 24px; }
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ANALOGY BOX */
+  .analogy {
+    background: linear-gradient(135deg, #4fc3f710, #7c6af710);
+    border: 1px solid #4fc3f730;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+  .analogy-icon { font-size: 20px; margin-bottom: 6px; }
+
+  /* INFO BOXES */
+  .box {
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+  .box-tip { background: #4caf8215; border-left: 3px solid var(--accent4); }
+  .box-warn { background: #f7c94815; border-left: 3px solid var(--accent3); }
+  .box-danger { background: #f25f5c15; border-left: 3px solid var(--red); }
+  .box-info { background: #7c6af715; border-left: 3px solid var(--accent); }
+  .box-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .box-tip .box-label { color: var(--accent4); }
+  .box-warn .box-label { color: var(--accent3); }
+  .box-danger .box-label { color: var(--red); }
+  .box-info .box-label { color: var(--accent); }
+
+  /* CODE */
+  pre, code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 10px 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .kw { color: #c792ea; }
+  .cm { color: #546e7a; font-style: italic; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .fn { color: #82aaff; }
+  .type { color: #ffcb6b; }
+  .op { color: #89ddff; }
+
+  /* DRY RUN TABLE */
+  .dry-run {
+    overflow-x: auto;
+    margin: 12px 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  th {
+    background: #7c6af720;
+    color: var(--accent);
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid var(--border);
+    font-weight: 700;
+  }
+  td {
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:nth-child(even) td { background: #ffffff05; }
+  .highlight-row td { background: #7c6af720 !important; color: var(--accent); font-weight: 700; }
+
+  /* COMPLEXITY */
+  .complexity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .cx-box {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+  .cx-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .cx-val { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: var(--accent2); }
+
+  /* STEPS */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    min-width: 28px;
+    height: 28px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content { font-size: 14px; }
+  .step-content strong { color: #fff; }
+
+  /* TEXT BOX DIAGRAM */
+  .diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 10px 0;
+    color: var(--accent2);
+  }
+
+  /* SUMMARY */
+  .summary-box {
+    background: linear-gradient(135deg, #7c6af715, #4fc3f710);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-top: 20px;
+  }
+  .summary-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .summary-box p { font-size: 14px; }
+
+  /* FOLLOW UPS */
+  .followups { margin-top: 16px; }
+  .followup-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .followup-item:last-child { border-bottom: none; }
+  .fq-icon { color: var(--accent3); font-size: 14px; margin-top: 2px; }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    background: var(--border);
+    height: 3px;
+    border-radius: 2px;
+    margin: 6px 0 0;
+  }
+  .progress-bar { height: 100%; border-radius: 2px; background: var(--accent); }
+
+  /* SIMILAR QS SECTION */
+  .similar-qs {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    margin-top: 40px;
+  }
+  .similar-qs h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+  .diff-section { margin-top: 20px; }
+  .diff-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .diff-easy { color: var(--accent4); }
+  .diff-medium { color: var(--accent3); }
+  .diff-hard { color: var(--red); }
+  .q-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .q-item:hover { border-color: var(--accent); }
+  .q-item-title { font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .q-item-hint { color: var(--muted); font-size: 12px; }
+  .q-item-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .hot-badge {
+    background: var(--red);
+    color: #fff;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    .hero { padding: 40px 16px 30px; }
+    .main { padding: 24px 14px 60px; }
+    .q-header { padding: 16px; }
+    .q-body { padding: 16px; }
+    .q-title { font-size: 16px; }
+    pre { font-size: 11px; }
+    .diagram { font-size: 10px; }
+  }
+
+  /* BACK TO TOP */
+  .back-top {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px #7c6af740;
+    display: none;
+    z-index: 200;
+  }
+  .back-top.visible { display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">C# · DSA · SYSTEM DESIGN · SQL</div>
+  <h1>C# Interview Prep<br>Complete Study Guide</h1>
+  <p>12 real interview questions explained from scratch — beginner-friendly, interview-focused.</p>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">12</div><div class="stat-label">Questions</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Topics</div></div>
+    <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Similar Qs</div></div>
+  </div>
+</div>
+
+<nav class="toc">
+  <div class="toc-inner" id="tocInner"></div>
+</nav>
+
+<main class="main" id="main">
+
+<!-- ==================== Q1 ==================== -->
+<div class="q-card" id="q1">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q1</span>
+    <div class="q-title-wrap">
+      <div class="q-title">Run-Length Encoding (String Compression)</div>
+      <div class="q-tags">
+        <span class="tag tag-dsa">DSA</span>
+        <span class="tag tag-hot">🔥 VERY COMMON</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body open">
+    <div class="section">
+      <div class="section-title">📖 The Problem</div>
+      <div class="box box-info">
+        <div class="box-label">Problem</div>
+        Input: <code>aaabbcccceeaa</code><br>
+        Output: <code>a3b2c4e2a2</code>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🎯 Analogy — Understand It Simply</div>
+      <div class="analogy">
+        <div class="analogy-icon">📦</div>
+        Imagine you're packing boxes. Instead of writing "apple, apple, apple" you write "apple × 3". That's exactly what run-length encoding does — it counts consecutive identical characters and writes them as <strong>character + count</strong>.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🧠 Algorithm — Step by Step</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Start at index 0</strong>, set count = 1</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Compare current char with next char</strong>. If same → increment count. If different → append char+count to result, reset count to 1.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>After loop ends</strong>, don't forget to append the last character group!</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Return</strong> the result string.</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🔬 Dry Run — aaabbcccceeaa</div>
+      <div class="dry-run">
+        <table>
+          <tr><th>Index</th><th>Char</th><th>Next</th><th>Count</th><th>Action</th><th>Result So Far</th></tr>
+          <tr><td>0</td><td>a</td><td>a</td><td>1→2</td><td>same, count++</td><td>""</td></tr>
+          <tr><td>1</td><td>a</td><td>a</td><td>2→3</td><td>same, count++</td><td>""</td></tr>
+          <tr><td>2</td><td>a</td><td>b</td><td>3</td><td>diff → write a3</td><td>"a3"</td></tr>
+          <tr><td>3</td><td>b</td><td>b</td><td>1→2</td><td>same, count++</td><td>"a3"</td></tr>
+          <tr><td>4</td><td>b</td><td>c</td><td>2</td><td>diff → write b2</td><td>"a3b2"</td></tr>
+          <tr><td>5-8</td><td>c×4</td><td>e</td><td>4</td><td>diff → write c4</td><td>"a3b2c4"</td></tr>
+          <tr><td>9-10</td><td>e×2</td><td>a</td><td>2</td><td>diff → write e2</td><td>"a3b2c4e2"</td></tr>
+          <tr class="highlight-row"><td>11-12</td><td>a×2</td><td>END</td><td>2</td><td>loop ends → write a2</td><td>"a3b2c4e2a2" ✅</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💻 Solution Code (C#)</div>
+<pre><span class="kw">public static</span> <span class="type">string</span> <span class="fn">RunLengthEncode</span>(<span class="type">string</span> input)
+{
+    <span class="kw">if</span> (<span class="type">string</span>.IsNullOrEmpty(input)) <span class="kw">return</span> <span class="str">""</span>;
+
+    <span class="kw">var</span> result = <span class="kw">new</span> <span class="type">StringBuilder</span>();
+    <span class="kw">int</span> count = <span class="num">1</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; input.Length; i++)
+    {
+        <span class="kw">if</span> (input[i] == input[i - <span class="num">1</span>])
+            count++;
+        <span class="kw">else</span>
+        {
+            result.Append(input[i - <span class="num">1</span>]);
+            result.Append(count);
+            count = <span class="num">1</span>;
+        }
+    }
+    <span class="cm">// Don't forget the last group!</span>
+    result.Append(input[input.Length - <span class="num">1</span>]);
+    result.Append(count);
+
+    <span class="kw">return</span> result.ToString();
+}</pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">⚡ Complexity</div>
+      <div class="complexity-grid">
+        <div class="cx-box"><div class="cx-label">Time</div><div class="cx-val">O(n)</div></div>
+        <div class="cx-box"><div class="cx-label">Space</div><div class="cx-val">O(n)</div></div>
+        <div class="cx-box"><div class="cx-label">Single Pass</div><div class="cx-val">✅ Yes</div></div>
+      </div>
+    </div>
+
+    <div class="box box-danger">
+      <div class="box-label">⚠️ Common Mistakes</div>
+      1. Forgetting to append the LAST group after the loop ends.<br>
+      2. Using <code>string +=</code> inside loops (creates new strings each time — O(n²)). Always use <code>StringBuilder</code>!
+    </div>
+
+    <div class="box box-warn">
+      <div class="box-label">🎤 Interview Tips</div>
+      • Mention StringBuilder vs string concatenation proactively.<br>
+      • Discuss edge cases: empty string, single char, all same chars.<br>
+      • Extension: what if count=1? Should you write "a1" or just "a"?
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>Scan string once. Count consecutive same chars. On change → write char+count. Don't miss the last group. Use StringBuilder for O(n) space efficiency.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q2 ==================== -->
+<div class="q-card" id="q2">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q2</span>
+    <div class="q-title-wrap">
+      <div class="q-title">Remove Duplicates from Array</div>
+      <div class="q-tags">
+        <span class="tag tag-dsa">DSA</span>
+        <span class="tag tag-hot">🔥 VERY COMMON</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">🎯 Analogy</div>
+      <div class="analogy">
+        <div class="analogy-icon">📋</div>
+        Imagine a guest list with duplicate names. You want to keep only the first occurrence of each name and hand a clean list. You'd go through the list, and tick off names you've already seen.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🧠 Three Approaches</div>
+      <div class="box box-info">
+        <div class="box-label">Approach 1 — Using HashSet (Best)</div>
+        A HashSet automatically rejects duplicates. Loop through array, try to add each element — HashSet ignores it if already present.
+      </div>
+      <div class="box box-warn">
+        <div class="box-label">Approach 2 — Using LINQ (Cleanest Code)</div>
+        <code>array.Distinct().ToArray()</code> — clean one-liner but hides the logic.
+      </div>
+      <div class="box box-danger">
+        <div class="box-label">Approach 3 — Nested Loop (Naive — Avoid!)</div>
+        O(n²) — for each element, scan all previous elements. Too slow for large arrays.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💻 Solution Code (C#)</div>
+<pre><span class="cm">// Approach 1: HashSet — O(n) time, O(n) space</span>
+<span class="kw">public static int</span>[] <span class="fn">RemoveDuplicates</span>(<span class="kw">int</span>[] arr)
+{
+    <span class="kw">var</span> seen = <span class="kw">new</span> <span class="type">HashSet</span>&lt;<span class="kw">int</span>&gt;();
+    <span class="kw">var</span> result = <span class="kw">new</span> <span class="type">List</span>&lt;<span class="kw">int</span>&gt;();
+
+    <span class="kw">foreach</span> (<span class="kw">var</span> num <span class="kw">in</span> arr)
+    {
+        <span class="kw">if</span> (seen.Add(num))  <span class="cm">// Add returns false if duplicate</span>
+            result.Add(num);
+    }
+    <span class="kw">return</span> result.ToArray();
+}
+
+<span class="cm">// Approach 2: LINQ (clean but for interviews, explain it)</span>
+<span class="kw">var</span> unique = arr.Distinct().ToArray();
+
+<span class="cm">// Input:  [1, 2, 3, 1, 2, 4, 5]</span>
+<span class="cm">// Output: [1, 2, 3, 4, 5]</span></pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🔬 Dry Run with HashSet</div>
+      <div class="dry-run">
+        <table>
+          <tr><th>Element</th><th>seen.Add()</th><th>Result</th></tr>
+          <tr><td>1</td><td>✅ Added (new)</td><td>[1]</td></tr>
+          <tr><td>2</td><td>✅ Added (new)</td><td>[1,2]</td></tr>
+          <tr><td>3</td><td>✅ Added (new)</td><td>[1,2,3]</td></tr>
+          <tr><td>1</td><td>❌ Rejected (dup)</td><td>[1,2,3]</td></tr>
+          <tr><td>2</td><td>❌ Rejected (dup)</td><td>[1,2,3]</td></tr>
+          <tr><td>4</td><td>✅ Added (new)</td><td>[1,2,3,4]</td></tr>
+          <tr class="highlight-row"><td>5</td><td>✅ Added (new)</td><td>[1,2,3,4,5] ✅</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">⚡ Complexity</div>
+      <div class="complexity-grid">
+        <div class="cx-box"><div class="cx-label">HashSet Time</div><div class="cx-val">O(n)</div></div>
+        <div class="cx-box"><div class="cx-label">HashSet Space</div><div class="cx-val">O(n)</div></div>
+        <div class="cx-box"><div class="cx-label">Naive Time</div><div class="cx-val">O(n²)</div></div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>HashSet = fastest way. It stores only unique elements. LINQ's <code>Distinct()</code> works but always explain the underlying logic in interviews.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q3 ==================== -->
+<div class="q-card" id="q3">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q3</span>
+    <div class="q-title-wrap">
+      <div class="q-title">SOLID Principles — What's Wrong with ReportGenerator?</div>
+      <div class="q-tags">
+        <span class="tag tag-oop">OOP</span>
+        <span class="tag tag-design">SOLID</span>
+        <span class="tag tag-hot">🔥 VERY COMMON</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">🎯 What is SOLID?</div>
+      <div class="analogy">
+        <div class="analogy-icon">🏗️</div>
+        SOLID is like building rules for software. Just as a good building has one purpose per room (kitchen = cooking, bedroom = sleeping), SOLID says each class should have one purpose, and adding new features shouldn't break old ones.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🔍 Problems in ReportGenerator</div>
+
+      <div class="box box-danger">
+        <div class="box-label">❌ Violation 1 — SRP (Single Responsibility Principle)</div>
+        <strong>Problem:</strong> One class is doing 3 completely different jobs: <em>generating reports</em>, <em>saving files</em>, and <em>sending emails</em>.<br><br>
+        <strong>Rule:</strong> A class should have only ONE reason to change.<br>
+        <strong>Real-world:</strong> A chef cooks. A waiter serves. They don't swap jobs.
+      </div>
+
+      <div class="box box-danger">
+        <div class="box-label">❌ Violation 2 — OCP (Open/Closed Principle)</div>
+        <strong>Problem:</strong> The <code>GenerateReport</code> method uses <code>if/else if</code> to check report types. To add "Word" format, you MUST edit this method.<br><br>
+        <strong>Rule:</strong> Classes should be <em>Open for extension, Closed for modification</em>.<br>
+        <strong>Real-world:</strong> A power strip has sockets — you add new devices without rebuilding it.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">✅ Fixed Design — Applying SOLID</div>
+<pre><span class="cm">// SRP: Separate concerns into separate classes</span>
+
+<span class="cm">// OCP: Use abstraction so new types can be added</span>
+<span class="kw">public interface</span> <span class="type">IReportGenerator</span>
+{
+    <span class="kw">void</span> <span class="fn">Generate</span>();
+}
+
+<span class="kw">public class</span> <span class="type">PdfReportGenerator</span> : <span class="type">IReportGenerator</span>
+{
+    <span class="kw">public void</span> <span class="fn">Generate</span>() => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Generating PDF..."</span>);
+}
+
+<span class="kw">public class</span> <span class="type">ExcelReportGenerator</span> : <span class="type">IReportGenerator</span>
+{
+    <span class="kw">public void</span> <span class="fn">Generate</span>() => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Generating Excel..."</span>);
+}
+
+<span class="cm">// SRP: File saving is separate</span>
+<span class="kw">public class</span> <span class="type">FileSaver</span>
+{
+    <span class="kw">public void</span> <span class="fn">Save</span>(<span class="type">string</span> data) => <span class="type">File</span>.<span class="fn">WriteAllText</span>(<span class="str">"report.txt"</span>, data);
+}
+
+<span class="cm">// SRP: Email sending is separate</span>
+<span class="kw">public class</span> <span class="type">EmailSender</span>
+{
+    <span class="kw">public void</span> <span class="fn">Send</span>(<span class="type">string</span> email, <span class="type">string</span> content)
+        => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Sending to {email}"</span>);
+}
+
+<span class="cm">// Adding "Word" format? Just add a new class — no existing code changes!</span>
+<span class="kw">public class</span> <span class="type">WordReportGenerator</span> : <span class="type">IReportGenerator</span>
+{
+    <span class="kw">public void</span> <span class="fn">Generate</span>() => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Generating Word..."</span>);
+}</pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📐 All 5 SOLID Principles — Quick Reference</div>
+      <div class="dry-run">
+        <table>
+          <tr><th>Letter</th><th>Name</th><th>Simple Rule</th><th>Real-World</th></tr>
+          <tr><td>S</td><td>Single Responsibility</td><td>One class = one job</td><td>Chef cooks, waiter serves</td></tr>
+          <tr><td>O</td><td>Open/Closed</td><td>Extend, don't modify</td><td>Power strip — add devices</td></tr>
+          <tr><td>L</td><td>Liskov Substitution</td><td>Subclass ≈ parent class</td><td>Square IS a Rectangle</td></tr>
+          <tr><td>I</td><td>Interface Segregation</td><td>Small focused interfaces</td><td>Worker vs Manager interface</td></tr>
+          <tr><td>D</td><td>Dependency Inversion</td><td>Depend on abstractions</td><td>Plugin socket, not hardwire</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>ReportGenerator violates SRP (one class, 3 jobs) and OCP (if/else blocks that need editing to extend). Fix: split into separate classes + use interfaces for report types.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q4 ==================== -->
+<div class="q-card" id="q4">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q4</span>
+    <div class="q-title-wrap">
+      <div class="q-title">Async/Await — How Long Does Each Take?</div>
+      <div class="q-tags">
+        <span class="tag tag-async">ASYNC</span>
+        <span class="tag tag-hot">🔥 TRICKY</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">🎯 Analogy — The Restaurant Kitchen</div>
+      <div class="analogy">
+        <div class="analogy-icon">🍳</div>
+        <strong>Sequential await</strong> = One chef does task1, waits for it to finish, then does task2. Tasks run one at a time.<br><br>
+        <strong>Task.WhenAll</strong> = Three chefs cook simultaneously. All start at once, you wait for the slowest one.<br><br>
+        <strong>Fire-and-forget</strong> = You started 3 chefs but left the kitchen before they finished!
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📊 Time Analysis (Assume each task = 1 second)</div>
+      <div class="dry-run">
+        <table>
+          <tr><th>Method</th><th>How it runs</th><th>Total Time</th></tr>
+          <tr><td><code>doAsyncTask()</code> with sequential await</td><td>1s → wait → 1s → wait → 1s</td><td class="highlight-row">~3 seconds</td></tr>
+          <tr><td><code>NormalTask()</code> synchronous</td><td>1s + 1s + 1s (blocking)</td><td class="highlight-row">~3 seconds</td></tr>
+          <tr><td><code>doAsyncTask()</code> fire-and-forget ⚠️</td><td>Tasks START but aren't awaited</td><td class="highlight-row">~0 seconds (BUG!)</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🔍 Detailed Breakdown</div>
+
+      <div class="box box-warn">
+        <div class="box-label">Version 1 — Sequential await (3 seconds)</div>
+        Each <code>await</code> pauses execution until that task completes. Like waiting at a red light, then driving, then another red light. Total = sum of all tasks.
+      </div>
+
+      <div class="box box-info">
+        <div class="box-label">Version 2 — Normal synchronous (3 seconds)</div>
+        Blocking calls. Thread is occupied the whole time. Same time as sequential await, but BLOCKS the thread (no UI responsiveness, no other work).
+      </div>
+
+      <div class="box box-danger">
+        <div class="box-label">Version 3 — Fire and Forget (DANGEROUS — ~0 seconds recorded but tasks incomplete)</div>
+        Tasks are started but <strong>not awaited</strong>. Timer stops immediately. Tasks still run in background. Exceptions are SWALLOWED silently! This is a common bug.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">✅ The RIGHT Way — Parallel Execution (Fastest)</div>
+<pre><span class="kw">public async</span> <span class="type">Task</span> <span class="fn">DoParallelAsync</span>()
+{
+    <span class="cm">// Start all tasks FIRST (don't await yet)</span>
+    <span class="type">Task</span> t1 = <span class="fn">TaskAsync1</span>();  <span class="cm">// starts immediately</span>
+    <span class="type">Task</span> t2 = <span class="fn">TaskAsync2</span>();  <span class="cm">// starts immediately</span>
+    <span class="type">Task</span> t3 = <span class="fn">TaskAsync3</span>();  <span class="cm">// starts immediately</span>
+
+    <span class="cm">// NOW await all of them together</span>
+    <span class="kw">await</span> <span class="type">Task</span>.<span class="fn">WhenAll</span>(t1, t2, t3);
+
+    <span class="cm">// Total time = MAX of all tasks, not SUM!</span>
+    <span class="cm">// If each = 1 sec → total ~1 second ✅</span>
+}</pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🗺️ Visual: Sequential vs Parallel</div>
+      <div class="diagram">Sequential await:
+───[Task1: 1s]──►───[Task2: 1s]──►───[Task3: 1s]──►  Total: 3s
+
+Parallel (WhenAll):
+───[Task1: 1s]──►
+───[Task2: 1s]──►   All running simultaneously!
+───[Task3: 1s]──►  Total: ~1s ✅
+
+Fire-and-forget:
+───[Task1]─ (not awaited)
+───[Task2]─ (not awaited)     Timer stops here ⚠️
+───[Task3]─ (not awaited)
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>Sequential await = 3s. Sync = 3s but blocks thread. Fire-and-forget = BUGS (exceptions lost, tasks untracked). <strong>Use Task.WhenAll() for parallel = 1s!</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q5 ==================== -->
+<div class="q-card" id="q5">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q5</span>
+    <div class="q-title-wrap">
+      <div class="q-title">Move All Zeroes to End (Keep Order)</div>
+      <div class="q-tags">
+        <span class="tag tag-dsa">DSA</span>
+        <span class="tag tag-hot">🔥 CLASSIC</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">🎯 Analogy</div>
+      <div class="analogy">
+        <div class="analogy-icon">🧹</div>
+        Think of sweeping a floor. Non-zero elements are people standing, zeroes are dust. You move everyone to the left, and the dust naturally settles to the right. People keep their relative order!
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🧠 Two Pointer Algorithm</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>writePos = 0</strong> — this pointer marks where the next non-zero goes.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Loop through array.</strong> When we find a non-zero element, place it at <code>arr[writePos]</code> and increment writePos.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>After loop:</strong> Fill remaining positions from writePos to end with 0s.</div></step></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🔬 Dry Run — [0, 1, 0, 3, 12]</div>
+      <div class="dry-run">
+        <table>
+          <tr><th>i</th><th>arr[i]</th><th>Action</th><th>Array State</th><th>writePos</th></tr>
+          <tr><td>0</td><td>0</td><td>Skip (zero)</td><td>[0,1,0,3,12]</td><td>0</td></tr>
+          <tr><td>1</td><td>1</td><td>Place at [0]</td><td>[1,1,0,3,12]</td><td>1</td></tr>
+          <tr><td>2</td><td>0</td><td>Skip (zero)</td><td>[1,1,0,3,12]</td><td>1</td></tr>
+          <tr><td>3</td><td>3</td><td>Place at [1]</td><td>[1,3,0,3,12]</td><td>2</td></tr>
+          <tr><td>4</td><td>12</td><td>Place at [2]</td><td>[1,3,12,3,12]</td><td>3</td></tr>
+          <tr class="highlight-row"><td>—</td><td>—</td><td>Fill [3],[4] with 0</td><td>[1,3,12,0,0] ✅</td><td>3</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💻 Solution Code (C#)</div>
+<pre><span class="kw">public static void</span> <span class="fn">MoveZeroesEnd</span>(<span class="kw">int</span>[] arr)
+{
+    <span class="kw">int</span> writePos = <span class="num">0</span>;
+
+    <span class="cm">// Step 1: Copy all non-zeros to front</span>
+    <span class="kw">foreach</span> (<span class="kw">var</span> num <span class="kw">in</span> arr)
+    {
+        <span class="kw">if</span> (num != <span class="num">0</span>)
+            arr[writePos++] = num;
+    }
+
+    <span class="cm">// Step 2: Fill rest with zeros</span>
+    <span class="kw">while</span> (writePos &lt; arr.Length)
+        arr[writePos++] = <span class="num">0</span>;
+}
+
+<span class="cm">// Input:  [0, 1, 0, 3, 12]</span>
+<span class="cm">// Output: [1, 3, 12, 0, 0]</span></pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">⚡ Complexity</div>
+      <div class="complexity-grid">
+        <div class="cx-box"><div class="cx-label">Time</div><div class="cx-val">O(n)</div></div>
+        <div class="cx-box"><div class="cx-label">Space</div><div class="cx-val">O(1)</div></div>
+        <div class="cx-box"><div class="cx-label">In-place</div><div class="cx-val">✅ Yes</div></div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>Two-pointer technique. One pass to move non-zeros to front (preserving order), then fill tail with zeros. O(n) time, O(1) space — in-place!</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q6 ==================== -->
+<div class="q-card" id="q6">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q6</span>
+    <div class="q-title-wrap">
+      <div class="q-title">Implement LRU Cache</div>
+      <div class="q-tags">
+        <span class="tag tag-dsa">DSA</span>
+        <span class="tag tag-design">System Design</span>
+        <span class="tag tag-hot">🔥 TOP INTERVIEW Q</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">🎯 What is LRU Cache?</div>
+      <div class="analogy">
+        <div class="analogy-icon">📚</div>
+        Imagine a small bookshelf holding 3 books. When it's full and you need a new book, you remove the one you read <strong>least recently</strong>. The most recently used books stay near the front. That's LRU (Least Recently Used) caching!<br><br>
+        <strong>Real examples:</strong> Browser cache, CPU cache, Redis cache, OS page replacement.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🧠 Data Structure Design</div>
+      <div class="box box-info">
+        <div class="box-label">Why Dictionary + LinkedList?</div>
+        • <strong>Dictionary (HashMap)</strong>: O(1) lookup by key<br>
+        • <strong>LinkedList</strong>: O(1) add/remove from front and back<br>
+        • Together: Get = O(1), Put = O(1) ← both operations are constant time!
+      </div>
+      <div class="diagram">
+Most Recently Used                    Least Recently Used
+       │                                        │
+       ▼                                        ▼
+  [HEAD] ←→ [Node:A,1] ←→ [Node:B,2] ←→ [TAIL]
+
+Dictionary:  { "A" → NodeA, "B" → NodeB }
+
+On GET(A): Move A to front (most recent)
+On PUT(new) when full: Remove from TAIL (least recent)</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💻 LRU Cache Implementation (C#)</div>
+<pre><span class="kw">public class</span> <span class="type">LRUCache</span>
+{
+    <span class="kw">private readonly int</span> _capacity;
+    <span class="kw">private readonly</span> <span class="type">Dictionary</span>&lt;<span class="kw">int</span>, <span class="type">LinkedListNode</span>&lt;(<span class="kw">int</span> key, <span class="kw">int</span> val)&gt;&gt; _map;
+    <span class="kw">private readonly</span> <span class="type">LinkedList</span>&lt;(<span class="kw">int</span> key, <span class="kw">int</span> val)&gt; _list;
+
+    <span class="kw">public</span> <span class="fn">LRUCache</span>(<span class="kw">int</span> capacity)
+    {
+        _capacity = capacity;
+        _map = <span class="kw">new</span>();
+        _list = <span class="kw">new</span>();
+    }
+
+    <span class="kw">public int</span> <span class="fn">Get</span>(<span class="kw">int</span> key)
+    {
+        <span class="kw">if</span> (!_map.ContainsKey(key)) <span class="kw">return</span> -<span class="num">1</span>;
+
+        <span class="kw">var</span> node = _map[key];
+        _list.<span class="fn">Remove</span>(node);          <span class="cm">// Remove from current position</span>
+        _list.<span class="fn">AddFirst</span>(node.Value);   <span class="cm">// Move to front (most recent)</span>
+        _map[key] = _list.First!;
+
+        <span class="kw">return</span> node.Value.val;
+    }
+
+    <span class="kw">public void</span> <span class="fn">Put</span>(<span class="kw">int</span> key, <span class="kw">int</span> value)
+    {
+        <span class="kw">if</span> (_map.ContainsKey(key))
+        {
+            _list.<span class="fn">Remove</span>(_map[key]);   <span class="cm">// Remove old position</span>
+        }
+        <span class="kw">else if</span> (_map.Count == _capacity)
+        {
+            <span class="cm">// Evict least recently used (tail)</span>
+            <span class="kw">var</span> lru = _list.Last!;
+            _map.<span class="fn">Remove</span>(lru.Value.key);
+            _list.<span class="fn">RemoveLast</span>();
+        }
+
+        _list.<span class="fn">AddFirst</span>((key, value));  <span class="cm">// Add to front</span>
+        _map[key] = _list.First!;
+    }
+}</pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">⚡ Complexity</div>
+      <div class="complexity-grid">
+        <div class="cx-box"><div class="cx-label">Get Time</div><div class="cx-val">O(1)</div></div>
+        <div class="cx-box"><div class="cx-label">Put Time</div><div class="cx-val">O(1)</div></div>
+        <div class="cx-box"><div class="cx-label">Space</div><div class="cx-val">O(n)</div></div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>LRU Cache = Dictionary + DoublyLinkedList. Dictionary for O(1) lookups. LinkedList for O(1) ordering (most recent = head, LRU = tail). On capacity: evict tail. On access/write: move to head.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q7 ==================== -->
+<div class="q-card" id="q7">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q7</span>
+    <div class="q-title-wrap">
+      <div class="q-title">Design Reports System — OOP with SOLID</div>
+      <div class="q-tags">
+        <span class="tag tag-design">System Design</span>
+        <span class="tag tag-oop">OOP</span>
+        <span class="tag tag-hot">🔥 COMMON</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">📋 Requirements Breakdown</div>
+      <div class="dry-run">
+        <table>
+          <tr><th>Report</th><th>Display</th><th>Print</th><th>Export</th></tr>
+          <tr><td>Report A</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td>Report B</td><td>✅</td><td>✅</td><td>❌</td></tr>
+          <tr><td>Report C</td><td>✅</td><td>❌</td><td>✅</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🧠 Design Approach — Interface Segregation (ISP)</div>
+      <div class="analogy">
+        <div class="analogy-icon">🔌</div>
+        Don't force a class to implement methods it doesn't need. A printer shouldn't have an "Export" method if it can't export. Split into small, focused interfaces.
+      </div>
+      <div class="diagram">
+         IReport              IPrintable           IExportable
+      ──────────           ────────────          ─────────────
+      + Display()          + Print()             + Export()
+           │                    │                      │
+           └───────────────┬────┘              ┌───────┘
+                           │                   │
+               ┌───────────▼───────────────────▼──────┐
+               │           ReportA                     │
+               │  Display() + Print() + Export() ✅    │
+               └───────────────────────────────────────┘
+               ┌─────────────────────────────────┐
+               │  ReportB: Display() + Print()   │
+               └─────────────────────────────────┘
+               ┌─────────────────────────────────┐
+               │  ReportC: Display() + Export()  │
+               └─────────────────────────────────┘</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💻 Implementation (C#)</div>
+<pre><span class="cm">// Segregated interfaces (ISP)</span>
+<span class="kw">public interface</span> <span class="type">IReport</span>
+{
+    <span class="kw">void</span> <span class="fn">Display</span>();  <span class="cm">// Common to all</span>
+}
+
+<span class="kw">public interface</span> <span class="type">IPrintable</span>
+{
+    <span class="kw">void</span> <span class="fn">Print</span>();
+}
+
+<span class="kw">public interface</span> <span class="type">IExportable</span>
+{
+    <span class="kw">void</span> <span class="fn">Export</span>();
+}
+
+<span class="cm">// Abstract base with common Display (Template Method Pattern)</span>
+<span class="kw">public abstract class</span> <span class="type">BaseReport</span> : <span class="type">IReport</span>
+{
+    <span class="kw">public abstract void</span> <span class="fn">Display</span>();  <span class="cm">// Each report shows differently</span>
+}
+
+<span class="cm">// Report A: can do everything</span>
+<span class="kw">public class</span> <span class="type">ReportA</span> : <span class="type">BaseReport</span>, <span class="type">IPrintable</span>, <span class="type">IExportable</span>
+{
+    <span class="kw">public override void</span> <span class="fn">Display</span>() => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Report A Display"</span>);
+    <span class="kw">public void</span> <span class="fn">Print</span>()  => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Report A Print"</span>);
+    <span class="kw">public void</span> <span class="fn">Export</span>() => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Report A Export"</span>);
+}
+
+<span class="cm">// Report B: print only</span>
+<span class="kw">public class</span> <span class="type">ReportB</span> : <span class="type">BaseReport</span>, <span class="type">IPrintable</span>
+{
+    <span class="kw">public override void</span> <span class="fn">Display</span>() => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Report B Display"</span>);
+    <span class="kw">public void</span> <span class="fn">Print</span>()  => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Report B Print"</span>);
+}
+
+<span class="cm">// Report C: export only</span>
+<span class="kw">public class</span> <span class="type">ReportC</span> : <span class="type">BaseReport</span>, <span class="type">IExportable</span>
+{
+    <span class="kw">public override void</span> <span class="fn">Display</span>() => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Report C Display"</span>);
+    <span class="kw">public void</span> <span class="fn">Export</span>() => <span class="type">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Report C Export"</span>);
+}
+
+<span class="cm">// Usage</span>
+<span class="type">IReport</span>[] reports = { <span class="kw">new</span> <span class="type">ReportA</span>(), <span class="kw">new</span> <span class="type">ReportB</span>(), <span class="kw">new</span> <span class="type">ReportC</span>() };
+<span class="kw">foreach</span> (<span class="kw">var</span> r <span class="kw">in</span> reports) r.<span class="fn">Display</span>();
+
+<span class="kw">if</span> (reports[<span class="num">0</span>] <span class="kw">is</span> <span class="type">IPrintable</span> printable) printable.<span class="fn">Print</span>();</pre>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>Use abstract base class for shared Display(). Use separate interfaces (IPrintable, IExportable) so classes only implement what they support. This is ISP from SOLID.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q8 ==================== -->
+<div class="q-card" id="q8">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q8</span>
+    <div class="q-title-wrap">
+      <div class="q-title">Extension Methods — Add GetData() to Employee Without Changing It</div>
+      <div class="q-tags">
+        <span class="tag tag-oop">C# Feature</span>
+        <span class="tag tag-hot">🔥 COMMON</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">🎯 Analogy</div>
+      <div class="analogy">
+        <div class="analogy-icon">🔧</div>
+        Imagine a tool you bought that doesn't have a specific attachment. Instead of rebuilding the tool, you create an adapter/attachment that works WITH the tool. That's what Extension Methods do — they add new methods to existing classes without modifying them!<br><br>
+        This is also how LINQ works! <code>.Where()</code>, <code>.Select()</code> etc. are all extension methods on <code>IEnumerable</code>.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📋 Rules for Extension Methods</div>
+      <div class="box box-info">
+        <div class="box-label">4 Requirements</div>
+        1. Must be in a <strong>static class</strong><br>
+        2. Method must be <strong>static</strong><br>
+        3. First parameter: <strong>this ClassName param</strong> (the "this" keyword is the magic!)<br>
+        4. Call it like a normal instance method
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💻 Solution Code (C#)</div>
+<pre><span class="cm">// The DLL has this class — we CANNOT change it</span>
+<span class="kw">public class</span> <span class="type">Employee</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="cm">// OUR code — adding GetData without modifying Employee</span>
+<span class="kw">public static class</span> <span class="type">EmployeeExtensions</span>
+{
+    <span class="cm">// "this Employee emp" = this applies to Employee instances</span>
+    <span class="kw">public static string</span> <span class="fn">GetData</span>(<span class="kw">this</span> <span class="type">Employee</span> emp)
+    {
+        <span class="kw">return</span> <span class="str">$"ID: {emp.Id}, Name: {emp.Name}"</span>;
+    }
+
+    <span class="cm">// You can add as many extension methods as needed!</span>
+    <span class="kw">public static bool</span> <span class="fn">IsValid</span>(<span class="kw">this</span> <span class="type">Employee</span> emp)
+    {
+        <span class="kw">return</span> emp.Id > <span class="num">0</span> &amp;&amp; !<span class="type">string</span>.IsNullOrEmpty(emp.Name);
+    }
+}
+
+<span class="cm">// Usage — looks like Employee has these methods natively!</span>
+<span class="kw">var</span> emp = <span class="kw">new</span> <span class="type">Employee</span> { Id = <span class="num">1</span>, Name = <span class="str">"Alice"</span> };
+<span class="kw">var</span> data = emp.<span class="fn">GetData</span>();   <span class="cm">// "ID: 1, Name: Alice"</span>
+<span class="kw">bool</span> valid = emp.<span class="fn">IsValid</span>(); <span class="cm">// true</span></pre>
+    </div>
+
+    <div class="box box-warn">
+      <div class="box-label">⚠️ Limitations of Extension Methods</div>
+      • Cannot access private members of the class<br>
+      • Won't show in IntelliSense unless the static class namespace is imported<br>
+      • If the class adds a method with same name later, the original method takes priority
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>Extension methods = add methods to sealed/external classes without inheritance or modification. Static class + static method + "this TypeName param". This is how LINQ is built!</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q9 ==================== -->
+<div class="q-card" id="q9">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q9</span>
+    <div class="q-title-wrap">
+      <div class="q-title">How to VIOLATE SOLID Principles (Examples)</div>
+      <div class="q-tags">
+        <span class="tag tag-oop">OOP</span>
+        <span class="tag tag-design">SOLID</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">🔥 One-Line Violations for Each Principle</div>
+
+      <div class="box box-danger">
+        <div class="box-label">❌ Violate SRP — One class, many jobs</div>
+<pre><span class="kw">class</span> <span class="type">UserManager</span>
+{
+    <span class="kw">void</span> <span class="fn">Login</span>() { }       <span class="cm">// auth logic</span>
+    <span class="kw">void</span> <span class="fn">SendEmail</span>() { }   <span class="cm">// email logic</span>
+    <span class="kw">void</span> <span class="fn">SaveToDb</span>() { }    <span class="cm">// data logic</span>
+    <span class="cm">// 3 jobs → 3 reasons to change ❌</span>
+}</pre>
+      </div>
+
+      <div class="box box-danger">
+        <div class="box-label">❌ Violate OCP — if/else that needs editing to extend</div>
+<pre><span class="kw">void</span> <span class="fn">DrawShape</span>(<span class="type">string</span> shape)
+{
+    <span class="kw">if</span> (shape == <span class="str">"Circle"</span>) { <span class="cm">/* draw */</span> }
+    <span class="kw">else if</span> (shape == <span class="str">"Square"</span>) { <span class="cm">/* draw */</span> }
+    <span class="cm">// Adding "Triangle"? Must edit this method ❌</span>
+}</pre>
+      </div>
+
+      <div class="box box-danger">
+        <div class="box-label">❌ Violate LSP — Subclass breaks parent's contract</div>
+<pre><span class="kw">class</span> <span class="type">Bird</span> { <span class="kw">virtual void</span> <span class="fn">Fly</span>() { } }
+<span class="kw">class</span> <span class="type">Penguin</span> : <span class="type">Bird</span>
+{
+    <span class="kw">override void</span> <span class="fn">Fly</span>()
+    {
+        <span class="kw">throw new</span> <span class="type">Exception</span>(<span class="str">"Penguins can't fly!"</span>); <span class="cm">// ❌ LSP violated</span>
+    }
+}</pre>
+      </div>
+
+      <div class="box box-danger">
+        <div class="box-label">❌ Violate ISP — Fat interface forces empty implementations</div>
+<pre><span class="kw">interface</span> <span class="type">IWorker</span>
+{
+    <span class="kw">void</span> <span class="fn">Work</span>();
+    <span class="kw">void</span> <span class="fn">Eat</span>();
+    <span class="kw">void</span> <span class="fn">Sleep</span>();  <span class="cm">// Robot doesn't sleep ❌</span>
+}
+<span class="kw">class</span> <span class="type">Robot</span> : <span class="type">IWorker</span>
+{
+    <span class="kw">void</span> <span class="fn">Sleep</span>() { <span class="cm">/* empty — forced ❌ */</span> }
+}</pre>
+      </div>
+
+      <div class="box box-danger">
+        <div class="box-label">❌ Violate DIP — Depend on concrete class, not abstraction</div>
+<pre><span class="kw">class</span> <span class="type">OrderService</span>
+{
+    <span class="kw">private</span> <span class="type">MySqlDatabase</span> _db = <span class="kw">new</span> <span class="type">MySqlDatabase</span>(); <span class="cm">// ❌ hardcoded</span>
+    <span class="cm">// What if we switch to PostgreSQL? We must rewrite OrderService ❌</span>
+}</pre>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>SRP: multiple jobs in one class. OCP: if/else to add features. LSP: subclass throws NotImplemented. ISP: empty interface methods. DIP: <code>new ConcreteClass()</code> inside class.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q10 ==================== -->
+<div class="q-card" id="q10">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q10</span>
+    <div class="q-title-wrap">
+      <div class="q-title">SQL — Cities with Above-Average Customer Count</div>
+      <div class="q-tags">
+        <span class="tag tag-sql">SQL</span>
+        <span class="tag tag-hot">🔥 COMMON</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">🎯 Problem Breakdown</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Count customers per city</strong> using GROUP BY + COUNT</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Calculate average</strong> customers per city using a subquery</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Filter cities</strong> where count > average using HAVING</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🔬 Data Analysis</div>
+      <div class="dry-run">
+        <table>
+          <tr><th>City</th><th>Count</th><th>Avg (8 customers / 7 cities ≈ 1.14)</th><th>Result</th></tr>
+          <tr class="highlight-row"><td>New York</td><td>2</td><td>> 1.14</td><td>✅ Include</td></tr>
+          <tr><td>California</td><td>1</td><td>≤ 1.14</td><td>❌ Exclude</td></tr>
+          <tr class="highlight-row"><td>London</td><td>2</td><td>> 1.14</td><td>✅ Include</td></tr>
+          <tr><td>Paris</td><td>1</td><td>≤ 1.14</td><td>❌ Exclude</td></tr>
+          <tr><td>Berlin</td><td>1</td><td>≤ 1.14</td><td>❌ Exclude</td></tr>
+          <tr><td>Moscow</td><td>1</td><td>≤ 1.14</td><td>❌ Exclude</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💻 SQL Solution</div>
+<pre><span class="cm">-- Solution using subquery</span>
+<span class="kw">SELECT</span>
+    city,
+    <span class="fn">COUNT</span>(customer_id) <span class="kw">AS</span> customer_count
+<span class="kw">FROM</span>
+    customers
+<span class="kw">GROUP BY</span>
+    city
+<span class="kw">HAVING</span>
+    <span class="fn">COUNT</span>(customer_id) > (
+        <span class="cm">-- Subquery: average customers per city</span>
+        <span class="kw">SELECT</span> <span class="fn">AVG</span>(city_count)
+        <span class="kw">FROM</span> (
+            <span class="kw">SELECT</span> <span class="fn">COUNT</span>(customer_id) <span class="kw">AS</span> city_count
+            <span class="kw">FROM</span> customers
+            <span class="kw">GROUP BY</span> city
+        ) <span class="kw">AS</span> city_totals
+    )
+<span class="kw">ORDER BY</span> customer_count <span class="kw">DESC</span>;
+
+<span class="cm">-- Result:
+-- city     | customer_count
+-- ---------+--------------
+-- New York  | 2
+-- London    | 2</span></pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🧠 WHERE vs HAVING — Important Distinction</div>
+      <div class="dry-run">
+        <table>
+          <tr><th></th><th>WHERE</th><th>HAVING</th></tr>
+          <tr><td>Used with</td><td>Individual rows</td><td>Aggregated groups</td></tr>
+          <tr><td>Can use</td><td>Column values</td><td>COUNT, SUM, AVG etc.</td></tr>
+          <tr><td>Runs</td><td>Before GROUP BY</td><td>After GROUP BY</td></tr>
+          <tr><td>Example</td><td>WHERE city = 'London'</td><td>HAVING COUNT(*) > 1</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>GROUP BY + COUNT to count per city. Nested subquery to calculate AVG. HAVING (not WHERE!) to filter groups by aggregate. New York and London have 2 customers each — above average of ~1.14.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q11 ==================== -->
+<div class="q-card" id="q11">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q11</span>
+    <div class="q-title-wrap">
+      <div class="q-title">FizzBuzz Variant — Output "a", "b", "ab"</div>
+      <div class="q-tags">
+        <span class="tag tag-dsa">DSA</span>
+        <span class="tag tag-hot">🔥 CLASSIC TRAP</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">📋 Pattern Analysis</div>
+      <div class="box box-info">
+        <div class="box-label">Input: [1..20] — Find the Rule</div>
+        Look at the output: <code>[1,2,"a",4,"b","a",7,8,"a","b",11,"a",13,14,"ab",16,17,"a",19,"b"]</code>
+      </div>
+      <div class="dry-run">
+        <table>
+          <tr><th>Position</th><th>Value</th><th>Divisible by?</th><th>Rule</th></tr>
+          <tr><td>3</td><td>"a"</td><td>3</td><td>div by 3 → "a"</td></tr>
+          <tr><td>5</td><td>"b"</td><td>5</td><td>div by 5 → "b"</td></tr>
+          <tr><td>6</td><td>"a"</td><td>3</td><td>div by 3 → "a"</td></tr>
+          <tr><td>9</td><td>"a"</td><td>3</td><td>div by 3 → "a"</td></tr>
+          <tr><td>10</td><td>"b"</td><td>5</td><td>div by 5 → "b"</td></tr>
+          <tr><td>12</td><td>"a"</td><td>3</td><td>div by 3 → "a"</td></tr>
+          <tr class="highlight-row"><td>15</td><td>"ab"</td><td>3 AND 5</td><td>div by BOTH → "ab"</td></tr>
+          <tr><td>18</td><td>"a"</td><td>3</td><td>div by 3 → "a"</td></tr>
+          <tr><td>20</td><td>"b"</td><td>5</td><td>div by 5 → "b"</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🧠 Key Insight — Check "ab" FIRST!</div>
+      <div class="box box-danger">
+        <div class="box-label">⚠️ Common Mistake</div>
+        Don't use <code>else if</code>! If you check <code>% 3</code> first with else if, number 15 will match 3 and skip 5. Always build the string or check both conditions independently!
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💻 Solution Code (C#)</div>
+<pre><span class="kw">var</span> numbers = <span class="type">Enumerable</span>.<span class="fn">Range</span>(<span class="num">1</span>, <span class="num">20</span>);
+<span class="kw">var</span> result = <span class="kw">new</span> <span class="type">List</span>&lt;<span class="type">object</span>&gt;();
+
+<span class="kw">foreach</span> (<span class="kw">var</span> i <span class="kw">in</span> numbers)
+{
+    <span class="kw">string</span> output = <span class="str">""</span>;
+
+    <span class="kw">if</span> (i % <span class="num">3</span> == <span class="num">0</span>) output += <span class="str">"a"</span>;  <span class="cm">// Divisible by 3</span>
+    <span class="kw">if</span> (i % <span class="num">5</span> == <span class="num">0</span>) output += <span class="str">"b"</span>;  <span class="cm">// Divisible by 5 (separate if!)</span>
+
+    result.Add(output.Length > <span class="num">0</span> ? output : (<span class="type">object</span>)i);
+}
+
+<span class="cm">// Output: [1, 2, "a", 4, "b", "a", 7, 8, "a", "b", 11, "a", 13, 14, "ab", ...]</span>
+
+<span class="cm">// LINQ version (one-liner)</span>
+<span class="kw">var</span> out2 = <span class="type">Enumerable</span>.<span class="fn">Range</span>(<span class="num">1</span>, <span class="num">20</span>)
+    .Select(i =>
+    {
+        <span class="kw">string</span> s = (i % <span class="num">3</span> == <span class="num">0</span> ? <span class="str">"a"</span> : <span class="str">""</span>) + (i % <span class="num">5</span> == <span class="num">0</span> ? <span class="str">"b"</span> : <span class="str">""</span>);
+        <span class="kw">return</span> s.Length > <span class="num">0</span> ? (<span class="type">object</span>)s : i;
+    })
+    .ToList();</pre>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>This is FizzBuzz with custom labels. Key trick: use two separate <code>if</code> statements (not else-if) so both conditions can fire. Concatenate "a" and "b" to naturally get "ab" for multiples of 15.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== Q12 ==================== -->
+<div class="q-card" id="q12">
+  <div class="q-header" onclick="toggle(this)">
+    <span class="q-num">Q12</span>
+    <div class="q-title-wrap">
+      <div class="q-title">Design Elevator System — Class Design</div>
+      <div class="q-tags">
+        <span class="tag tag-design">System Design</span>
+        <span class="tag tag-oop">OOP</span>
+        <span class="tag tag-hot">🔥 TOP INTERVIEW Q</span>
+      </div>
+    </div>
+    <span class="q-toggle">▼</span>
+  </div>
+  <div class="q-body">
+    <div class="section">
+      <div class="section-title">🎯 Requirements</div>
+      <div class="box box-info">
+        <div class="box-label">System Spec</div>
+        • 3 Elevators<br>
+        • 25-floor building<br>
+        • Each elevator has: current floor, direction, status, capacity<br>
+        • Building controls which elevator to dispatch
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🏗️ System Architecture</div>
+      <div class="diagram">
+┌─────────────────────────────────────────────────┐
+│                   Building                       │
+│  ┌─────────────────────────────────────────┐    │
+│  │         ElevatorController              │    │
+│  │  - Dispatch(requestedFloor)             │    │
+│  │  - FindNearestElevator()                │    │
+│  └─────────────────────────────────────────┘    │
+│                                                  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
+│  │Elevator 1│  │Elevator 2│  │Elevator 3│       │
+│  │Floor: 3  │  │Floor: 10 │  │Floor: 20 │       │
+│  │Dir: UP   │  │Dir: IDLE │  │Dir: DOWN │       │
+│  └──────────┘  └──────────┘  └──────────┘       │
+│                                                  │
+│  Floor Buttons: [1][2][3]...[25]                │
+└─────────────────────────────────────────────────┘</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💻 Class Definitions (C#)</div>
+<pre><span class="cm">// Enums for state</span>
+<span class="kw">public enum</span> <span class="type">Direction</span> { Up, Down, Idle }
+<span class="kw">public enum</span> <span class="type">ElevatorStatus</span> { Moving, Stopped, OutOfService }
+
+<span class="cm">// Represents a floor button request</span>
+<span class="kw">public class</span> <span class="type">ElevatorRequest</span>
+{
+    <span class="kw">public int</span> RequestedFloor { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="type">Direction</span> Direction { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="cm">// Core Elevator class</span>
+<span class="kw">public class</span> <span class="type">Elevator</span>
+{
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; }
+    <span class="kw">public int</span> CurrentFloor { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">public</span> <span class="type">Direction</span> Direction { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">public</span> <span class="type">ElevatorStatus</span> Status { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">public int</span> Capacity { <span class="kw">get</span>; } = <span class="num">10</span>;
+    <span class="kw">public int</span> CurrentLoad { <span class="kw">get</span>; <span class="kw">private set</span>; }
+
+    <span class="kw">private</span> <span class="type">Queue</span>&lt;<span class="kw">int</span>&gt; _floorQueue = <span class="kw">new</span>();
+
+    <span class="kw">public</span> <span class="fn">Elevator</span>(<span class="kw">int</span> id, <span class="kw">int</span> startFloor = <span class="num">1</span>)
+    {
+        Id = id;
+        CurrentFloor = startFloor;
+        Direction = <span class="type">Direction</span>.Idle;
+        Status = <span class="type">ElevatorStatus</span>.Stopped;
+    }
+
+    <span class="kw">public void</span> <span class="fn">AddFloorRequest</span>(<span class="kw">int</span> floor)
+    {
+        _floorQueue.<span class="fn">Enqueue</span>(floor);
+        <span class="fn">MoveToNextFloor</span>();
+    }
+
+    <span class="kw">private void</span> <span class="fn">MoveToNextFloor</span>()
+    {
+        <span class="kw">if</span> (!_floorQueue.Any()) { Direction = <span class="type">Direction</span>.Idle; <span class="kw">return</span>; }
+
+        <span class="kw">int</span> target = _floorQueue.<span class="fn">Peek</span>();
+        Direction = target > CurrentFloor ? <span class="type">Direction</span>.Up : <span class="type">Direction</span>.Down;
+        Status = <span class="type">ElevatorStatus</span>.Moving;
+
+        <span class="cm">// Simulate movement (in real system: event-driven)</span>
+        CurrentFloor = _floorQueue.<span class="fn">Dequeue</span>();
+        Status = <span class="type">ElevatorStatus</span>.Stopped;
+        <span class="fn">MoveToNextFloor</span>();
+    }
+}
+
+<span class="cm">// Dispatcher: picks the best elevator</span>
+<span class="kw">public class</span> <span class="type">ElevatorController</span>
+{
+    <span class="kw">private</span> <span class="type">List</span>&lt;<span class="type">Elevator</span>&gt; _elevators;
+
+    <span class="kw">public</span> <span class="fn">ElevatorController</span>(<span class="kw">int</span> count, <span class="kw">int</span> floors)
+    {
+        _elevators = <span class="type">Enumerable</span>.<span class="fn">Range</span>(<span class="num">1</span>, count)
+            .Select(i => <span class="kw">new</span> <span class="type">Elevator</span>(i))
+            .ToList();
+    }
+
+    <span class="kw">public void</span> <span class="fn">RequestElevator</span>(<span class="kw">int</span> floor, <span class="type">Direction</span> dir)
+    {
+        <span class="kw">var</span> best = _elevators
+            .Where(e => e.Status != <span class="type">ElevatorStatus</span>.OutOfService)
+            .OrderBy(e => <span class="type">Math</span>.<span class="fn">Abs</span>(e.CurrentFloor - floor))
+            .First();  <span class="cm">// Nearest available elevator</span>
+
+        best.<span class="fn">AddFloorRequest</span>(floor);
+    }
+}
+
+<span class="cm">// Building ties it all together</span>
+<span class="kw">public class</span> <span class="type">Building</span>
+{
+    <span class="kw">public int</span> TotalFloors { <span class="kw">get</span>; } = <span class="num">25</span>;
+    <span class="kw">public</span> <span class="type">ElevatorController</span> Controller { <span class="kw">get</span>; }
+
+    <span class="kw">public</span> <span class="fn">Building</span>() => Controller = <span class="kw">new</span> <span class="type">ElevatorController</span>(<span class="num">3</span>, <span class="num">25</span>);
+}</pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🎤 Interview Discussion Points</div>
+      <div class="followups">
+        <div class="followup-item"><span class="fq-icon">💡</span>How do you pick the best elevator? (Nearest floor, least load, same direction)</div>
+        <div class="followup-item"><span class="fq-icon">💡</span>How to handle peak hours? (Priority queues, floor grouping)</div>
+        <div class="followup-item"><span class="fq-icon">💡</span>How to scale to 100 floors or 10 elevators?</div>
+        <div class="followup-item"><span class="fq-icon">💡</span>What design patterns are used? (Strategy for dispatch algorithm, Observer for floor buttons)</div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">⚡ Quick Summary</div>
+      <p>Key classes: Elevator (state), ElevatorController (dispatch), Building (config). Elevator selection strategy = nearest floor. Use Queue for floor requests. Expose only needed info (encapsulation).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SIMILAR QUESTIONS ==================== -->
+<div class="similar-qs" id="similar">
+  <h2>📚 More Interview Questions</h2>
+  <p style="color: var(--muted); font-size: 14px; margin-bottom: 16px;">Organized by difficulty. <span style="color: var(--red); font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--red)20; padding: 2px 8px; border-radius: 4px;">🔥 HOT</span> = frequently asked</p>
+
+  <div class="diff-section">
+    <div class="diff-label diff-easy">▶ EASY</div>
+
+    <div class="q-item">
+      <div class="q-item-title">Reverse a string without using built-in Reverse()</div>
+      <div class="q-item-hint">💡 Two pointers from both ends, swap characters inward</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Check if a string is a palindrome</div>
+      <div class="q-item-hint">💡 Compare string with its reverse, or use two pointers</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Find the maximum element in an array without using Max()</div>
+      <div class="q-item-hint">💡 Track a running max variable through single loop</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Count words in a sentence</div>
+      <div class="q-item-hint">💡 Split by space, handle multiple spaces. string.Split(' ', StringSplitOptions.RemoveEmptyEntries)</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">SQL: Find second highest salary</div>
+      <div class="q-item-hint">💡 SELECT MAX(salary) WHERE salary < (SELECT MAX(salary) FROM emp)</div>
+      <div class="q-item-tags"><span class="tag tag-sql">SQL</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">What is the difference between abstract class and interface?</div>
+      <div class="q-item-hint">💡 Abstract = partial implementation + state. Interface = pure contract. C# 8+ interfaces can have default implementations.</div>
+      <div class="q-item-tags"><span class="tag tag-oop">OOP</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Check if a number is prime</div>
+      <div class="q-item-hint">💡 Loop from 2 to √n. If any divides evenly, not prime. O(√n)</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span></div>
+    </div>
+  </div>
+
+  <div class="diff-section">
+    <div class="diff-label diff-medium">▶ MEDIUM</div>
+
+    <div class="q-item">
+      <div class="q-item-title">Find two numbers in array that sum to a target</div>
+      <div class="q-item-hint">💡 Use HashSet — for each num, check if (target - num) exists in set. O(n)</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Implement a Stack using two Queues</div>
+      <div class="q-item-hint">💡 On push: enqueue to Q1, then move all of Q1 to Q2, swap Q1 & Q2</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Find first non-repeating character in a string</div>
+      <div class="q-item-hint">💡 Build a frequency dictionary, then scan string for first char with count=1</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Design a Parking Lot system</div>
+      <div class="q-item-hint">💡 Classes: ParkingLot, Floor, Slot, Vehicle (Bike/Car/Truck), Ticket. Use Strategy for slot selection</div>
+      <div class="q-item-tags"><span class="tag tag-design">OOP</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">SQL: Find employees who earn more than their manager</div>
+      <div class="q-item-hint">💡 Self-join: JOIN Employee e2 ON e1.ManagerId = e2.Id WHERE e1.Salary > e2.Salary</div>
+      <div class="q-item-tags"><span class="tag tag-sql">SQL</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">What is the difference between Task, Thread, and async/await?</div>
+      <div class="q-item-hint">💡 Thread = OS-level, heavy. Task = lighter async unit. async/await = syntactic sugar over Tasks. Don't create Threads manually — use Task.Run()</div>
+      <div class="q-item-tags"><span class="tag tag-async">ASYNC</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Group anagrams together from a list of strings</div>
+      <div class="q-item-hint">💡 Sort each word alphabetically as key, group words with same key using Dictionary</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Implement Observer Pattern in C#</div>
+      <div class="q-item-hint">💡 Use IObserver/IObservable or events/delegates. Subject notifies all subscribers on change</div>
+      <div class="q-item-tags"><span class="tag tag-oop">Pattern</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+  </div>
+
+  <div class="diff-section">
+    <div class="diff-label diff-hard">▶ HARD</div>
+
+    <div class="q-item">
+      <div class="q-item-title">Design a URL Shortener (like bit.ly)</div>
+      <div class="q-item-hint">💡 Key decisions: base62 encoding for short URLs, consistent hashing for distributed storage, cache popular URLs in Redis, handle 301 vs 302 redirect</div>
+      <div class="q-item-tags"><span class="tag tag-design">System Design</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Find the longest substring without repeating characters</div>
+      <div class="q-item-hint">💡 Sliding window + HashSet. Move right pointer forward, when duplicate found shrink left. O(n)</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Design a Rate Limiter</div>
+      <div class="q-item-hint">💡 Algorithms: Token Bucket (bursty ok), Leaky Bucket (steady), Sliding Window (precise). Use Redis for distributed state</div>
+      <div class="q-item-tags"><span class="tag tag-design">System Design</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Implement Merge Sort and explain when to use it vs QuickSort</div>
+      <div class="q-item-hint">💡 MergeSort: O(n log n) always, stable, good for linked lists. QuickSort: O(n log n) avg, O(n²) worst, in-place, better cache performance</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">SQL: Find consecutive date gaps in user logins</div>
+      <div class="q-item-hint">💡 Use LAG() window function to compare each login date with previous. Find where gap > 1 day</div>
+      <div class="q-item-tags"><span class="tag tag-sql">SQL</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Design a Thread-Safe Singleton in C#</div>
+      <div class="q-item-hint">💡 Use double-check locking with volatile keyword, OR use Lazy&lt;T&gt; which handles thread-safety internally</div>
+      <div class="q-item-tags"><span class="tag tag-oop">Pattern</span><span class="hot-badge">🔥 HOT</span></div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-item-title">Serialize/Deserialize a Binary Tree</div>
+      <div class="q-item-hint">💡 Use level-order (BFS) with null markers. Serialize to string, parse back with a queue</div>
+      <div class="q-item-tags"><span class="tag tag-dsa">DSA</span></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+
+<script>
+// Toggle Q cards
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('.q-toggle');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+// Build TOC
+const questions = [
+  {id:'q1', label:'Q1: Run-Length'},
+  {id:'q2', label:'Q2: Duplicates'},
+  {id:'q3', label:'Q3: SOLID'},
+  {id:'q4', label:'Q4: Async'},
+  {id:'q5', label:'Q5: Zeroes'},
+  {id:'q6', label:'Q6: LRU Cache'},
+  {id:'q7', label:'Q7: Reports OOP'},
+  {id:'q8', label:'Q8: Extensions'},
+  {id:'q9', label:'Q9: Break SOLID'},
+  {id:'q10', label:'Q10: SQL'},
+  {id:'q11', label:'Q11: FizzBuzz'},
+  {id:'q12', label:'Q12: Elevator'},
+  {id:'similar', label:'More Qs'},
+];
+
+const tocEl = document.getElementById('tocInner');
+questions.forEach(q => {
+  const btn = document.createElement('button');
+  btn.className = 'toc-btn';
+  btn.textContent = q.label;
+  btn.onclick = () => {
+    document.getElementById(q.id).scrollIntoView({behavior:'smooth', block:'start'});
+    document.querySelectorAll('.toc-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+  tocEl.appendChild(btn);
+});
+
+// Back to top button
+window.addEventListener('scroll', () => {
+  document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
+});
+
+// Intersection observer for TOC highlight
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      const idx = questions.findIndex(q => q.id === id);
+      if (idx >= 0) {
+        document.querySelectorAll('.toc-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+      }
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+questions.forEach(q => {
+  const el = document.getElementById(q.id);
+  if (el) observer.observe(el);
+});
+</script>
+</body>
+</html>
