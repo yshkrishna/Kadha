@@ -1,0 +1,2405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Design Interview — Complete Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --sidebar-bg: #080a0d;
+  --surface: #13161d;
+  --surface2: #1a1e28;
+  --border: rgba(255,255,255,0.07);
+  --cyan: #00f5d4;
+  --orange: #ff6b35;
+  --yellow: #ffd166;
+  --pink: #f472b6;
+  --blue: #60a5fa;
+  --green: #4ade80;
+  --text: #dde1ec;
+  --muted: #5a6080;
+  --light: #9aa3c2;
+  --code-bg: #0a0d14;
+  --sidebar-w: 270px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Source Serif 4',Georgia,serif;
+  display:flex;
+  min-height:100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:var(--sidebar-w);
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--border);
+  position:fixed;
+  top:0; left:0; bottom:0;
+  overflow-y:auto;
+  z-index:200;
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:4px;}
+
+.sidebar-logo {
+  padding:1.5rem 1.25rem 1rem;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  background:var(--sidebar-bg);
+  z-index:10;
+}
+
+.sidebar-logo .brand {
+  font-family:'Bitter',serif;
+  font-size:1.1rem;
+  font-weight:700;
+  letter-spacing:-0.02em;
+  color:var(--text);
+}
+
+.sidebar-logo .brand span { color:var(--cyan); }
+
+.sidebar-logo .sub {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.6rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  margin-top:0.25rem;
+}
+
+.sidebar-section-label {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.58rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+  padding:1rem 1.25rem 0.4rem;
+}
+
+.nav-item {
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+  padding:0.65rem 1.25rem;
+  cursor:pointer;
+  transition:all 0.15s;
+  border-left:2px solid transparent;
+  text-decoration:none;
+  color:var(--light);
+}
+
+.nav-item:hover {
+  background:rgba(255,255,255,0.03);
+  color:var(--text);
+}
+
+.nav-item.active {
+  border-left-color:var(--cyan);
+  background:rgba(0,245,212,0.05);
+  color:var(--cyan);
+}
+
+.nav-icon {
+  font-size:1rem;
+  width:20px;
+  text-align:center;
+  flex-shrink:0;
+}
+
+.nav-text {
+  font-size:0.82rem;
+  font-weight:400;
+  line-height:1.3;
+}
+
+.nav-num {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.58rem;
+  color:var(--muted);
+  margin-left:auto;
+  flex-shrink:0;
+}
+
+.sidebar-footer {
+  margin-top:auto;
+  padding:1rem 1.25rem;
+  border-top:1px solid var(--border);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.6rem;
+  color:var(--muted);
+  line-height:1.6;
+}
+
+/* ── MAIN ── */
+.main {
+  margin-left:var(--sidebar-w);
+  flex:1;
+  min-height:100vh;
+}
+
+/* ── TOPIC PAGES ── */
+.topic-page {
+  display:none;
+  animation:fadeIn 0.3s ease;
+}
+
+.topic-page.active { display:block; }
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── TOPIC HERO ── */
+.topic-hero {
+  padding:3.5rem 3rem 2.5rem;
+  border-bottom:1px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+
+.topic-hero::after {
+  content: attr(data-emoji);
+  position:absolute;
+  right:-1rem;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:9rem;
+  opacity:0.06;
+  pointer-events:none;
+  line-height:1;
+}
+
+.topic-num {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+  margin-bottom:0.75rem;
+}
+
+.topic-title {
+  font-family:'Bitter',serif;
+  font-size:clamp(1.8rem,4vw,3rem);
+  font-weight:700;
+  line-height:1.1;
+  letter-spacing:-0.03em;
+  margin-bottom:1rem;
+}
+
+.topic-desc {
+  color:var(--light);
+  font-size:1rem;
+  font-weight:300;
+  line-height:1.7;
+  max-width:620px;
+}
+
+.topic-tags {
+  display:flex;
+  gap:0.5rem;
+  flex-wrap:wrap;
+  margin-top:1.25rem;
+}
+
+.tag {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.6rem;
+  padding:0.2rem 0.6rem;
+  border-radius:4px;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+}
+
+/* ── SECTIONS ── */
+.sections-wrapper {
+  padding:2rem 3rem 5rem;
+  max-width:900px;
+}
+
+.section-block {
+  margin-bottom:1.25rem;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--surface);
+}
+
+.section-toggle {
+  width:100%;
+  background:none;
+  border:none;
+  padding:1.1rem 1.5rem;
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  cursor:pointer;
+  color:var(--text);
+  text-align:left;
+  transition:background 0.15s;
+  border-left:3px solid transparent;
+}
+
+.section-toggle:hover { background:rgba(255,255,255,0.02); }
+
+.section-block.open .section-toggle {
+  border-bottom:1px solid var(--border);
+}
+
+.s-icon {
+  font-size:1.15rem;
+  width:24px;
+  text-align:center;
+  flex-shrink:0;
+}
+
+.s-title {
+  font-family:'Bitter',serif;
+  font-size:1rem;
+  font-weight:600;
+  flex:1;
+}
+
+.s-badge {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.58rem;
+  padding:0.2rem 0.55rem;
+  border-radius:4px;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  flex-shrink:0;
+}
+
+.s-chevron {
+  color:var(--muted);
+  font-size:0.75rem;
+  transition:transform 0.25s;
+  flex-shrink:0;
+}
+
+.section-block.open .s-chevron { transform:rotate(180deg); }
+
+.section-body {
+  display:none;
+  padding:1.5rem;
+}
+
+.section-block.open .section-body { display:block; }
+
+/* ── CONTENT STYLES ── */
+.content h3 {
+  font-family:'Bitter',serif;
+  font-size:1.1rem;
+  font-weight:700;
+  color:var(--text);
+  margin:1.5rem 0 0.6rem;
+}
+.content h3:first-child { margin-top:0; }
+
+.content h4 {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.72rem;
+  color:var(--cyan);
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  margin:1.25rem 0 0.5rem;
+}
+
+.content p {
+  font-size:0.95rem;
+  line-height:1.85;
+  color:var(--light);
+  margin-bottom:0.9rem;
+  font-weight:300;
+}
+
+.content strong { color:var(--text); font-weight:600; }
+.content em { color:var(--cyan); font-style:normal; font-family:'IBM Plex Mono',monospace; font-size:0.88em; }
+
+.content ul, .content ol {
+  margin:0.75rem 0 1rem 1.25rem;
+}
+
+.content li {
+  font-size:0.93rem;
+  line-height:1.8;
+  color:var(--light);
+  font-weight:300;
+  margin-bottom:0.3rem;
+}
+
+.content li strong { color:var(--text); }
+
+/* Code */
+.content pre {
+  background:var(--code-bg);
+  border:1px solid rgba(0,245,212,0.12);
+  border-radius:8px;
+  padding:1.25rem;
+  overflow-x:auto;
+  margin:1rem 0;
+  position:relative;
+}
+
+.content pre code {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.8rem;
+  line-height:1.75;
+  color:#a8d8c0;
+  background:none;
+  padding:0;
+  border:none;
+}
+
+.content code {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.82em;
+  background:var(--surface2);
+  color:var(--cyan);
+  padding:0.1rem 0.35rem;
+  border-radius:4px;
+  border:1px solid var(--border);
+}
+
+/* Diagrams */
+.diagram {
+  background:var(--code-bg);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:1.25rem 1.5rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.78rem;
+  line-height:1.7;
+  color:#7090a8;
+  overflow-x:auto;
+  margin:1rem 0;
+  white-space:pre;
+}
+
+/* Tables */
+.content table {
+  width:100%;
+  border-collapse:collapse;
+  margin:1rem 0;
+  font-size:0.86rem;
+}
+
+.content th {
+  background:var(--surface2);
+  padding:0.6rem 1rem;
+  text-align:left;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  border-bottom:1px solid var(--border);
+  font-weight:500;
+}
+
+.content td {
+  padding:0.7rem 1rem;
+  border-bottom:1px solid rgba(255,255,255,0.035);
+  color:var(--light);
+  line-height:1.55;
+  font-weight:300;
+  vertical-align:top;
+}
+
+.content tr:last-child td { border-bottom:none; }
+.content td strong { color:var(--text); font-weight:600; }
+
+/* Callout boxes */
+.callout {
+  border-radius:8px;
+  padding:1rem 1.25rem;
+  margin:1rem 0;
+  font-size:0.9rem;
+  line-height:1.7;
+  font-weight:300;
+}
+
+.callout-story { background:rgba(255,209,102,0.06); border-left:3px solid var(--yellow); color:var(--light); }
+.callout-bad { background:rgba(255,107,53,0.06); border-left:3px solid var(--orange); }
+.callout-good { background:rgba(74,222,128,0.06); border-left:3px solid var(--green); }
+.callout-tip { background:rgba(0,245,212,0.05); border-left:3px solid var(--cyan); }
+.callout-interview { background:rgba(244,114,182,0.06); border-left:3px solid var(--pink); }
+
+.callout-label {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.6rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  margin-bottom:0.5rem;
+  font-weight:600;
+}
+
+.callout-story .callout-label { color:var(--yellow); }
+.callout-bad .callout-label { color:var(--orange); }
+.callout-good .callout-label { color:var(--green); }
+.callout-tip .callout-label { color:var(--cyan); }
+.callout-interview .callout-label { color:var(--pink); }
+
+/* Cheat sheet grid */
+.cheat-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1rem;
+  margin-top:1rem;
+}
+
+.cheat-cell {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:1rem;
+}
+
+.cheat-cell-title {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.62rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--cyan);
+  margin-bottom:0.6rem;
+}
+
+.cheat-cell ul {
+  margin:0;
+  padding-left:1.1rem;
+}
+
+.cheat-cell li {
+  font-size:0.82rem;
+  color:var(--light);
+  margin-bottom:0.25rem;
+  line-height:1.5;
+}
+
+/* Section color themes */
+.s1 .section-toggle { border-left-color:var(--yellow); }
+.s2 .section-toggle { border-left-color:var(--cyan); }
+.s3 .section-toggle { border-left-color:var(--orange); }
+.s4 .section-toggle { border-left-color:var(--blue); }
+.s5 .section-toggle { border-left-color:var(--pink); }
+.s6 .section-toggle { border-left-color:var(--green); }
+
+.badge-eli10 { background:rgba(255,209,102,0.1); color:var(--yellow); }
+.badge-concept { background:rgba(0,245,212,0.1); color:var(--cyan); }
+.badge-tools { background:rgba(255,107,53,0.1); color:var(--orange); }
+.badge-example { background:rgba(96,165,250,0.1); color:var(--blue); }
+.badge-interview { background:rgba(244,114,182,0.1); color:var(--pink); }
+.badge-cheatsheet { background:rgba(74,222,128,0.1); color:var(--green); }
+
+/* ── HOME PAGE ── */
+.home-page {
+  padding:4rem 3rem;
+  max-width:880px;
+}
+
+.home-eyebrow {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.15em;
+  margin-bottom:1.5rem;
+}
+
+.home-title {
+  font-family:'Bitter',serif;
+  font-size:clamp(2.5rem,5vw,4rem);
+  font-weight:700;
+  letter-spacing:-0.04em;
+  line-height:1.05;
+  margin-bottom:1.25rem;
+}
+
+.home-title .hl { color:var(--cyan); }
+
+.home-desc {
+  color:var(--light);
+  font-size:1.05rem;
+  font-weight:300;
+  line-height:1.8;
+  max-width:580px;
+  margin-bottom:3rem;
+}
+
+.cards-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:1rem;
+}
+
+.topic-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:1.25rem;
+  cursor:pointer;
+  transition:all 0.2s;
+  text-decoration:none;
+  display:block;
+}
+
+.topic-card:hover {
+  border-color:rgba(0,245,212,0.3);
+  background:rgba(0,245,212,0.03);
+  transform:translateY(-2px);
+}
+
+.tc-emoji { font-size:1.75rem; margin-bottom:0.75rem; display:block; }
+
+.tc-num {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.58rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  margin-bottom:0.3rem;
+}
+
+.tc-title {
+  font-family:'Bitter',serif;
+  font-size:0.95rem;
+  font-weight:600;
+  line-height:1.3;
+  color:var(--text);
+}
+
+.tc-arrow {
+  margin-top:0.75rem;
+  font-size:0.8rem;
+  color:var(--muted);
+  font-family:'IBM Plex Mono',monospace;
+  transition:color 0.2s;
+}
+
+.topic-card:hover .tc-arrow { color:var(--cyan); }
+
+/* ── MOBILE ── */
+.mobile-nav-btn {
+  display:none;
+  position:fixed;
+  bottom:1.5rem;
+  right:1.5rem;
+  z-index:500;
+  background:var(--cyan);
+  color:#0d0f14;
+  border:none;
+  border-radius:999px;
+  padding:0.75rem 1.25rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.75rem;
+  font-weight:600;
+  cursor:pointer;
+  letter-spacing:0.05em;
+}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform 0.3s;}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .mobile-nav-btn{display:block;}
+  .topic-hero{padding:2rem 1.25rem 1.5rem;}
+  .sections-wrapper{padding:1.25rem 1.25rem 4rem;}
+  .home-page{padding:2rem 1.25rem;}
+  .cheat-grid{grid-template-columns:1fr;}
+  .topic-hero::after{display:none;}
+}
+
+/* Progress bar top */
+.progress-line {
+  position:fixed;
+  top:0; left:0;
+  height:2px;
+  background:var(--cyan);
+  z-index:999;
+  transition:width 0.1s;
+  width:0;
+}
+</style>
+</head>
+<body>
+
+<div class="progress-line" id="progressLine"></div>
+<button class="mobile-nav-btn" onclick="toggleSidebar()">☰ Topics</button>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">System<span>Design</span></div>
+    <div class="sub">Interview Masterclass · 7 Topics</div>
+  </div>
+
+  <div class="sidebar-section-label">Start Here</div>
+  <a class="nav-item active" onclick="showPage('home')" href="#">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-text">Overview</span>
+  </a>
+
+  <div class="sidebar-section-label">Core Topics</div>
+  <a class="nav-item" onclick="showPage('perf')" href="#">
+    <span class="nav-icon">⚡</span>
+    <span class="nav-text">App Performance</span>
+    <span class="nav-num">01</span>
+  </a>
+  <a class="nav-item" onclick="showPage('db')" href="#">
+    <span class="nav-icon">🗄️</span>
+    <span class="nav-text">Databases at Scale</span>
+    <span class="nav-num">02</span>
+  </a>
+  <a class="nav-item" onclick="showPage('url')" href="#">
+    <span class="nav-icon">🌐</span>
+    <span class="nav-text">URL → Browser</span>
+    <span class="nav-num">03</span>
+  </a>
+  <a class="nav-item" onclick="showPage('cache')" href="#">
+    <span class="nav-icon">🧠</span>
+    <span class="nav-text">How Caching Works</span>
+    <span class="nav-num">04</span>
+  </a>
+  <a class="nav-item" onclick="showPage('ha')" href="#">
+    <span class="nav-icon">🔰</span>
+    <span class="nav-text">High Availability</span>
+    <span class="nav-num">05</span>
+  </a>
+  <a class="nav-item" onclick="showPage('lb')" href="#">
+    <span class="nav-icon">⚖️</span>
+    <span class="nav-text">Load Balancing</span>
+    <span class="nav-num">06</span>
+  </a>
+  <a class="nav-item" onclick="showPage('ms')" href="#">
+    <span class="nav-icon">🔗</span>
+    <span class="nav-text">Microservices Comms</span>
+    <span class="nav-num">07</span>
+  </a>
+
+  <div class="sidebar-footer">
+    6 sections per topic<br>
+    ELI10 → Senior Engineer depth<br>
+    Interview-ready frameworks
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ═══════════ HOME ═══════════ -->
+<div class="topic-page active" id="page-home">
+<div class="home-page">
+  <div class="home-eyebrow">System Design · Interview Masterclass</div>
+  <h1 class="home-title">From <span class="hl">10 years old</span><br>to Senior Engineer</h1>
+  <p class="home-desc">Seven essential system design topics — each explained with a child's story, real tech depth, code examples, and an exact interview framework. Pick a topic to start.</p>
+  <div class="cards-grid">
+    <a class="topic-card" onclick="showPage('perf')" href="#">
+      <span class="tc-emoji">⚡</span>
+      <div class="tc-num">Topic 01</div>
+      <div class="tc-title">How to Improve Application Performance</div>
+      <div class="tc-arrow">→ Start reading</div>
+    </a>
+    <a class="topic-card" onclick="showPage('db')" href="#">
+      <span class="tc-emoji">🗄️</span>
+      <div class="tc-num">Topic 02</div>
+      <div class="tc-title">How Databases Handle Millions of Users</div>
+      <div class="tc-arrow">→ Start reading</div>
+    </a>
+    <a class="topic-card" onclick="showPage('url')" href="#">
+      <span class="tc-emoji">🌐</span>
+      <div class="tc-num">Topic 03</div>
+      <div class="tc-title">What Happens When You Type a URL</div>
+      <div class="tc-arrow">→ Start reading</div>
+    </a>
+    <a class="topic-card" onclick="showPage('cache')" href="#">
+      <span class="tc-emoji">🧠</span>
+      <div class="tc-num">Topic 04</div>
+      <div class="tc-title">How Caching Works</div>
+      <div class="tc-arrow">→ Start reading</div>
+    </a>
+    <a class="topic-card" onclick="showPage('ha')" href="#">
+      <span class="tc-emoji">🔰</span>
+      <div class="tc-num">Topic 05</div>
+      <div class="tc-title">How to Design for High Availability</div>
+      <div class="tc-arrow">→ Start reading</div>
+    </a>
+    <a class="topic-card" onclick="showPage('lb')" href="#">
+      <span class="tc-emoji">⚖️</span>
+      <div class="tc-num">Topic 06</div>
+      <div class="tc-title">How Load Balancing Works</div>
+      <div class="tc-arrow">→ Start reading</div>
+    </a>
+    <a class="topic-card" onclick="showPage('ms')" href="#">
+      <span class="tc-emoji">🔗</span>
+      <div class="tc-num">Topic 07</div>
+      <div class="tc-title">How Microservices Communicate</div>
+      <div class="tc-arrow">→ Start reading</div>
+    </a>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ TOPIC 1: PERFORMANCE ═══════════ -->
+<div class="topic-page" id="page-perf">
+<div class="topic-hero" data-emoji="⚡">
+  <div class="topic-num">Topic 01 / 07</div>
+  <h1 class="topic-title">How to Improve<br>Application Performance</h1>
+  <p class="topic-desc">Why fast apps win, what slows them down, and the exact tools to fix every bottleneck — from profiling to async patterns.</p>
+  <div class="topic-tags">
+    <span class="tag" style="background:rgba(255,209,102,.1);color:var(--yellow)">Profiling</span>
+    <span class="tag" style="background:rgba(0,245,212,.1);color:var(--cyan)">Caching</span>
+    <span class="tag" style="background:rgba(255,107,53,.1);color:var(--orange)">Async</span>
+    <span class="tag" style="background:rgba(74,222,128,.1);color:var(--green)">DB Optimization</span>
+    <span class="tag" style="background:rgba(244,114,182,.1);color:var(--pink)">CDN</span>
+  </div>
+</div>
+<div class="sections-wrapper">
+
+  <!-- S1 -->
+  <div class="section-block s1 open">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧒</span>
+      <span class="s-title">The Simple Story (ELI10)</span>
+      <span class="s-badge badge-eli10">Beginner</span>
+      <span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body">
+      <div class="content">
+        <div class="callout callout-story">
+          <div class="callout-label">🍕 The Pizza Shop Analogy</div>
+          <p>Imagine a pizza shop. On a normal day, one chef can make pizzas fast enough. But on Friday night, 200 people walk in at once. The single chef gets overwhelmed, orders pile up, and everyone waits an hour for cold pizza.</p>
+          <p>The shop has a <strong>performance problem</strong>. What can they do?</p>
+          <ul>
+            <li>Write orders faster (better code / algorithms)</li>
+            <li>Keep popular toppings pre-chopped (caching)</li>
+            <li>Hire more chefs (more servers)</li>
+            <li>Use the industrial oven instead of the small one (better hardware/tools)</li>
+            <li>Take phone orders ahead of time (async, queues)</li>
+            <li>Open a second counter for drinks so the main counter isn't blocked (separate concerns)</li>
+          </ul>
+          <p>Application performance is exactly this — your app is the chef, users are the customers, and <strong>every fix is a way to serve more people, faster, without dropping orders.</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section-block s2">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚙️</span>
+      <span class="s-title">The Real Concept</span>
+      <span class="s-badge badge-concept">Technical</span>
+      <span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body">
+      <div class="content">
+        <p><strong>Application performance</strong> is measured by how fast an app responds (<em>latency</em>), how many requests it handles per second (<em>throughput</em>), and how efficiently it uses resources (<em>CPU, memory, I/O</em>).</p>
+        <p>Performance problems have a <strong>root cause</strong>. The most common are:</p>
+        <ul>
+          <li><strong>CPU-bound</strong> — computation is too expensive (e.g. sorting a million records on every request)</li>
+          <li><strong>I/O-bound</strong> — waiting on disk reads, network calls, database queries</li>
+          <li><strong>Memory-bound</strong> — objects are created and garbage-collected too often</li>
+          <li><strong>Concurrency-bound</strong> — requests queue up because only one thread handles them</li>
+        </ul>
+        <p><strong>Rule #1:</strong> Never guess. Always <em>profile</em> (measure) first to find the actual bottleneck. Optimising the wrong thing wastes time and sometimes makes things worse.</p>
+        <h4>Key Metrics</h4>
+        <table>
+          <tr><th>Metric</th><th>What it means</th><th>Good target</th></tr>
+          <tr><td><strong>p50 latency</strong></td><td>Median response time</td><td>&lt; 100ms</td></tr>
+          <tr><td><strong>p99 latency</strong></td><td>Worst 1% of requests</td><td>&lt; 500ms</td></tr>
+          <tr><td><strong>Throughput (RPS)</strong></td><td>Requests per second</td><td>Depends on load</td></tr>
+          <tr><td><strong>Error rate</strong></td><td>% of failed requests</td><td>&lt; 0.1%</td></tr>
+          <tr><td><strong>Apdex score</strong></td><td>User satisfaction index</td><td>&gt; 0.9</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section-block s3">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧰</span>
+      <span class="s-title">Building Blocks & Techniques</span>
+      <span class="s-badge badge-tools">Tools</span>
+      <span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body">
+      <div class="content">
+        <table>
+          <tr><th>Technique</th><th>What it does</th><th>When to use</th><th>Example</th></tr>
+          <tr>
+            <td><strong>Profiling</strong></td>
+            <td>Measures where time is actually spent</td>
+            <td>Always first</td>
+            <td>py-spy, Chrome DevTools, New Relic</td>
+          </tr>
+          <tr>
+            <td><strong>Caching</strong></td>
+            <td>Stores expensive results so you don't recompute</td>
+            <td>Repeated reads, slow queries</td>
+            <td>Redis, Memcached, in-memory dict</td>
+          </tr>
+          <tr>
+            <td><strong>DB indexing</strong></td>
+            <td>Lets DB find rows without scanning all data</td>
+            <td>Slow queries on large tables</td>
+            <td><code>CREATE INDEX ON users(email)</code></td>
+          </tr>
+          <tr>
+            <td><strong>Async / queues</strong></td>
+            <td>Defer slow work; return immediately to user</td>
+            <td>Email, image processing, reports</td>
+            <td>Celery, RabbitMQ, SQS</td>
+          </tr>
+          <tr>
+            <td><strong>Connection pooling</strong></td>
+            <td>Reuse DB connections instead of creating new ones</td>
+            <td>High concurrency apps</td>
+            <td>PgBouncer, HikariCP</td>
+          </tr>
+          <tr>
+            <td><strong>CDN</strong></td>
+            <td>Serves static assets from edge nodes near users</td>
+            <td>Images, JS, CSS</td>
+            <td>Cloudflare, CloudFront</td>
+          </tr>
+          <tr>
+            <td><strong>Horizontal scaling</strong></td>
+            <td>Add more servers to share load</td>
+            <td>Traffic spikes, stateless services</td>
+            <td>K8s autoscaling, AWS ASG</td>
+          </tr>
+          <tr>
+            <td><strong>Algorithm optimization</strong></td>
+            <td>Reduce time complexity of key operations</td>
+            <td>CPU-heavy logic</td>
+            <td>O(n²) sort → O(n log n) quicksort</td>
+          </tr>
+          <tr>
+            <td><strong>Lazy loading</strong></td>
+            <td>Load data only when actually needed</td>
+            <td>Large lists, heavy relations</td>
+            <td>Paginate API responses</td>
+          </tr>
+          <tr>
+            <td><strong>Compression</strong></td>
+            <td>Shrink payload sizes over the wire</td>
+            <td>Large API responses</td>
+            <td>gzip, Brotli on HTTP responses</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section-block s4">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚡</span>
+      <span class="s-title">Before vs After</span>
+      <span class="s-badge badge-example">Example</span>
+      <span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body">
+      <div class="content">
+        <h3>Scenario: User Dashboard API taking 3–5 seconds</h3>
+        <div class="callout callout-bad">
+          <div class="callout-label">❌ Before — Slow</div>
+          <p>Every request hits the database 4 times: once for user, once for orders, once for notifications, once for stats. All synchronous. No caching.</p>
+        </div>
+<pre><code># BEFORE: 4 sequential DB hits, ~3000ms
+def get_dashboard(user_id):
+    user   = db.query("SELECT * FROM users WHERE id = ?", user_id)       # 200ms
+    orders = db.query("SELECT * FROM orders WHERE user_id = ?", user_id) # 800ms (no index)
+    notifs = db.query("SELECT * FROM notifications WHERE uid = ?", user_id) # 600ms
+    stats  = db.query("SELECT COUNT(*), SUM(total)...", user_id)         # 1400ms (full scan)
+    return build_response(user, orders, notifs, stats)
+    # Total: ~3000ms 😬</code></pre>
+
+        <div class="callout callout-good">
+          <div class="callout-label">✅ After — Fast</div>
+          <p>Add indexes, run queries in parallel, cache the result. Same data, 95% faster.</p>
+        </div>
+<pre><code># AFTER: parallel queries + Redis cache + indexes, ~140ms
+import asyncio, redis
+
+cache = redis.Redis()
+
+async def get_dashboard(user_id):
+    cache_key = f"dashboard:{user_id}"
+    cached = cache.get(cache_key)
+    if cached:
+        return json.loads(cached)  # ~2ms ⚡
+
+    # Run all 4 queries IN PARALLEL (asyncio / thread pool)
+    user, orders, notifs, stats = await asyncio.gather(
+        db.async_query("SELECT * FROM users WHERE id = ?", user_id),       # 200ms (index)
+        db.async_query("SELECT * FROM orders WHERE user_id = ?", user_id), # 80ms  (index)
+        db.async_query("SELECT * FROM notifications WHERE uid = ?", user_id), # 60ms
+        db.async_query("SELECT COUNT(*), SUM(total)...", user_id),         # 100ms (index)
+    )
+    # Longest query = 200ms (not 3000ms sum!)
+    result = build_response(user, orders, notifs, stats)
+    cache.setex(cache_key, 300, json.dumps(result))  # cache 5 mins
+    return result
+    # Total: ~140ms 🚀</code></pre>
+
+        <h4>What Changed</h4>
+        <ul>
+          <li><strong>Indexes added</strong> on <code>orders.user_id</code>, <code>notifications.uid</code> → query time dropped 10×</li>
+          <li><strong>Parallel execution</strong> with asyncio → total time = slowest query, not sum of all</li>
+          <li><strong>Redis cache</strong> → repeat requests in 2ms instead of 140ms</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section-block s5">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🎙️</span>
+      <span class="s-title">Interview Answer Framework</span>
+      <span class="s-badge badge-interview">Interview</span>
+      <span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body">
+      <div class="content">
+        <div class="callout callout-interview">
+          <div class="callout-label">🎙️ Exact Script</div>
+          <ol>
+            <li><strong>Open with measurement:</strong> "Before touching any code, I'd profile the application to find the actual bottleneck — CPU, I/O, memory, or concurrency. Optimising without data is guessing."</li>
+            <li><strong>Layer the fixes:</strong> "I'd approach it in layers: first the quick wins — database indexes and query optimization, then caching hot data in Redis, then async patterns for slow background work, then horizontal scaling if we hit hardware limits."</li>
+            <li><strong>Mention numbers:</strong> "A missing index can turn a 2-second full-table scan into a 10ms indexed lookup. Redis can serve repeated reads in under 1ms vs 100ms+ from the DB. A CDN cuts static asset load times by 60–80% for global users."</li>
+            <li><strong>Trade-offs:</strong> "Caching introduces staleness — I'd use appropriate TTLs and cache invalidation. Async processing means the user doesn't get an immediate result; I'd pair it with websockets or polling for status updates."</li>
+            <li><strong>Close:</strong> "The goal is to measure → fix → measure again. Performance work is never 'done' — it evolves with traffic patterns."</li>
+          </ol>
+        </div>
+        <h4>Likely Follow-up Questions</h4>
+        <ul>
+          <li>"How do you invalidate a cache when data changes?"</li>
+          <li>"What's the difference between horizontal and vertical scaling?"</li>
+          <li>"How would you debug a memory leak in production?"</li>
+          <li>"What tools do you use to monitor performance in production?"</li>
+          <li>"What is the N+1 query problem?"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section-block s6">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">📋</span>
+      <span class="s-title">Cheat Sheet</span>
+      <span class="s-badge badge-cheatsheet">Reference</span>
+      <span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body">
+      <div class="content">
+        <div class="cheat-grid">
+          <div class="cheat-cell">
+            <div class="cheat-cell-title">Core Concepts</div>
+            <ul>
+              <li>Latency = time per request</li>
+              <li>Throughput = requests/second</li>
+              <li>CPU-bound vs I/O-bound</li>
+              <li>Profile before optimising</li>
+              <li>p99 matters more than p50</li>
+            </ul>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-title">Key Techniques</div>
+            <ul>
+              <li>DB indexes (10–100× speedup)</li>
+              <li>Redis cache (&lt;1ms reads)</li>
+              <li>Async queues (Celery/SQS)</li>
+              <li>Connection pooling (PgBouncer)</li>
+              <li>CDN for static assets</li>
+              <li>Horizontal scaling (stateless)</li>
+            </ul>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-title">Important Numbers</div>
+            <ul>
+              <li>Good p50: &lt;100ms</li>
+              <li>Good p99: &lt;500ms</li>
+              <li>Redis: ~0.1–1ms</li>
+              <li>DB indexed: ~1–10ms</li>
+              <li>DB full scan: 100ms–10s</li>
+              <li>CDN saves: 60–80% latency</li>
+            </ul>
+          </div>
+          <div class="cheat-cell">
+            <div class="cheat-cell-title">Do's & Don'ts</div>
+            <ul>
+              <li>✅ Profile first, always</li>
+              <li>✅ Cache read-heavy data</li>
+              <li>✅ Parallelize independent queries</li>
+              <li>❌ Premature optimisation</li>
+              <li>❌ Cache without TTL</li>
+              <li>❌ Scale before fixing code</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /sections-wrapper -->
+</div><!-- /topic perf -->
+
+<!-- ═══════════ TOPIC 2: DATABASES ═══════════ -->
+<div class="topic-page" id="page-db">
+<div class="topic-hero" data-emoji="🗄️">
+  <div class="topic-num">Topic 02 / 07</div>
+  <h1 class="topic-title">How Databases Handle<br>Millions of Users</h1>
+  <p class="topic-desc">Indexing, sharding, replication, read replicas, and the CAP theorem — everything you need to scale from 1 to 1 billion records.</p>
+  <div class="topic-tags">
+    <span class="tag" style="background:rgba(255,209,102,.1);color:var(--yellow)">Indexing</span>
+    <span class="tag" style="background:rgba(0,245,212,.1);color:var(--cyan)">Sharding</span>
+    <span class="tag" style="background:rgba(255,107,53,.1);color:var(--orange)">Replication</span>
+    <span class="tag" style="background:rgba(74,222,128,.1);color:var(--green)">CAP Theorem</span>
+    <span class="tag" style="background:rgba(96,165,250,.1);color:var(--blue)">NoSQL</span>
+  </div>
+</div>
+<div class="sections-wrapper">
+
+  <!-- S1 -->
+  <div class="section-block s1 open">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧒</span><span class="s-title">The Simple Story (ELI10)</span>
+      <span class="s-badge badge-eli10">Beginner</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-story">
+        <div class="callout-label">📚 The Library Analogy</div>
+        <p>Imagine a library with 10 books. The librarian can find any book instantly. Now imagine the library has 10 million books and 50,000 people walk in every day asking for books.</p>
+        <p>Problems appear fast:</p>
+        <ul>
+          <li>Finding a book by hand takes forever → need a <strong>catalogue/index</strong></li>
+          <li>One librarian can't serve everyone → need <strong>more librarians (replicas)</strong></li>
+          <li>One building can't hold all books → split into <strong>multiple branches (sharding)</strong></li>
+          <li>If the only library burns down, all books are lost → need <strong>backup copies (replication)</strong></li>
+        </ul>
+        <p>Databases solve exactly these problems. Every technique exists because one server, one disk, one copy is never enough at massive scale.</p>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section-block s2">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚙️</span><span class="s-title">The Real Concept</span>
+      <span class="s-badge badge-concept">Technical</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <p>A <strong>database</strong> stores and retrieves structured data. At small scale, a single SQL database (PostgreSQL, MySQL) is fine. At large scale, you face three fundamental problems:</p>
+      <ul>
+        <li><strong>Read bottleneck</strong> — too many SELECT queries for one server</li>
+        <li><strong>Write bottleneck</strong> — too many INSERTs/UPDATEs for one server</li>
+        <li><strong>Storage limit</strong> — one machine can't hold petabytes of data</li>
+      </ul>
+      <h4>The CAP Theorem</h4>
+      <p>A distributed system can guarantee at most 2 of 3: <strong>Consistency</strong> (every read sees the latest write), <strong>Availability</strong> (every request gets a response), <strong>Partition tolerance</strong> (system works even if nodes can't talk).</p>
+      <p>In practice, network partitions always happen, so you choose CP (consistent, may be unavailable) or AP (always available, may be stale). Most internet apps choose <strong>AP</strong> — you'd rather show slightly stale data than show an error.</p>
+      <h4>SQL vs NoSQL</h4>
+      <table>
+        <tr><th>Feature</th><th>SQL (PostgreSQL)</th><th>NoSQL (Cassandra, DynamoDB)</th></tr>
+        <tr><td>Structure</td><td>Strict schema, tables, rows</td><td>Flexible, document/key-value</td></tr>
+        <tr><td>Scaling</td><td>Vertical + read replicas</td><td>Horizontal, built-in sharding</td></tr>
+        <tr><td>Consistency</td><td>Strong (ACID)</td><td>Eventual (BASE)</td></tr>
+        <tr><td>Best for</td><td>Transactions, relations</td><td>High write throughput, global scale</td></tr>
+      </table>
+    </div></div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section-block s3">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧰</span><span class="s-title">Building Blocks & Techniques</span>
+      <span class="s-badge badge-tools">Tools</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <table>
+        <tr><th>Technique</th><th>What it does</th><th>When to use</th><th>Example</th></tr>
+        <tr><td><strong>Indexing</strong></td><td>B-tree structure for O(log n) lookups</td><td>Frequently queried columns</td><td><code>CREATE INDEX ON orders(user_id)</code></td></tr>
+        <tr><td><strong>Read Replicas</strong></td><td>Copy of DB for read traffic only</td><td>Read-heavy workloads</td><td>Primary → 3 read replicas</td></tr>
+        <tr><td><strong>Sharding</strong></td><td>Split data across multiple DBs by key</td><td>Write bottleneck, huge data</td><td>users 0–499K → DB1, 500K+ → DB2</td></tr>
+        <tr><td><strong>Connection Pooling</strong></td><td>Reuse DB connections</td><td>High concurrency</td><td>PgBouncer, HikariCP</td></tr>
+        <tr><td><strong>Caching layer</strong></td><td>Serve reads from Redis not DB</td><td>Read-heavy, cacheable data</td><td>Redis in front of DB</td></tr>
+        <tr><td><strong>Query optimization</strong></td><td>Rewrite bad queries, use EXPLAIN</td><td>Slow queries</td><td>Avoid SELECT *, use LIMIT</td></tr>
+        <tr><td><strong>Denormalization</strong></td><td>Store pre-joined data to avoid JOINs</td><td>Read-heavy analytics</td><td>Embed user name in orders table</td></tr>
+        <tr><td><strong>Partitioning</strong></td><td>Split one table into physical parts by range/list</td><td>Time-series, huge tables</td><td>Partition by month</td></tr>
+        <tr><td><strong>CQRS</strong></td><td>Separate read model from write model</td><td>Complex domains, high scale</td><td>Write to PostgreSQL, read from Elasticsearch</td></tr>
+      </table>
+    </div></div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section-block s4">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚡</span><span class="s-title">Before vs After</span>
+      <span class="s-badge badge-example">Example</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <h3>Scaling a User Database from 10K to 10M Users</h3>
+      <div class="callout callout-bad">
+        <div class="callout-label">❌ Before — Single DB, No Index</div>
+      </div>
+<div class="diagram">Single PostgreSQL Server
+┌─────────────────────────────┐
+│  App Server  ──────────────▶│  PostgreSQL (single)
+│  (all reads │               │  10M rows, no indexes
+│   + writes) │◀──────────────│  CPU at 95%
+└─────────────────────────────┘
+Every query → full table scan
+Response time: 3–8 seconds 😬</div>
+
+      <div class="callout callout-good">
+        <div class="callout-label">✅ After — Replicas + Sharding + Cache</div>
+      </div>
+<div class="diagram">                   ┌──── Redis Cache (hot reads, &lt;1ms)
+                   │
+App ──▶ Load Balancer ──▶ Write: Primary DB (shard A: users 0–5M)
+                   │              │ replicates to →
+                   │         Read Replica 1 (shard A)
+                   │         Read Replica 2 (shard A)
+                   │
+                   └──▶ Write: Primary DB (shard B: users 5M–10M)
+                              │ replicates to →
+                         Read Replica 3 (shard B)
+
+Result: 10,000 RPS sustained, p99 &lt; 50ms ✅</div>
+
+      <h4>What Changed & Why It Helped</h4>
+      <ul>
+        <li><strong>Read replicas</strong> → reads distributed across 4 servers instead of 1</li>
+        <li><strong>Sharding</strong> → writes split, each shard handles half the data</li>
+        <li><strong>Indexes</strong> → lookup goes from O(n) table scan to O(log n) B-tree</li>
+        <li><strong>Redis</strong> → repeated reads (e.g. user profile) served in &lt;1ms</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section-block s5">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🎙️</span><span class="s-title">Interview Answer Framework</span>
+      <span class="s-badge badge-interview">Interview</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-interview">
+        <div class="callout-label">🎙️ Exact Script</div>
+        <ol>
+          <li><strong>Open with the bottleneck:</strong> "At scale, databases face three bottlenecks: reads, writes, and storage. My approach is to tackle each layer separately."</li>
+          <li><strong>Read bottleneck:</strong> "For reads, I'd add indexes on queried columns, put a cache layer like Redis in front of the DB, and add read replicas to distribute read traffic."</li>
+          <li><strong>Write bottleneck:</strong> "For writes, I'd first optimize queries, then consider sharding — splitting data by a key like user_id — so writes distribute across multiple primaries."</li>
+          <li><strong>Numbers:</strong> "A read replica setup can handle 10× more reads. A cache hit from Redis is ~0.1ms vs 10ms+ from the DB. Sharding can horizontally scale writes linearly."</li>
+          <li><strong>Trade-offs:</strong> "Sharding adds query complexity — cross-shard JOINs become expensive. Replication lag means reads can be stale. The CAP theorem means we must choose between consistency and availability during a partition."</li>
+          <li><strong>Close:</strong> "The right architecture depends on the read/write ratio, data size, and consistency requirements. I'd always start with a single well-indexed DB and only add complexity when metrics demand it."</li>
+        </ol>
+      </div>
+      <h4>Likely Follow-up Questions</h4>
+      <ul>
+        <li>"How do you pick a sharding key?"</li>
+        <li>"What's the difference between replication and sharding?"</li>
+        <li>"When would you use NoSQL over SQL?"</li>
+        <li>"How do you handle a hot shard (one shard gets all the traffic)?"</li>
+        <li>"Explain ACID vs BASE."</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section-block s6">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">📋</span><span class="s-title">Cheat Sheet</span>
+      <span class="s-badge badge-cheatsheet">Reference</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="cheat-grid">
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Core Concepts</div>
+          <ul>
+            <li>CAP: choose CP or AP</li>
+            <li>ACID = SQL transactions</li>
+            <li>BASE = NoSQL eventual consistency</li>
+            <li>Index = B-tree, O(log n) lookup</li>
+            <li>Replica lag = data staleness risk</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Scaling Techniques</div>
+          <ul>
+            <li>Indexing (first thing, always)</li>
+            <li>Read replicas (read scale)</li>
+            <li>Sharding (write scale)</li>
+            <li>Caching (Redis, Memcached)</li>
+            <li>Connection pooling (PgBouncer)</li>
+            <li>CQRS (separate read/write models)</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Key Numbers</div>
+          <ul>
+            <li>Index lookup: ~1–10ms</li>
+            <li>Full scan (1M rows): ~1–5s</li>
+            <li>Redis read: ~0.1ms</li>
+            <li>Replication lag: 10ms–1s</li>
+            <li>Single PG: ~5K writes/s</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Do's & Don'ts</div>
+          <ul>
+            <li>✅ Index FK columns immediately</li>
+            <li>✅ Use EXPLAIN ANALYZE on slow queries</li>
+            <li>✅ Start SQL, migrate to NoSQL if needed</li>
+            <li>❌ SELECT * in production queries</li>
+            <li>❌ Shard too early</li>
+            <li>❌ Cross-shard transactions</li>
+          </ul>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+</div></div>
+
+<!-- ═══════════ TOPIC 3: URL → BROWSER ═══════════ -->
+<div class="topic-page" id="page-url">
+<div class="topic-hero" data-emoji="🌐">
+  <div class="topic-num">Topic 03 / 07</div>
+  <h1 class="topic-title">What Happens When<br>You Type a URL</h1>
+  <p class="topic-desc">DNS, TCP, TLS, HTTP, rendering — the complete 20-step journey from keypress to pixels on screen, explained precisely.</p>
+  <div class="topic-tags">
+    <span class="tag" style="background:rgba(255,209,102,.1);color:var(--yellow)">DNS</span>
+    <span class="tag" style="background:rgba(0,245,212,.1);color:var(--cyan)">TCP/TLS</span>
+    <span class="tag" style="background:rgba(255,107,53,.1);color:var(--orange)">HTTP</span>
+    <span class="tag" style="background:rgba(74,222,128,.1);color:var(--green)">CDN</span>
+    <span class="tag" style="background:rgba(96,165,250,.1);color:var(--blue)">Rendering</span>
+  </div>
+</div>
+<div class="sections-wrapper">
+  <div class="section-block s1 open">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧒</span><span class="s-title">The Simple Story (ELI10)</span>
+      <span class="s-badge badge-eli10">Beginner</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-story">
+        <div class="callout-label">📮 The Letter Delivery Analogy</div>
+        <p>Imagine you want to send a letter to a friend but you only know their name, not their address. Here's what happens:</p>
+        <ol>
+          <li>You ask the <strong>phone book (DNS)</strong> — "What's the address for google.com?" It tells you: 142.250.80.46</li>
+          <li>The post office <strong>opens a connection (TCP handshake)</strong> — both sides agree "I'm ready to receive"</li>
+          <li>Because it's sensitive mail, you <strong>lock the envelope (TLS)</strong> so only the recipient can open it</li>
+          <li>You write your <strong>request letter (HTTP GET)</strong> — "Please send me your homepage"</li>
+          <li>Google's server reads the letter, <strong>prepares a reply</strong> (HTML, CSS, JS files)</li>
+          <li>Your browser <strong>reads the reply and draws it on screen</strong> — layout, colours, fonts, images</li>
+        </ol>
+        <p>All of this happens in under 200 milliseconds — faster than a blink. Every step is precisely engineered to be that fast.</p>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="section-block s2">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚙️</span><span class="s-title">The Real Concept</span>
+      <span class="s-badge badge-concept">Technical</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <p>The journey has <strong>network layers</strong> and <strong>browser rendering stages</strong>. Each is distinct and optimizable.</p>
+      <h4>Network Phase</h4>
+      <ul>
+        <li><strong>DNS resolution</strong> — translates domain name to IP. Checks: browser cache → OS cache → router cache → ISP recursive resolver → authoritative nameserver</li>
+        <li><strong>TCP handshake</strong> — 3-way SYN / SYN-ACK / ACK establishes a reliable connection</li>
+        <li><strong>TLS handshake</strong> — (for HTTPS) negotiates cipher suite, exchanges certificates, derives session keys. TLS 1.3 does this in 1 round-trip</li>
+        <li><strong>HTTP request/response</strong> — browser sends GET, server responds with status + headers + body</li>
+        <li><strong>CDN</strong> — a Content Delivery Network may intercept the request and serve cached responses from an edge node near the user</li>
+      </ul>
+      <h4>Browser Rendering Phase (Critical Path)</h4>
+      <ul>
+        <li><strong>Parse HTML</strong> → build DOM (Document Object Model)</li>
+        <li><strong>Parse CSS</strong> → build CSSOM (CSS Object Model)</li>
+        <li><strong>Combine</strong> DOM + CSSOM → <strong>Render Tree</strong></li>
+        <li><strong>Layout</strong> — calculate element positions and sizes</li>
+        <li><strong>Paint</strong> — draw pixels into layers</li>
+        <li><strong>Composite</strong> — merge layers onto screen</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s3">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧰</span><span class="s-title">Building Blocks & Techniques</span>
+      <span class="s-badge badge-tools">Tools</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <table>
+        <tr><th>Component</th><th>What it does</th><th>Optimization lever</th></tr>
+        <tr><td><strong>DNS</strong></td><td>Name → IP resolution</td><td>Low TTL vs high TTL trade-off; use DNS prefetch</td></tr>
+        <tr><td><strong>TCP</strong></td><td>Reliable byte-stream transport</td><td>HTTP/2 multiplexing eliminates head-of-line blocking</td></tr>
+        <tr><td><strong>TLS 1.3</strong></td><td>Encryption + auth</td><td>1-RTT handshake (vs TLS 1.2's 2-RTT)</td></tr>
+        <tr><td><strong>HTTP/2</strong></td><td>Multiplexed streams, header compression</td><td>One connection, many parallel requests</td></tr>
+        <tr><td><strong>CDN</strong></td><td>Edge caching, reduce latency</td><td>Serve static assets from 50ms away vs 300ms</td></tr>
+        <tr><td><strong>Service Worker</strong></td><td>Browser-side cache for offline + speed</td><td>Cache assets after first load</td></tr>
+        <tr><td><strong>Critical CSS</strong></td><td>Inline above-fold CSS to unblock render</td><td>Eliminate render-blocking stylesheets</td></tr>
+        <tr><td><strong>Lazy loading</strong></td><td>Load images only when scrolled into view</td><td><code>loading="lazy"</code> on &lt;img&gt;</td></tr>
+        <tr><td><strong>Preload / Prefetch</strong></td><td>Hint browser to fetch resources early</td><td><code>&lt;link rel="preload"&gt;</code></td></tr>
+      </table>
+    </div></div>
+  </div>
+
+  <div class="section-block s4">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚡</span><span class="s-title">Before vs After</span>
+      <span class="s-badge badge-example">Example</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <h3>Complete URL-to-Pixel Flow Diagram</h3>
+<div class="diagram">USER TYPES: https://www.example.com/products
+
+STEP 1 — DNS LOOKUP
+Browser cache miss → OS cache miss → ISP Resolver → Authoritative NS
+Response: 93.184.216.34  (cached for TTL=300s)
+
+STEP 2 — TCP HANDSHAKE (1 round-trip ~20ms)
+Client ──SYN──────────────────────▶ Server
+Client ◀──SYN-ACK───────────────── Server
+Client ──ACK──────────────────────▶ Server
+
+STEP 3 — TLS 1.3 HANDSHAKE (1 round-trip ~20ms)
+Client ──ClientHello──────────────▶ Server
+Client ◀──ServerHello + Cert─────── Server
+Client ──Finished─────────────────▶ Server
+(Session keys derived, encrypted from here)
+
+STEP 4 — HTTP/2 REQUEST
+Client ──GET /products HTTP/2──────▶ Server (CDN edge node, 5ms away)
+         Headers: Accept-Encoding: gzip
+                  Cookie: session=abc
+
+STEP 5 — SERVER RESPONSE
+CDN Cache HIT → 200 OK (2ms)
+Body: HTML (gzipped, 12KB compressed from 85KB)
+
+STEP 6 — BROWSER RENDER
+Parse HTML → DOM (8ms)
+Parse CSS  → CSSOM (4ms)
+DOM + CSSOM → Render Tree → Layout → Paint → Composite
+First Contentful Paint: ~180ms total ✅</div>
+
+      <div class="callout callout-good">
+        <div class="callout-label">✅ Optimized version adds</div>
+        <ul>
+          <li><code>&lt;link rel="dns-prefetch" href="//api.example.com"&gt;</code> — pre-resolve DNS for API calls</li>
+          <li><code>&lt;link rel="preload" as="font"&gt;</code> — fonts loaded before parser hits them</li>
+          <li>HTTP/2 server push — CSS and JS arrive with the initial HTML response</li>
+          <li>CDN edge node — user in Singapore hits an SG node (5ms) not US origin (200ms)</li>
+        </ul>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="section-block s5">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🎙️</span><span class="s-title">Interview Answer Framework</span>
+      <span class="s-badge badge-interview">Interview</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-interview">
+        <div class="callout-label">🎙️ Exact Script (Classic Interview Question)</div>
+        <ol>
+          <li><strong>Open with layers:</strong> "There are two phases: the network phase and the browser rendering phase."</li>
+          <li><strong>Network:</strong> "First, DNS resolves the domain to an IP — checking browser cache, OS cache, then the recursive resolver. Then a TCP handshake establishes the connection. For HTTPS, a TLS handshake encrypts traffic. Then the HTTP request goes out, ideally hitting a CDN edge node rather than the origin server."</li>
+          <li><strong>Rendering:</strong> "The browser parses HTML into the DOM, CSS into the CSSOM, combines them into a render tree, runs layout to compute positions, then paints and composites pixels."</li>
+          <li><strong>Mention HTTP/2:</strong> "Modern browsers use HTTP/2 which multiplexes multiple requests over one TCP connection, eliminating head-of-line blocking."</li>
+          <li><strong>Numbers:</strong> "DNS: 0–100ms. TCP+TLS: 40–100ms. CDN response: 5–50ms. Total: under 200ms for a well-optimized site."</li>
+          <li><strong>Optimization angle:</strong> "Performance can be improved at each step: DNS prefetch, TLS session resumption, HTTP/2, CDN, critical CSS inlining, lazy loading images."</li>
+        </ol>
+      </div>
+      <h4>Likely Follow-up Questions</h4>
+      <ul>
+        <li>"What's the difference between HTTP/1.1 and HTTP/2?"</li>
+        <li>"What is a CDN and how does it work?"</li>
+        <li>"What is CORS and why does it exist?"</li>
+        <li>"What happens during a TLS handshake?"</li>
+        <li>"What is the critical rendering path?"</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s6">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">📋</span><span class="s-title">Cheat Sheet</span>
+      <span class="s-badge badge-cheatsheet">Reference</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="cheat-grid">
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Network Steps</div>
+          <ul>
+            <li>1. DNS lookup (name → IP)</li>
+            <li>2. TCP 3-way handshake</li>
+            <li>3. TLS handshake (HTTPS)</li>
+            <li>4. HTTP GET request</li>
+            <li>5. Server / CDN response</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Render Steps</div>
+          <ul>
+            <li>1. Parse HTML → DOM</li>
+            <li>2. Parse CSS → CSSOM</li>
+            <li>3. DOM + CSSOM → Render Tree</li>
+            <li>4. Layout (positions)</li>
+            <li>5. Paint + Composite</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Key Numbers</div>
+          <ul>
+            <li>DNS: 0–100ms</li>
+            <li>TCP+TLS: 40–100ms</li>
+            <li>TLS 1.3: 1-RTT</li>
+            <li>CDN hit: 5–50ms</li>
+            <li>Target FCP: &lt;1.8s</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Optimizations</div>
+          <ul>
+            <li>✅ HTTP/2 multiplexing</li>
+            <li>✅ CDN for static assets</li>
+            <li>✅ DNS prefetch</li>
+            <li>✅ Preload critical resources</li>
+            <li>✅ Inline critical CSS</li>
+            <li>❌ Render-blocking scripts in &lt;head&gt;</li>
+          </ul>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</div></div>
+
+<!-- ═══════════ TOPIC 4: CACHING ═══════════ -->
+<div class="topic-page" id="page-cache">
+<div class="topic-hero" data-emoji="🧠">
+  <div class="topic-num">Topic 04 / 07</div>
+  <h1 class="topic-title">How Caching Works</h1>
+  <p class="topic-desc">Cache-aside, write-through, eviction policies, Redis patterns, TTLs, and how to avoid the classic pitfalls: stampede, thundering herd, and stale data.</p>
+  <div class="topic-tags">
+    <span class="tag" style="background:rgba(255,209,102,.1);color:var(--yellow)">Redis</span>
+    <span class="tag" style="background:rgba(0,245,212,.1);color:var(--cyan)">Eviction</span>
+    <span class="tag" style="background:rgba(255,107,53,.1);color:var(--orange)">TTL</span>
+    <span class="tag" style="background:rgba(74,222,128,.1);color:var(--green)">Write-Through</span>
+    <span class="tag" style="background:rgba(96,165,250,.1);color:var(--blue)">Cache-Aside</span>
+  </div>
+</div>
+<div class="sections-wrapper">
+  <div class="section-block s1 open">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧒</span><span class="s-title">The Simple Story (ELI10)</span>
+      <span class="s-badge badge-eli10">Beginner</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-story">
+        <div class="callout-label">📝 The School Desk Analogy</div>
+        <p>Imagine your school has a huge library with every book ever written. Every time you need a maths formula, you'd have to walk to the library, find the book, look it up, and walk back. That takes 10 minutes every time.</p>
+        <p>Smart students write the most-used formulas on a <strong>sticky note on their desk</strong>. Now it takes 2 seconds. That sticky note is a <strong>cache</strong>.</p>
+        <p>But the sticky note has limits:</p>
+        <ul>
+          <li>It gets <strong>out of date</strong> — the formula changes but your note doesn't (stale data)</li>
+          <li>Your desk has limited space — you must <strong>remove old notes</strong> to add new ones (eviction)</li>
+          <li>The note <strong>expires</strong> after an exam — after which you write a fresh one (TTL)</li>
+        </ul>
+        <p>Every caching system in computing works exactly like this sticky-note system — just much faster and at massive scale.</p>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="section-block s2">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚙️</span><span class="s-title">The Real Concept</span>
+      <span class="s-badge badge-concept">Technical</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <p>A <strong>cache</strong> is a fast, temporary store that holds copies of data that is expensive to compute or fetch. When a request arrives, you check the cache first (<em>cache hit</em>). If not found (<em>cache miss</em>), you fetch from source and optionally store in cache.</p>
+      <h4>Cache Hit Rate</h4>
+      <p><strong>Hit rate = cache hits / total requests.</strong> A hit rate of 90% means 90% of reads skip the database entirely. Even 80% is transformative at scale.</p>
+      <h4>Core Properties</h4>
+      <table>
+        <tr><th>Property</th><th>What it means</th><th>Example</th></tr>
+        <tr><td><strong>TTL</strong></td><td>Time-To-Live — how long before data expires</td><td>User profile cached for 5 minutes</td></tr>
+        <tr><td><strong>Eviction policy</strong></td><td>Which key to remove when cache is full</td><td>LRU removes least recently used</td></tr>
+        <tr><td><strong>Cache warming</strong></td><td>Pre-populate cache before traffic hits</td><td>Load top 1000 products at startup</td></tr>
+        <tr><td><strong>Cache invalidation</strong></td><td>Remove or update entry when source data changes</td><td>Delete cache key on user update</td></tr>
+      </table>
+      <h4>Classic Cache Problems</h4>
+      <ul>
+        <li><strong>Cache stampede</strong> — many requests all miss the cache at once and hammer the DB simultaneously</li>
+        <li><strong>Thundering herd</strong> — cache server restarts, all traffic hits origin together</li>
+        <li><strong>Stale data</strong> — cache has old value that doesn't match DB</li>
+        <li><strong>Cache poisoning</strong> — attacker injects bad data into cache</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s3">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧰</span><span class="s-title">Building Blocks & Techniques</span>
+      <span class="s-badge badge-tools">Tools</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <table>
+        <tr><th>Pattern</th><th>How it works</th><th>Best for</th><th>Trade-off</th></tr>
+        <tr><td><strong>Cache-Aside (Lazy)</strong></td><td>App checks cache; on miss, loads DB and writes to cache</td><td>Read-heavy, general purpose</td><td>First request is slow; stale risk</td></tr>
+        <tr><td><strong>Write-Through</strong></td><td>Write to cache AND DB simultaneously</td><td>Consistency critical</td><td>Write latency doubles</td></tr>
+        <tr><td><strong>Write-Behind</strong></td><td>Write to cache; DB updated asynchronously</td><td>Write-heavy, can tolerate some lag</td><td>Data loss risk on crash</td></tr>
+        <tr><td><strong>Read-Through</strong></td><td>Cache sits in front; it fetches from DB on miss</td><td>Transparent caching layer</td><td>Cache must know DB schema</td></tr>
+        <tr><td><strong>LRU Eviction</strong></td><td>Remove Least Recently Used key when full</td><td>General use</td><td>Doesn't consider frequency</td></tr>
+        <tr><td><strong>LFU Eviction</strong></td><td>Remove Least Frequently Used key</td><td>Stable hot data</td><td>New items get evicted quickly</td></tr>
+        <tr><td><strong>TTL-based expiry</strong></td><td>Keys auto-delete after N seconds</td><td>Time-sensitive data</td><td>Stale between writes and expiry</td></tr>
+        <tr><td><strong>Jitter on TTL</strong></td><td>Randomize TTL to prevent stampede</td><td>High-traffic homogeneous data</td><td>Slightly more complex</td></tr>
+      </table>
+    </div></div>
+  </div>
+
+  <div class="section-block s4">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚡</span><span class="s-title">Before vs After</span>
+      <span class="s-badge badge-example">Example</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <h3>Product Page — 50,000 requests/minute for top 100 products</h3>
+<pre><code># BEFORE: Every request hits PostgreSQL
+def get_product(product_id):
+    return db.query(
+        "SELECT * FROM products WHERE id = ?", product_id
+    )  # 80ms per call, DB CPU 95%, 50K RPM = DB melts 🔥</code></pre>
+
+<pre><code># AFTER: Cache-Aside with Redis + TTL jitter
+import redis, random
+
+r = redis.Redis()
+
+def get_product(product_id):
+    key = f"product:{product_id}"
+    cached = r.get(key)
+
+    if cached:
+        return json.loads(cached)  # ~0.3ms ⚡
+
+    # Cache miss — fetch from DB (rare)
+    product = db.query("SELECT * FROM products WHERE id = ?", product_id)
+
+    # Store with TTL jitter to avoid stampede
+    ttl = 300 + random.randint(0, 60)  # 5–6 minutes
+    r.setex(key, ttl, json.dumps(product))
+
+    return product
+
+# Cache invalidation on product update:
+def update_product(product_id, data):
+    db.update("UPDATE products SET ... WHERE id = ?", data, product_id)
+    r.delete(f"product:{product_id}")  # evict stale cache</code></pre>
+
+      <h4>Result</h4>
+      <ul>
+        <li>Hit rate: ~97% (top 100 products almost always cached)</li>
+        <li>DB queries: 50,000/min → ~1,500/min (97% reduction)</li>
+        <li>Avg response: 80ms → 0.3ms (99.6% faster)</li>
+        <li>DB CPU: 95% → 12%</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s5">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🎙️</span><span class="s-title">Interview Answer Framework</span>
+      <span class="s-badge badge-interview">Interview</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-interview">
+        <div class="callout-label">🎙️ Exact Script</div>
+        <ol>
+          <li><strong>Define:</strong> "A cache is a fast temporary store — like Redis — that sits in front of slower data sources like databases."</li>
+          <li><strong>Pattern:</strong> "The most common pattern is cache-aside: check cache first, on a miss load from DB and populate the cache, with a TTL so data doesn't become permanently stale."</li>
+          <li><strong>Numbers:</strong> "A cache hit in Redis takes ~0.1–0.3ms. A DB query takes 10–100ms. Even a 90% hit rate reduces DB load by 10× at the same traffic level."</li>
+          <li><strong>Trade-offs:</strong> "The core trade-off is consistency vs speed. You must decide your TTL — too short and you lose the benefit, too long and users see stale data. Cache invalidation is notoriously hard: delete on write, or use event-driven invalidation."</li>
+          <li><strong>Problems:</strong> "The two failure modes I'd highlight: cache stampede — multiple simultaneous misses hammering the DB — solved with mutex locks or TTL jitter. And thundering herd on restart — solved with cache warming or gradual rollout."</li>
+          <li><strong>Close:</strong> "Caching is most powerful for read-heavy, rarely-changing data. I'd avoid caching highly personalized or rapidly changing data without very short TTLs."</li>
+        </ol>
+      </div>
+      <h4>Likely Follow-up Questions</h4>
+      <ul>
+        <li>"How do you handle cache invalidation?"</li>
+        <li>"What's the difference between write-through and write-behind?"</li>
+        <li>"How do you prevent a cache stampede?"</li>
+        <li>"When would you NOT use a cache?"</li>
+        <li>"What eviction policy does Redis use by default?"</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s6">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">📋</span><span class="s-title">Cheat Sheet</span>
+      <span class="s-badge badge-cheatsheet">Reference</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="cheat-grid">
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Core Patterns</div>
+          <ul>
+            <li>Cache-aside (most common)</li>
+            <li>Write-through (consistency)</li>
+            <li>Write-behind (write speed)</li>
+            <li>Read-through (transparent)</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Eviction Policies</div>
+          <ul>
+            <li>LRU — least recently used</li>
+            <li>LFU — least frequently used</li>
+            <li>TTL — time expiry</li>
+            <li>FIFO — oldest first</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Key Numbers</div>
+          <ul>
+            <li>Redis read: ~0.1–0.3ms</li>
+            <li>DB read: 10–100ms</li>
+            <li>Good hit rate: &gt;90%</li>
+            <li>Redis max memory: config-limited</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Do's & Don'ts</div>
+          <ul>
+            <li>✅ Set TTL on every key</li>
+            <li>✅ Add jitter to prevent stampede</li>
+            <li>✅ Invalidate on write</li>
+            <li>❌ Cache user-specific sensitive data long</li>
+            <li>❌ Cache without monitoring hit rate</li>
+            <li>❌ Cache mutable data without invalidation</li>
+          </ul>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</div></div>
+
+<!-- ═══════════ TOPIC 5: HIGH AVAILABILITY ═══════════ -->
+<div class="topic-page" id="page-ha">
+<div class="topic-hero" data-emoji="🔰">
+  <div class="topic-num">Topic 05 / 07</div>
+  <h1 class="topic-title">How to Design for<br>High Availability</h1>
+  <p class="topic-desc">Redundancy, failover, health checks, SLAs, circuit breakers, and chaos engineering — building systems that stay up when things break.</p>
+  <div class="topic-tags">
+    <span class="tag" style="background:rgba(255,209,102,.1);color:var(--yellow)">Redundancy</span>
+    <span class="tag" style="background:rgba(0,245,212,.1);color:var(--cyan)">Failover</span>
+    <span class="tag" style="background:rgba(255,107,53,.1);color:var(--orange)">Circuit Breaker</span>
+    <span class="tag" style="background:rgba(74,222,128,.1);color:var(--green)">SLA / SLO</span>
+    <span class="tag" style="background:rgba(96,165,250,.1);color:var(--blue)">Chaos Engineering</span>
+  </div>
+</div>
+<div class="sections-wrapper">
+  <div class="section-block s1 open">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧒</span><span class="s-title">The Simple Story (ELI10)</span>
+      <span class="s-badge badge-eli10">Beginner</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-story">
+        <div class="callout-label">✈️ The Airplane Analogy</div>
+        <p>Airplanes don't have one engine — they have two, three, or four. Not because one engine usually fails, but because if it does, you can't land and fix it mid-air. The cost of failure is catastrophic.</p>
+        <p>High availability systems are engineered the same way:</p>
+        <ul>
+          <li><strong>Redundancy</strong> — multiple copies of everything so one failure doesn't stop the whole system</li>
+          <li><strong>Failover</strong> — when one thing breaks, another takes over automatically</li>
+          <li><strong>Health checks</strong> — the plane constantly monitors each engine (not the pilot guessing)</li>
+          <li><strong>Graceful degradation</strong> — fly with 3 engines, not crash because one is out</li>
+          <li><strong>Chaos engineering</strong> — Netflix literally breaks their own systems on purpose to make sure the backup systems really work</li>
+        </ul>
+        <p>High availability means: <strong>your system keeps working even when parts of it break.</strong></p>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="section-block s2">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚙️</span><span class="s-title">The Real Concept</span>
+      <span class="s-badge badge-concept">Technical</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <p><strong>High Availability (HA)</strong> is the property of a system that remains operational for a high percentage of time. It's measured as <em>uptime percentage</em>, often called "nines."</p>
+      <table>
+        <tr><th>Availability</th><th>Downtime/year</th><th>Downtime/month</th></tr>
+        <tr><td>99% (two nines)</td><td>3.65 days</td><td>7.2 hours</td></tr>
+        <tr><td>99.9% (three nines)</td><td>8.7 hours</td><td>43.8 minutes</td></tr>
+        <tr><td>99.99% (four nines)</td><td>52 minutes</td><td>4.4 minutes</td></tr>
+        <tr><td>99.999% (five nines)</td><td>5.2 minutes</td><td>26 seconds</td></tr>
+      </table>
+      <p>Key concepts:</p>
+      <ul>
+        <li><strong>SLA</strong> — Service Level Agreement: the uptime you promise customers (contractual)</li>
+        <li><strong>SLO</strong> — Service Level Objective: the internal uptime target you engineer for (always higher than SLA)</li>
+        <li><strong>SPOF</strong> — Single Point of Failure: any component whose failure brings down the whole system</li>
+        <li><strong>MTTR</strong> — Mean Time to Recover: average time to fix an outage</li>
+        <li><strong>MTBF</strong> — Mean Time Between Failures: average time between incidents</li>
+        <li><strong>RTO</strong> — Recovery Time Objective: maximum acceptable downtime during a disaster</li>
+        <li><strong>RPO</strong> — Recovery Point Objective: maximum acceptable data loss duration</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s3">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧰</span><span class="s-title">Building Blocks & Techniques</span>
+      <span class="s-badge badge-tools">Tools</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <table>
+        <tr><th>Technique</th><th>What it does</th><th>When to use</th><th>Example</th></tr>
+        <tr><td><strong>Redundancy</strong></td><td>Run N+1 instances of every component</td><td>Always</td><td>3 app servers behind LB instead of 1</td></tr>
+        <tr><td><strong>Active-Active failover</strong></td><td>Multiple nodes handle traffic; if one fails others absorb load</td><td>Stateless services</td><td>2 app servers, both live</td></tr>
+        <tr><td><strong>Active-Passive failover</strong></td><td>Standby node takes over on primary failure</td><td>Stateful services (DB)</td><td>Primary DB + hot standby</td></tr>
+        <tr><td><strong>Health checks</strong></td><td>LB pings each server; removes unhealthy ones from rotation</td><td>All production services</td><td>HTTP /health endpoint every 5s</td></tr>
+        <tr><td><strong>Circuit Breaker</strong></td><td>Stop calling a failing dependency; return fallback</td><td>Service-to-service calls</td><td>Hystrix, Resilience4j</td></tr>
+        <tr><td><strong>Retry with backoff</strong></td><td>Retry failed requests with exponential delay</td><td>Transient failures</td><td>Retry after 1s, 2s, 4s, 8s</td></tr>
+        <tr><td><strong>Multi-AZ / Multi-region</strong></td><td>Distribute across availability zones or regions</td><td>High criticality services</td><td>AWS us-east-1a + 1b + 1c</td></tr>
+        <tr><td><strong>Graceful degradation</strong></td><td>Serve partial functionality when a dependency fails</td><td>Non-critical features</td><td>Show cached recommendations if ML service is down</td></tr>
+        <tr><td><strong>Chaos Engineering</strong></td><td>Intentionally kill components in production to test resilience</td><td>Mature systems</td><td>Netflix Chaos Monkey</td></tr>
+        <tr><td><strong>Rate limiting</strong></td><td>Prevent traffic spikes from overwhelming the system</td><td>Public APIs, shared services</td><td>Token bucket: 1000 req/min per user</td></tr>
+      </table>
+    </div></div>
+  </div>
+
+  <div class="section-block s4">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚡</span><span class="s-title">Before vs After</span>
+      <span class="s-badge badge-example">Example</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-bad">
+        <div class="callout-label">❌ Before — Single Points of Failure Everywhere</div>
+      </div>
+<div class="diagram">Internet
+   │
+   ▼
+[Single App Server]  ← SPOF #1: server dies, site is down
+   │
+   ▼
+[Single Database]    ← SPOF #2: DB dies, everything fails
+   │
+   ▼
+[Single Region]      ← SPOF #3: datacenter outage = total blackout
+
+Availability: ~97% (10+ hours downtime/year)</div>
+
+      <div class="callout callout-good">
+        <div class="callout-label">✅ After — Redundant, Multi-AZ, Resilient</div>
+      </div>
+<div class="diagram">Internet
+   │
+   ▼
+[Route 53 DNS with health checks]
+   │
+   ├── Region: us-east-1
+   │     │
+   │     ▼
+   │  [ALB Load Balancer]
+   │     ├─ App Server (AZ-a) ─── health check ✅
+   │     ├─ App Server (AZ-b) ─── health check ✅
+   │     └─ App Server (AZ-c) ─── health check ✅
+   │          │
+   │          ▼
+   │   [Primary RDS] ─── auto-replication ──▶ [Standby RDS (AZ-b)]
+   │                    failover in &lt;60s
+   │
+   └── Region: eu-west-1 (active-passive for DR)
+
+Circuit Breakers on all service calls
+Retry logic with exponential backoff
+/health endpoint on every service
+
+Availability: 99.99% (52 min downtime/year)</div>
+    </div></div>
+  </div>
+
+  <div class="section-block s5">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🎙️</span><span class="s-title">Interview Answer Framework</span>
+      <span class="s-badge badge-interview">Interview</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-interview">
+        <div class="callout-label">🎙️ Exact Script</div>
+        <ol>
+          <li><strong>Frame with nines:</strong> "High availability is about eliminating single points of failure to hit a target uptime — typically 99.9% or 99.99% depending on business requirements."</li>
+          <li><strong>SPOF audit:</strong> "My first step is to map the architecture and identify every SPOF — any component whose failure takes down the system."</li>
+          <li><strong>Redundancy layers:</strong> "I'd add redundancy at every layer: multiple app server instances behind a load balancer, database primary with standby replica with automatic failover, and distribute across multiple availability zones."</li>
+          <li><strong>Failure handling:</strong> "Between services I'd use circuit breakers to stop cascading failures, retries with exponential backoff for transient errors, and timeouts to avoid hanging requests piling up."</li>
+          <li><strong>Numbers:</strong> "99.9% means 8.7 hours of downtime per year. 99.99% means 52 minutes. Each nine costs significantly more to achieve."</li>
+          <li><strong>Close:</strong> "True high availability isn't just architecture — it's tested. I'd use health checks, alerting, runbooks, and eventually chaos engineering to verify the system behaves correctly during failures, not just during normal operation."</li>
+        </ol>
+      </div>
+      <h4>Likely Follow-up Questions</h4>
+      <ul>
+        <li>"What's the difference between RTO and RPO?"</li>
+        <li>"How does a circuit breaker work?"</li>
+        <li>"What's active-active vs active-passive failover?"</li>
+        <li>"How do you design for a datacenter outage?"</li>
+        <li>"What is chaos engineering?"</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s6">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">📋</span><span class="s-title">Cheat Sheet</span>
+      <span class="s-badge badge-cheatsheet">Reference</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="cheat-grid">
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Availability Nines</div>
+          <ul>
+            <li>99% → 3.65 days/year down</li>
+            <li>99.9% → 8.7 hours/year</li>
+            <li>99.99% → 52 min/year</li>
+            <li>99.999% → 5.2 min/year</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Key Patterns</div>
+          <ul>
+            <li>Eliminate all SPOFs</li>
+            <li>Multi-AZ deployment</li>
+            <li>Active-passive DB failover</li>
+            <li>Circuit breaker pattern</li>
+            <li>Retry + exponential backoff</li>
+            <li>Graceful degradation</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Key Terms</div>
+          <ul>
+            <li>SLA — customer-facing promise</li>
+            <li>SLO — internal target (&gt; SLA)</li>
+            <li>SPOF — single point of failure</li>
+            <li>RTO — max downtime allowed</li>
+            <li>RPO — max data loss allowed</li>
+            <li>MTTR — mean time to recover</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Do's & Don'ts</div>
+          <ul>
+            <li>✅ Health checks on every service</li>
+            <li>✅ Test failover regularly</li>
+            <li>✅ Design for partial failure</li>
+            <li>❌ Single DB with no replica</li>
+            <li>❌ Single region deployment</li>
+            <li>❌ Assume network is reliable</li>
+          </ul>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</div></div>
+
+<!-- ═══════════ TOPIC 6: LOAD BALANCING ═══════════ -->
+<div class="topic-page" id="page-lb">
+<div class="topic-hero" data-emoji="⚖️">
+  <div class="topic-num">Topic 06 / 07</div>
+  <h1 class="topic-title">How Load Balancing Works</h1>
+  <p class="topic-desc">Round-robin, least connections, consistent hashing, L4 vs L7, session affinity, and health checks — distributing traffic at scale.</p>
+  <div class="topic-tags">
+    <span class="tag" style="background:rgba(255,209,102,.1);color:var(--yellow)">Round-Robin</span>
+    <span class="tag" style="background:rgba(0,245,212,.1);color:var(--cyan)">Consistent Hashing</span>
+    <span class="tag" style="background:rgba(255,107,53,.1);color:var(--orange)">L4 vs L7</span>
+    <span class="tag" style="background:rgba(74,222,128,.1);color:var(--green)">Health Checks</span>
+    <span class="tag" style="background:rgba(96,165,250,.1);color:var(--blue)">Session Affinity</span>
+  </div>
+</div>
+<div class="sections-wrapper">
+  <div class="section-block s1 open">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧒</span><span class="s-title">The Simple Story (ELI10)</span>
+      <span class="s-badge badge-eli10">Beginner</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-story">
+        <div class="callout-label">🏦 The Bank Counter Analogy</div>
+        <p>Imagine a bank with 500 customers arriving at once, but only one teller. The queue is enormous and everyone waits an hour.</p>
+        <p>The bank opens 10 teller counters. But who decides which counter each customer goes to?</p>
+        <ul>
+          <li><strong>A greeter (the load balancer)</strong> stands at the entrance and directs each customer: "You go to counter 3, you go to counter 7."</li>
+          <li>The greeter makes sure no counter is overwhelmed while others sit idle</li>
+          <li>If a teller calls in sick (server crashes), the greeter stops sending customers there</li>
+          <li>Some greeters are smart — they send VIP customers (premium users) to the faster senior teller</li>
+        </ul>
+        <p>A load balancer is exactly this greeter. It sits in front of your servers and distributes traffic so no single server gets crushed.</p>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="section-block s2">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚙️</span><span class="s-title">The Real Concept</span>
+      <span class="s-badge badge-concept">Technical</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <p>A <strong>load balancer (LB)</strong> is a network component that distributes incoming traffic across a pool of backend servers. It operates at different <em>OSI layers</em>:</p>
+      <h4>L4 vs L7 Load Balancing</h4>
+      <table>
+        <tr><th>Layer</th><th>Sees</th><th>Can route by</th><th>Example</th></tr>
+        <tr><td><strong>L4 (Transport)</strong></td><td>IP + TCP/UDP packets</td><td>IP, port, protocol</td><td>AWS NLB, HAProxy TCP mode</td></tr>
+        <tr><td><strong>L7 (Application)</strong></td><td>Full HTTP request</td><td>URL path, headers, cookies, body</td><td>AWS ALB, NGINX, Envoy</td></tr>
+      </table>
+      <p>L7 is more powerful but adds latency (~1ms). L4 is faster but dumb — it can't route <code>/api/*</code> to one backend and <code>/images/*</code> to another.</p>
+      <h4>Key Properties</h4>
+      <ul>
+        <li><strong>Health checks</strong> — LB pings each server (e.g. HTTP GET /health every 5s) and removes failed ones from rotation</li>
+        <li><strong>Session affinity (sticky sessions)</strong> — routes a user's requests to the same server, needed for stateful apps</li>
+        <li><strong>SSL termination</strong> — LB decrypts HTTPS so backend servers handle plain HTTP</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s3">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧰</span><span class="s-title">Building Blocks & Techniques</span>
+      <span class="s-badge badge-tools">Tools</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <table>
+        <tr><th>Algorithm</th><th>How it works</th><th>Best for</th><th>Weakness</th></tr>
+        <tr><td><strong>Round Robin</strong></td><td>Rotate through servers in sequence</td><td>Homogeneous servers, similar request size</td><td>Ignores server load</td></tr>
+        <tr><td><strong>Weighted Round Robin</strong></td><td>Servers with more capacity get more requests</td><td>Heterogeneous server specs</td><td>Static weights don't adapt</td></tr>
+        <tr><td><strong>Least Connections</strong></td><td>Route to server with fewest open connections</td><td>Long-lived connections (websockets)</td><td>Slightly more overhead</td></tr>
+        <tr><td><strong>Least Response Time</strong></td><td>Route to fastest-responding server</td><td>Latency-sensitive workloads</td><td>Requires active probing</td></tr>
+        <tr><td><strong>IP Hash</strong></td><td>Hash client IP to pick server consistently</td><td>Basic session affinity</td><td>Uneven distribution if IPs cluster</td></tr>
+        <tr><td><strong>Consistent Hashing</strong></td><td>Hash request key; minimal remapping when servers added/removed</td><td>Distributed caches, stateful routing</td><td>Hot spots possible</td></tr>
+        <tr><td><strong>Random</strong></td><td>Pick a random server</td><td>Simple, stateless, homogeneous</td><td>No guarantees on distribution</td></tr>
+      </table>
+      <h4>Tools</h4>
+      <ul>
+        <li><strong>NGINX</strong> — popular open-source, L7, highly configurable</li>
+        <li><strong>HAProxy</strong> — high-performance, L4/L7, battle-tested</li>
+        <li><strong>AWS ALB</strong> — managed L7 LB, path-based routing, auto-scaling integration</li>
+        <li><strong>AWS NLB</strong> — managed L4, ultra-low latency, static IPs</li>
+        <li><strong>Envoy</strong> — cloud-native proxy/LB, used as sidecar in service meshes</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s4">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚡</span><span class="s-title">Before vs After</span>
+      <span class="s-badge badge-example">Example</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-bad">
+        <div class="callout-label">❌ Before — Single Server, No LB</div>
+      </div>
+<div class="diagram">All 50,000 users → [Single App Server]
+                      CPU: 100%, crashes under load
+                      If server dies: entire site down ☠️</div>
+
+      <div class="callout callout-good">
+        <div class="callout-label">✅ After — L7 ALB with Path-Based Routing</div>
+      </div>
+<div class="diagram">Users
+  │
+  ▼
+[AWS ALB — L7 Load Balancer]
+  │
+  ├─ /api/*  ──▶ API Server Pool (3 instances, least-connections)
+  │               ├─ api-server-1 [healthy ✅]
+  │               ├─ api-server-2 [healthy ✅]
+  │               └─ api-server-3 [unhealthy ❌] ← LB stops sending here
+  │
+  ├─ /images/* ──▶ Image Server Pool (scales on demand)
+  │
+  └─ /ws/*  ──▶ WebSocket Server Pool (sticky sessions enabled)
+                  (same user always hits same server via cookie affinity)
+
+NGINX config snippet for least_conn:
+upstream api_backend {
+    least_conn;
+    server api-1:8080;
+    server api-2:8080;
+    server api-3:8080;
+}
+
+Health check: GET /health every 5s
+Failure threshold: 2 consecutive failures → removed from pool
+Recovery threshold: 3 consecutive successes → added back</div>
+    </div></div>
+  </div>
+
+  <div class="section-block s5">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🎙️</span><span class="s-title">Interview Answer Framework</span>
+      <span class="s-badge badge-interview">Interview</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-interview">
+        <div class="callout-label">🎙️ Exact Script</div>
+        <ol>
+          <li><strong>Define:</strong> "A load balancer distributes incoming traffic across multiple backend servers to prevent any single server from becoming a bottleneck or SPOF."</li>
+          <li><strong>L4 vs L7:</strong> "I'd choose based on needs. L4 load balancers route by IP and port — very fast, low overhead. L7 load balancers see the full HTTP request and can route by URL path, headers, or cookies — more powerful but add ~1ms."</li>
+          <li><strong>Algorithm:</strong> "The algorithm depends on the workload. Round-robin works for homogeneous stateless services. Least-connections is better for long-lived connections like websockets. Consistent hashing is essential when you're routing to stateful backends like distributed caches."</li>
+          <li><strong>Health checks:</strong> "Every LB should have health checks — polling a /health endpoint every 5–10 seconds and removing any server that fails N consecutive checks from the rotation."</li>
+          <li><strong>Sticky sessions:</strong> "For stateful apps I'd use session affinity — routing a user to the same server via cookie or IP hash. But I'd prefer to make the service stateless instead and store state in Redis."</li>
+          <li><strong>Close:</strong> "In production I'd also put the load balancer itself behind DNS-based failover or use two LBs in active-passive to avoid the LB becoming a SPOF."</li>
+        </ol>
+      </div>
+      <h4>Likely Follow-up Questions</h4>
+      <ul>
+        <li>"What is consistent hashing and why is it useful?"</li>
+        <li>"How do you make a load balancer itself highly available?"</li>
+        <li>"What's the difference between a load balancer and a reverse proxy?"</li>
+        <li>"When would you use sticky sessions?"</li>
+        <li>"How does DNS load balancing work?"</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s6">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">📋</span><span class="s-title">Cheat Sheet</span>
+      <span class="s-badge badge-cheatsheet">Reference</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="cheat-grid">
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Algorithms</div>
+          <ul>
+            <li>Round-robin (default)</li>
+            <li>Weighted round-robin</li>
+            <li>Least connections (websockets)</li>
+            <li>IP hash (basic affinity)</li>
+            <li>Consistent hashing (caches)</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">L4 vs L7</div>
+          <ul>
+            <li>L4 = IP/port routing, faster</li>
+            <li>L7 = HTTP routing, smarter</li>
+            <li>L7 can route by URL path</li>
+            <li>L7 can do SSL termination</li>
+            <li>L7 can set headers, modify requests</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Tools</div>
+          <ul>
+            <li>NGINX (open-source L7)</li>
+            <li>HAProxy (L4+L7, high-perf)</li>
+            <li>AWS ALB (managed L7)</li>
+            <li>AWS NLB (managed L4)</li>
+            <li>Envoy (service mesh)</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Do's & Don'ts</div>
+          <ul>
+            <li>✅ Health checks on every backend</li>
+            <li>✅ SSL terminate at LB</li>
+            <li>✅ Keep backends stateless</li>
+            <li>✅ HA the LB itself (2x)</li>
+            <li>❌ Sticky sessions as default</li>
+            <li>❌ Ignore slow servers (use least-conn)</li>
+          </ul>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</div></div>
+
+<!-- ═══════════ TOPIC 7: MICROSERVICES ═══════════ -->
+<div class="topic-page" id="page-ms">
+<div class="topic-hero" data-emoji="🔗">
+  <div class="topic-num">Topic 07 / 07</div>
+  <h1 class="topic-title">How Microservices<br>Communicate</h1>
+  <p class="topic-desc">Synchronous REST/gRPC, async messaging, service discovery, API gateways, event-driven patterns, and the pitfalls of distributed systems.</p>
+  <div class="topic-tags">
+    <span class="tag" style="background:rgba(255,209,102,.1);color:var(--yellow)">REST / gRPC</span>
+    <span class="tag" style="background:rgba(0,245,212,.1);color:var(--cyan)">Message Queues</span>
+    <span class="tag" style="background:rgba(255,107,53,.1);color:var(--orange)">Event-Driven</span>
+    <span class="tag" style="background:rgba(74,222,128,.1);color:var(--green)">API Gateway</span>
+    <span class="tag" style="background:rgba(96,165,250,.1);color:var(--blue)">Service Mesh</span>
+  </div>
+</div>
+<div class="sections-wrapper">
+  <div class="section-block s1 open">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧒</span><span class="s-title">The Simple Story (ELI10)</span>
+      <span class="s-badge badge-eli10">Beginner</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-story">
+        <div class="callout-label">🏢 The Office Building Analogy</div>
+        <p>Imagine a huge company that used to have one giant office with everyone crammed in together. Every decision required walking across the entire floor. It was slow, chaotic, and if one team was sick, everything stopped.</p>
+        <p>So the company split into departments — Sales, Engineering, Finance, HR — each in their own room. Now they're microservices. But they still need to talk to each other. How?</p>
+        <ul>
+          <li><strong>Phone calls (REST/gRPC)</strong> — "Hey Finance, what's Bob's salary?" Wait for reply. Fast and direct but the caller is blocked until Finance answers.</li>
+          <li><strong>Email/Slack (message queues)</strong> — "Finance, please process this invoice." Drop it in their inbox and move on. No waiting. Finance processes it when ready.</li>
+          <li><strong>Company-wide announcements (events)</strong> — "A new employee has joined." Anyone who cares (IT, HR, Finance) reacts. The announcer doesn't know who's listening.</li>
+          <li><strong>Receptionist (API Gateway)</strong> — all outside visitors go through one front desk who routes them to the right department.</li>
+        </ul>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="section-block s2">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚙️</span><span class="s-title">The Real Concept</span>
+      <span class="s-badge badge-concept">Technical</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <p><strong>Microservices</strong> are independently deployable services that each own a specific business domain. They communicate over a network — unlike a monolith where functions call each other in memory.</p>
+      <h4>Two Communication Modes</h4>
+      <table>
+        <tr><th>Mode</th><th>Description</th><th>Best for</th><th>Examples</th></tr>
+        <tr><td><strong>Synchronous</strong></td><td>Caller waits for response; tight coupling</td><td>Real-time queries, transactions</td><td>REST, gRPC, GraphQL</td></tr>
+        <tr><td><strong>Asynchronous</strong></td><td>Caller doesn't wait; loose coupling</td><td>Background tasks, event notification</td><td>Kafka, RabbitMQ, SQS, SNS</td></tr>
+      </table>
+      <h4>Key Distributed Systems Challenges</h4>
+      <ul>
+        <li><strong>Network unreliability</strong> — calls can fail, timeout, or arrive out of order</li>
+        <li><strong>Partial failures</strong> — a downstream service is slow; do you wait forever?</li>
+        <li><strong>Data consistency</strong> — each service owns its DB; cross-service transactions require Sagas or 2-phase commit</li>
+        <li><strong>Service discovery</strong> — how does Service A find the current IP of Service B? (Consul, Eureka, K8s DNS)</li>
+        <li><strong>Observability</strong> — a request touches 10 services; where did it fail? (Distributed tracing: Jaeger, Zipkin)</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s3">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🧰</span><span class="s-title">Building Blocks & Techniques</span>
+      <span class="s-badge badge-tools">Tools</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <table>
+        <tr><th>Pattern / Tool</th><th>What it does</th><th>When to use</th><th>Example</th></tr>
+        <tr><td><strong>REST</strong></td><td>HTTP verbs + JSON; human-readable, ubiquitous</td><td>External APIs, simple sync calls</td><td>GET /users/123</td></tr>
+        <tr><td><strong>gRPC</strong></td><td>Binary protocol buffers; strongly typed, faster than REST</td><td>Internal high-throughput sync calls</td><td>UserService.GetUser(123) → protobuf</td></tr>
+        <tr><td><strong>Message Queue</strong></td><td>Durable async message passing, decouples producer/consumer</td><td>Work queues, retries, async tasks</td><td>RabbitMQ, SQS</td></tr>
+        <tr><td><strong>Event Streaming</strong></td><td>Ordered, persistent log of events; multiple consumers</td><td>Event sourcing, audit logs, fan-out</td><td>Kafka, Kinesis</td></tr>
+        <tr><td><strong>API Gateway</strong></td><td>Single entry point; handles auth, routing, rate limiting</td><td>All external traffic</td><td>AWS API GW, Kong, NGINX</td></tr>
+        <tr><td><strong>Service Mesh</strong></td><td>Handles service-to-service comms (retries, mTLS, tracing) via sidecar proxy</td><td>Large microservice deployments</td><td>Istio, Linkerd</td></tr>
+        <tr><td><strong>Saga Pattern</strong></td><td>Coordinate distributed transactions without 2-phase commit</td><td>Cross-service business transactions</td><td>Order → Payment → Inventory</td></tr>
+        <tr><td><strong>Idempotency</strong></td><td>Same message processed twice = same result (safe retries)</td><td>All async message consumers</td><td>Idempotency key on payment API</td></tr>
+        <tr><td><strong>Distributed Tracing</strong></td><td>Track a request across all services with correlation ID</td><td>Debugging, performance analysis</td><td>Jaeger, Zipkin, AWS X-Ray</td></tr>
+      </table>
+    </div></div>
+  </div>
+
+  <div class="section-block s4">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">⚡</span><span class="s-title">Before vs After</span>
+      <span class="s-badge badge-example">Example</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <h3>Order Placement — Monolith vs Microservices</h3>
+      <div class="callout callout-bad">
+        <div class="callout-label">❌ Before — Monolith, Tight Coupling</div>
+      </div>
+<pre><code># Monolith: everything in one process
+def place_order(user_id, items):
+    validate_inventory(items)     # function call in-process
+    charge_payment(user_id)       # function call in-process
+    update_inventory(items)       # function call in-process
+    send_confirmation_email()     # blocks order completion!
+    # Total: ~3s (email sending blocks everything)</code></pre>
+
+      <div class="callout callout-good">
+        <div class="callout-label">✅ After — Microservices with Async Messaging</div>
+      </div>
+<div class="diagram">Client ──POST /orders──▶ [API Gateway]
+                              │
+                              ▼
+                      [Order Service]
+                        │
+                        ├──gRPC──▶ [Inventory Service] → check stock (sync, ~5ms)
+                        │
+                        ├──gRPC──▶ [Payment Service]  → charge card (sync, ~200ms)
+                        │
+                        └──Kafka publish──▶ "order.placed" event
+                                              │
+                              ┌───────────────┼────────────────┐
+                              ▼               ▼                ▼
+                    [Email Service]  [Analytics Service]  [Notif Service]
+                    (async, ~2s)       (async, fast)       (async, push)
+
+Order API returns in ~220ms ✅ (not 3s)
+Email failure does NOT affect order success ✅
+Each service deploys independently ✅</div>
+
+<pre><code># Order Service publishes event (Python + Kafka)
+from kafka import KafkaProducer
+import json
+
+producer = KafkaProducer(bootstrap_servers='kafka:9092')
+
+def place_order(user_id, items):
+    # Sync: check stock + charge payment via gRPC
+    inventory_client.check_and_reserve(items)    # gRPC ~5ms
+    payment_client.charge(user_id, total)        # gRPC ~200ms
+
+    # Async: fire event, don't wait
+    event = {"user_id": user_id, "items": items, "total": total}
+    producer.send('order.placed', json.dumps(event).encode())
+
+    return {"status": "confirmed"}  # Returns in ~220ms</code></pre>
+    </div></div>
+  </div>
+
+  <div class="section-block s5">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">🎙️</span><span class="s-title">Interview Answer Framework</span>
+      <span class="s-badge badge-interview">Interview</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="callout callout-interview">
+        <div class="callout-label">🎙️ Exact Script</div>
+        <ol>
+          <li><strong>Two modes:</strong> "Microservices communicate in two modes: synchronous and asynchronous. The choice depends on whether the caller needs an immediate answer."</li>
+          <li><strong>Synchronous:</strong> "For real-time responses — like checking if a product is in stock before letting a user check out — I'd use REST for external APIs or gRPC for internal service calls. gRPC uses Protocol Buffers which are 3–10× smaller and faster than JSON."</li>
+          <li><strong>Asynchronous:</strong> "For background tasks — sending emails, updating analytics, triggering notifications — I'd publish events to Kafka or SQS. This decouples services so a slow email service doesn't block order placement."</li>
+          <li><strong>Infrastructure:</strong> "All external traffic routes through an API Gateway for auth, rate limiting, and routing. In large deployments I'd use a service mesh like Istio for automatic retries, mTLS, and distributed tracing between services."</li>
+          <li><strong>Hardest problems:</strong> "The hardest parts are distributed transactions — I'd use the Saga pattern instead of 2-phase commit — and debugging failures across services, which requires distributed tracing with a correlation ID."</li>
+          <li><strong>Close:</strong> "The guiding principle is: use synchronous calls when you need an answer now, use async messaging when you don't. Async makes systems more resilient — a consumer being down doesn't block producers."</li>
+        </ol>
+      </div>
+      <h4>Likely Follow-up Questions</h4>
+      <ul>
+        <li>"What's the difference between REST and gRPC?"</li>
+        <li>"How do you handle a distributed transaction across microservices?"</li>
+        <li>"What is the Saga pattern?"</li>
+        <li>"How do you ensure exactly-once message processing?"</li>
+        <li>"What's a service mesh and when do you need one?"</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="section-block s6">
+    <button class="section-toggle" onclick="toggleSection(this)">
+      <span class="s-icon">📋</span><span class="s-title">Cheat Sheet</span>
+      <span class="s-badge badge-cheatsheet">Reference</span><span class="s-chevron">▾</span>
+    </button>
+    <div class="section-body"><div class="content">
+      <div class="cheat-grid">
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Sync Protocols</div>
+          <ul>
+            <li>REST — JSON/HTTP, universal</li>
+            <li>gRPC — binary protobuf, fast</li>
+            <li>GraphQL — flexible queries</li>
+            <li>WebSockets — bidirectional</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Async Tools</div>
+          <ul>
+            <li>Kafka — ordered, durable, high-throughput</li>
+            <li>RabbitMQ — flexible routing</li>
+            <li>SQS — AWS managed queue</li>
+            <li>SNS — fan-out pub/sub</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Patterns</div>
+          <ul>
+            <li>API Gateway — single entry point</li>
+            <li>Service Mesh — infra-level comms</li>
+            <li>Saga — distributed transactions</li>
+            <li>Idempotency — safe retries</li>
+            <li>Outbox pattern — atomic publish</li>
+          </ul>
+        </div>
+        <div class="cheat-cell">
+          <div class="cheat-cell-title">Do's & Don'ts</div>
+          <ul>
+            <li>✅ Async for non-critical paths</li>
+            <li>✅ Idempotency on all consumers</li>
+            <li>✅ Distributed tracing always</li>
+            <li>❌ Sync calls for fire-and-forget work</li>
+            <li>❌ Shared DB between services</li>
+            <li>❌ 2-phase commit in microservices</li>
+          </ul>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</div></div>
+
+</main><!-- /main -->
+
+<script>
+// ── Navigation ──
+function showPage(id) {
+  document.querySelectorAll('.topic-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  // Activate correct nav item
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) {
+      n.classList.add('active');
+    }
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+}
+
+// ── Section accordion ──
+function toggleSection(btn) {
+  const block = btn.closest('.section-block');
+  block.classList.toggle('open');
+}
+
+// ── Mobile sidebar ──
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ── Scroll progress bar ──
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = total > 0 ? (scrolled / total) * 100 : 0;
+  document.getElementById('progressLine').style.width = pct + '%';
+});
+
+// ── Open first section of visible topic by default ──
+document.querySelectorAll('.sections-wrapper').forEach(wrapper => {
+  const first = wrapper.querySelector('.section-block');
+  if (first) first.classList.add('open');
+});
+</script>
+</body>
+</html>
