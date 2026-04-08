@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WEX .NET Interview — Complete Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue:#3b82f6;--deep:#1e3a5f;--green:#22c55e;--green-light:#dcfce7;
+    --yellow:#fbbf24;--yellow-light:#fef9c3;--orange:#f97316;--orange-light:#ffedd5;
+    --purple:#8b5cf6;--purple-light:#ede9fe;--red:#ef4444;
+    --card:#ffffff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#e0f2fe 0%,#f0fdf4 50%,#fef9c3 100%);min-height:100vh;color:var(--text);padding:20px;}
+
+  .hero{text-align:center;padding:50px 20px 40px;max-width:900px;margin:0 auto 40px;}
+  .hero-badge{display:inline-block;background:var(--deep);color:#fff;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:6px 18px;border-radius:100px;margin-bottom:18px;}
+  .hero h1{font-family:'Fredoka One',sans-serif;font-size:clamp(2.2rem,6vw,3.6rem);color:var(--deep);line-height:1.1;margin-bottom:16px;}
+  .hero h1 span{color:var(--blue);}
+  .hero p{font-size:1.05rem;color:var(--muted);max-width:580px;margin:0 auto 28px;line-height:1.75;}
+  .parts-nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .parts-nav a{text-decoration:none;background:white;border:2px solid var(--border);border-radius:100px;padding:8px 20px;font-weight:700;font-size:0.85rem;color:var(--deep);transition:all .2s;}
+  .parts-nav a:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px);}
+
+  .section{max-width:900px;margin:0 auto 52px;}
+  .part-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+  .part-num{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',sans-serif;font-size:1.4rem;color:white;flex-shrink:0;}
+  .num-blue{background:var(--blue);} .num-green{background:var(--green);}
+  .num-purple{background:var(--purple);} .num-orange{background:var(--orange);}
+  .part-header h2{font-family:'Fredoka One',sans-serif;font-size:1.75rem;color:var(--deep);line-height:1.1;}
+  .part-header .sub{font-size:0.87rem;color:var(--muted);margin-top:4px;}
+
+  .card{background:var(--card);border-radius:20px;padding:26px 30px;margin-bottom:20px;border:1.5px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .card h3{font-size:1.05rem;font-weight:800;color:var(--deep);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .card p,.card li{font-size:0.95rem;line-height:1.8;color:var(--text);}
+  .card ul{padding-left:22px;} .card li{margin-bottom:5px;}
+
+  .story{border-radius:16px;padding:20px 24px;margin-bottom:20px;border-left:5px solid;}
+  .story-yellow{background:var(--yellow-light);border-color:var(--yellow);}
+  .story-green{background:var(--green-light);border-color:var(--green);}
+  .story-purple{background:var(--purple-light);border-color:var(--purple);}
+  .story .label{font-size:0.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;opacity:.7;margin-bottom:7px;}
+  .story p{font-size:0.94rem;line-height:1.75;}
+
+  .code-wrap{background:#0f172a;border-radius:16px;overflow:hidden;margin:14px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+  .code-header{display:flex;align-items:center;padding:11px 18px;background:#1e293b;gap:8px;}
+  .dot{width:12px;height:12px;border-radius:50%;}
+  .dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
+  .code-lang{margin-left:auto;font-size:0.68rem;color:#94a3b8;font-family:'Fira Code',monospace;letter-spacing:1px;text-transform:uppercase;}
+  .code-wrap pre{font-family:'Fira Code',monospace;font-size:0.81rem;line-height:1.75;padding:20px 22px;overflow-x:auto;color:#e2e8f0;}
+  .kw{color:#c084fc;}.fn{color:#67e8f9;}.str{color:#86efac;}.num{color:#fde68a;}.cm{color:#64748b;font-style:italic;}.tp{color:#fb923c;}
+
+  /* ANNOTATED TABLE */
+  .annotated{border-radius:14px;overflow:hidden;border:1.5px solid var(--border);margin:14px 0;}
+  .ann-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);}
+  .ann-row:last-child{border-bottom:none;}
+  .ann-code{background:#0f172a;padding:13px 16px;font-family:'Fira Code',monospace;font-size:0.78rem;line-height:1.65;color:#e2e8f0;}
+  .ann-explain{background:#f8fafc;padding:13px 16px;font-size:0.87rem;line-height:1.65;color:var(--text);}
+  .ann-explain strong{color:var(--deep);display:block;margin-bottom:2px;}
+  .ann-header{background:var(--deep);color:white;padding:9px 16px;font-size:0.75rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;display:grid;grid-template-columns:1fr 1fr;}
+  @media(max-width:600px){.ann-row,.ann-header{grid-template-columns:1fr;}.ann-header span:last-child{display:none;}}
+
+  /* LAMBDA BOX */
+  .lambda-box{background:#1e1b4b;border-radius:14px;padding:18px 20px;margin:12px 0;}
+  .lambda-title{color:#c4b5fd;font-size:0.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+  .lambda-parts{display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .lp{border-radius:8px;padding:8px 14px;font-family:'Fira Code',monospace;font-size:0.87rem;font-weight:700;}
+  .lp-var{background:#312e81;color:#a5b4fc;}
+  .lp-arr{background:#1e3a5f;color:#93c5fd;padding:8px 10px;}
+  .lp-body{background:#14532d;color:#86efac;}
+  .lp-label{font-size:0.7rem;color:#94a3b8;text-align:center;margin-top:4px;}
+  .lambda-row{display:flex;flex-direction:column;align-items:center;margin-right:6px;}
+  .lambda-explain{color:#cbd5e1;font-size:0.88rem;line-height:1.65;}
+  .lambda-explain strong{color:#e2e8f0;}
+
+  /* STEPS */
+  .steps{display:flex;flex-direction:column;gap:0;margin:14px 0;}
+  .step{display:flex;gap:14px;}
+  .step-left{display:flex;flex-direction:column;align-items:center;}
+  .step-circle{width:34px;height:34px;border-radius:50%;background:var(--blue);color:white;font-weight:800;font-size:0.87rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-line{width:2px;flex:1;background:#e2e8f0;margin:3px 0;min-height:20px;}
+  .step:last-child .step-line{display:none;}
+  .step-body{padding:3px 0 22px;}
+  .step-body strong{font-weight:800;color:var(--deep);display:block;margin-bottom:3px;}
+  .step-body p{font-size:0.92rem;color:var(--muted);line-height:1.65;}
+
+  /* TABLE */
+  .tbl-wrap{overflow-x:auto;border-radius:12px;border:1.5px solid var(--border);margin:14px 0;}
+  table{width:100%;border-collapse:collapse;font-size:0.87rem;}
+  th{background:var(--deep);color:white;padding:11px 15px;text-align:left;font-weight:700;}
+  td{padding:9px 15px;border-bottom:1px solid var(--border);}
+  tr:last-child td{border-bottom:none;}
+  tr:nth-child(even) td{background:#f8fafc;}
+
+  /* ALERTS */
+  .alert{border-radius:14px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;margin:14px 0;}
+  .alert-icon{font-size:1.3rem;flex-shrink:0;}
+  .alert-body{font-size:0.92rem;line-height:1.65;}
+  .alert-body strong{font-weight:800;display:block;margin-bottom:2px;}
+  .alert-warn{background:#fef9c3;border:1.5px solid var(--yellow);}
+  .alert-tip{background:#dcfce7;border:1.5px solid var(--green);}
+  .alert-info{background:#eff6ff;border:1.5px solid var(--blue);}
+  .alert-danger{background:#fee2e2;border:1.5px solid var(--red);}
+
+  .pill{display:inline-block;border-radius:100px;padding:3px 11px;font-size:0.77rem;font-weight:700;}
+  .pill-blue{background:#dbeafe;color:#1d4ed8;}.pill-green{background:#dcfce7;color:#15803d;}
+  .pill-purple{background:#ede9fe;color:#6d28d9;}.pill-orange{background:#ffedd5;color:#c2410c;}
+  .highlight{display:inline-block;background:var(--yellow);border-radius:6px;padding:2px 8px;font-weight:800;color:#78350f;font-size:0.87rem;}
+
+  .complexity{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;}
+  .cb{border-radius:10px;padding:9px 15px;font-size:0.84rem;font-weight:700;border:1.5px solid;}
+  .cb-time{background:#eff6ff;border-color:#93c5fd;color:#1e40af;}
+  .cb-space{background:#f0fdf4;border-color:#86efac;color:#15803d;}
+
+  /* Q&A */
+  .qa-item{background:white;border-radius:18px;border:1.5px solid var(--border);margin-bottom:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  .qa-question{padding:18px 22px;cursor:pointer;display:flex;align-items:flex-start;gap:13px;transition:background .15s;user-select:none;}
+  .qa-question:hover{background:#f8fafc;}
+  .qa-num{width:30px;height:30px;border-radius:10px;background:var(--deep);color:white;font-weight:800;font-size:0.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .qa-q-text{flex:1;}
+  .qa-q-text .q-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px;}
+  .qa-q-text .q-text{font-size:0.97rem;font-weight:700;color:var(--deep);line-height:1.4;}
+  .qa-arrow{font-size:0.9rem;color:var(--muted);margin-left:auto;flex-shrink:0;margin-top:5px;transition:transform .25s;}
+  .qa-item.open .qa-arrow{transform:rotate(180deg);}
+  .qa-answer{display:none;padding:0 22px 22px 65px;}
+  .qa-item.open .qa-answer{display:block;}
+  .qa-answer .ans-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--green);margin-bottom:9px;padding-top:2px;}
+  .qa-answer .ans-body{font-size:0.93rem;line-height:1.8;color:var(--text);}
+  .qa-answer .ans-body p{margin-bottom:9px;}
+  .qa-answer .ans-body ul,.qa-answer .ans-body ol{padding-left:20px;margin-bottom:9px;}
+  .qa-answer .ans-body li{margin-bottom:4px;}
+  .qa-answer .ans-body code{background:#f1f5f9;border-radius:5px;padding:2px 6px;font-family:'Fira Code',monospace;font-size:0.82rem;color:#be123c;}
+  .qa-answer .ans-body .code-block{background:#0f172a;border-radius:10px;padding:14px 16px;font-family:'Fira Code',monospace;font-size:0.8rem;line-height:1.7;color:#e2e8f0;margin:8px 0;overflow-x:auto;}
+
+  .qa-cat-header{display:flex;align-items:center;gap:12px;margin:30px 0 14px;}
+  .qa-cat-header h3{font-family:'Fredoka One',sans-serif;font-size:1.3rem;color:var(--deep);}
+
+  .divider{height:2px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:44px auto;max-width:900px;}
+
+  .footer{text-align:center;padding:40px 20px;color:var(--muted);font-size:0.85rem;max-width:900px;margin:0 auto;}
+  .footer strong{color:var(--deep);}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">WEX .NET L1 Interview Template</div>
+  <h1>Complete Tutorial<br><span>Line by Line 🔬</span></h1>
+  <p>Every SQL clause explained. Every LINQ method demystified. Every lambda decoded. Plus 18 interview questions with full model answers — nothing left unclear.</p>
+  <div class="parts-nav">
+    <a href="#part1">Part 1 · Merge Intervals</a>
+    <a href="#part2">Part 2 · SQL Deep Dive</a>
+    <a href="#part3">Part 3 · LINQ Deep Dive</a>
+    <a href="#qa">18 Q&amp;A Practice</a>
+  </div>
+</div>
+
+<!-- ══ PART 1 ══ -->
+<div class="section" id="part1">
+  <div class="part-header">
+    <div class="part-num num-blue">1</div>
+    <div>
+      <h2>Merge Overlapping Intervals</h2>
+      <div style="display:flex;gap:8px;margin-top:5px"><span class="pill pill-blue">DSA</span><span class="pill pill-green">Arrays · Sorting</span></div>
+    </div>
+  </div>
+
+  <div class="story story-yellow">
+    <div class="label">📋 Problem</div>
+    <p><strong>Input:</strong> <code>[[1,3],[2,6],[8,10],[15,18]]</code></p>
+    <p><strong>Output:</strong> <code>[[1,6],[8,10],[15,18]]</code></p>
+    <p style="margin-top:8px">Merge all intervals that overlap. Return the simplified list.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="icon">🧸</span> Playground Booking Analogy</h3>
+    <p>Kids booking a slide: <strong>Kid A: 1–3pm</strong>, <strong>Kid B: 2–6pm</strong> — they overlap at 2pm and 3pm, so combine into <strong>1–6pm</strong>. <strong>Kid C: 8–10pm</strong> — no overlap, stays alone.</p>
+    <p style="margin-top:10px"><strong>Merging intervals = combining overlapping time bookings into one.</strong></p>
+  </div>
+
+  <div class="card">
+    <h3><span class="icon">🗺️</span> Algorithm Steps</h3>
+    <div class="steps">
+      <div class="step"><div class="step-left"><div class="step-circle">1</div><div class="step-line"></div></div><div class="step-body"><strong>Sort by start time</strong><p>Ensures overlapping intervals are adjacent. Without sorting, the algorithm breaks on unsorted input.</p></div></div>
+      <div class="step"><div class="step-left"><div class="step-circle">2</div><div class="step-line"></div></div><div class="step-body"><strong>Take first as "current"</strong><p>This is the interval we're trying to extend.</p></div></div>
+      <div class="step"><div class="step-left"><div class="step-circle">3</div><div class="step-line"></div></div><div class="step-body"><strong>Check overlap: next.start ≤ current.end?</strong><p>If yes — merge by extending current.end = Max(current.end, next.end).</p></div></div>
+      <div class="step"><div class="step-left"><div class="step-circle">4</div><div class="step-line"></div></div><div class="step-body"><strong>No overlap → save current, move on</strong><p>Add current to results. Next becomes the new current.</p></div></div>
+      <div class="step"><div class="step-left"><div class="step-circle">5</div><div class="step-line"></div></div><div class="step-body"><strong>Add the final "current"</strong><p>The loop ends without adding the last interval — do it manually.</p></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="icon">💻</span> Complete C# Solution</h3>
+    <div class="code-wrap">
+      <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="code-lang">C#</span></div>
+      <pre>
+<span class="kw">public static</span> <span class="tp">int</span>[][] <span class="fn">Merge</span>(<span class="tp">int</span>[][] intervals)
+{
+    <span class="cm">// ✅ Always sort first — candidate forgot this!</span>
+    <span class="tp">Array</span>.<span class="fn">Sort</span>(intervals, (a, b) => a[<span class="num">0</span>].CompareTo(b[<span class="num">0</span>]));
+
+    <span class="kw">var</span> result  = <span class="kw">new</span> <span class="tp">List</span>&lt;<span class="tp">int</span>[]&gt;();
+    <span class="kw">int</span>[] current = intervals[<span class="num">0</span>];
+
+    <span class="kw">for</span> (<span class="tp">int</span> i = <span class="num">1</span>; i &lt; intervals.Length; i++)
+    {
+        <span class="kw">int</span>[] next = intervals[i];
+        <span class="kw">if</span> (next[<span class="num">0</span>] &lt;= current[<span class="num">1</span>])
+            current[<span class="num">1</span>] = <span class="tp">Math</span>.<span class="fn">Max</span>(current[<span class="num">1</span>], next[<span class="num">1</span>]);
+        <span class="kw">else</span> { result.<span class="fn">Add</span>(current); current = next; }
+    }
+    result.<span class="fn">Add</span>(current);
+    <span class="kw">return</span> result.<span class="fn">ToArray</span>();
+}</pre>
+    </div>
+    <div class="complexity"><div class="cb cb-time">⏱ Time: O(n log n)</div><div class="cb cb-space">💾 Space: O(n)</div></div>
+  </div>
+
+  <div class="alert alert-danger"><div class="alert-icon">⚠️</div><div class="alert-body"><strong>Template Feedback: Candidate forgot to sort.</strong> Always sort first. Mention it proactively — shows senior awareness. Never assume sorted input.</div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ PART 2 — SQL ══ -->
+<div class="section" id="part2">
+  <div class="part-header">
+    <div class="part-num num-green">2</div>
+    <div>
+      <h2>SQL Customer Analytics</h2>
+      <div style="display:flex;gap:8px;margin-top:5px"><span class="pill pill-green">SQL</span><span class="pill pill-blue">GROUP BY · Aggregates · Window Functions</span></div>
+    </div>
+  </div>
+
+  <div class="story story-green">
+    <div class="label">📋 Problem — find per customer:</div>
+    <p>1. Total number of orders &nbsp;|&nbsp; 2. Total order amount &nbsp;|&nbsp; 3. Average order amount &nbsp;|&nbsp; 4. Largest single order &nbsp;|&nbsp; 5. Rank by total spend (highest = rank 1)</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="icon">🧸</span> Toy Store Report Card Analogy</h3>
+    <p>A toy store has a notebook of every purchase. The manager wants a <strong>report card per customer</strong>: how many visits, total spent, average per visit, biggest purchase, and who spent the most overall.</p>
+    <p style="margin-top:8px"><strong>SQL aggregation = making that report card for groups of rows.</strong></p>
+  </div>
+
+  <div class="card">
+    <h3><span class="icon">📊</span> The Data — <code>orders</code> Table</h3>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>order_id</th><th>customer_name</th><th>order_amount</th></tr>
+        <tr><td>1</td><td>Alice</td><td>500</td></tr>
+        <tr><td>2</td><td>Alice</td><td>200</td></tr>
+        <tr><td>3</td><td>Bob</td><td>900</td></tr>
+        <tr><td>4</td><td>Charlie</td><td>300</td></tr>
+        <tr><td>5</td><td>Charlie</td><td>700</td></tr>
+      </table>
+    </div>
+    <p style="margin-top:10px">5 rows, 3 customers. SQL will <strong>group</strong> these by customer_name and calculate stats for each group separately.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="icon">💻</span> The Complete SQL Query</h3>
+    <div class="code-wrap">
+      <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="code-lang">SQL</span></div>
+      <pre>
+<span class="kw">SELECT</span>
+    customer_name,
+    <span class="fn">COUNT</span>(order_id)              <span class="kw">AS</span> total_orders,
+    <span class="fn">SUM</span>(order_amount)            <span class="kw">AS</span> total_amount,
+    <span class="fn">ROUND</span>(<span class="fn">AVG</span>(order_amount), <span class="num">2</span>)   <span class="kw">AS</span> avg_amount,
+    <span class="fn">MAX</span>(order_amount)            <span class="kw">AS</span> largest_order,
+    <span class="fn">RANK</span>() <span class="kw">OVER</span> (
+        <span class="kw">ORDER BY</span> <span class="fn">SUM</span>(order_amount) <span class="kw">DESC</span>
+    )                            <span class="kw">AS</span> spend_rank
+<span class="kw">FROM</span>   orders
+<span class="kw">GROUP BY</span> customer_name
+<span class="kw">ORDER BY</span> spend_rank;</pre>
+    </div>
+  </div>
+
+  <!-- LINE BY LINE SQL -->
+  <div class="card">
+    <h3><span class="icon">🔬</span> Every Clause — Line by Line</h3>
+    <p style="margin-bottom:14px">Read the code on the left. Understand what it does on the right.</p>
+    <div class="annotated">
+      <div class="ann-header"><span>SQL Code</span><span>What It Means &amp; Why</span></div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="kw">SELECT</span> customer_name,</div>
+        <div class="ann-explain"><strong>Show the customer name</strong>This is the column we grouped by. Every row in the result will show one customer's name. Required in SELECT when using GROUP BY.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="fn">COUNT</span>(order_id) <span class="kw">AS</span> total_orders,</div>
+        <div class="ann-explain"><strong>COUNT — how many rows in this group?</strong>Counts how many order rows belong to each customer. Alice has rows 1 and 2 → COUNT = 2. The <code>AS total_orders</code> renames the column in the output — just cosmetic.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="fn">SUM</span>(order_amount) <span class="kw">AS</span> total_amount,</div>
+        <div class="ann-explain"><strong>SUM — add up all order amounts</strong>Adds every order_amount in the group. Alice: 500+200=700. Charlie: 300+700=1000. Each customer gets their own total — not the grand total.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="fn">ROUND</span>(<span class="fn">AVG</span>(order_amount),<span class="num">2</span>)<br><span class="kw">AS</span> avg_amount,</div>
+        <div class="ann-explain"><strong>AVG — average per customer, rounded</strong>AVG divides the group's sum by the group's count. Alice: 700÷2=350.00. ROUND(...,2) limits to 2 decimal places so you don't get 350.000000000...</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="fn">MAX</span>(order_amount) <span class="kw">AS</span> largest_order,</div>
+        <div class="ann-explain"><strong>MAX — biggest single order in the group</strong>Picks the highest value. Alice's max: 500 (not 200). Charlie's max: 700 (not 300). One value per customer.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="fn">RANK</span>() <span class="kw">OVER</span> (<br>  <span class="kw">ORDER BY</span> <span class="fn">SUM</span>(order_amount) <span class="kw">DESC</span><br>) <span class="kw">AS</span> spend_rank,</div>
+        <div class="ann-explain"><strong>RANK() OVER — Window Function (see below)</strong>This is different from COUNT/SUM. It doesn't collapse rows — it adds a rank column alongside existing columns. OVER says "rank across all grouped results." ORDER BY SUM(...) DESC = highest spender = rank 1. Charlie(1000)=1, Bob(900)=2, Alice(700)=3.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="kw">FROM</span> orders</div>
+        <div class="ann-explain"><strong>FROM — source table</strong>We're reading data from the <code>orders</code> table. SQL starts here before anything else runs.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="kw">GROUP BY</span> customer_name</div>
+        <div class="ann-explain"><strong>GROUP BY — THE most important clause here!</strong>Without this, COUNT/SUM/AVG/MAX would give one number for ALL 5 rows combined. With GROUP BY, SQL splits rows into buckets (one per unique customer) and runs the aggregate functions separately on each bucket. Think of it as: "calculate everything per customer, not globally."</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="kw">ORDER BY</span> spend_rank;</div>
+        <div class="ann-explain"><strong>ORDER BY — sort the final output</strong>Sorts the 3-row result by spend_rank ascending. Rank 1 (biggest spender) appears first in the result.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GROUP BY VISUAL -->
+  <div class="card">
+    <h3><span class="icon">👁️</span> GROUP BY Visualised — Before and After</h3>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin:14px 0">
+      <div>
+        <p style="font-weight:800;margin-bottom:8px;font-size:0.82rem;color:var(--muted)">BEFORE (5 raw rows)</p>
+        <div class="tbl-wrap" style="margin:0"><table>
+          <tr><th>customer</th><th>amount</th></tr>
+          <tr><td>Alice</td><td>500</td></tr>
+          <tr><td>Alice</td><td>200</td></tr>
+          <tr><td>Bob</td><td>900</td></tr>
+          <tr><td>Charlie</td><td>300</td></tr>
+          <tr><td>Charlie</td><td>700</td></tr>
+        </table></div>
+      </div>
+      <div style="font-size:2rem;text-align:center;color:var(--blue)">→</div>
+      <div>
+        <p style="font-weight:800;margin-bottom:8px;font-size:0.82rem;color:var(--muted)">AFTER GROUP BY (3 rows)</p>
+        <div class="tbl-wrap" style="margin:0"><table>
+          <tr><th>customer</th><th>count</th><th>sum</th><th>avg</th><th>max</th></tr>
+          <tr><td>Alice</td><td>2</td><td>700</td><td>350</td><td>500</td></tr>
+          <tr><td>Bob</td><td>1</td><td>900</td><td>900</td><td>900</td></tr>
+          <tr><td>Charlie</td><td>2</td><td>1000</td><td>500</td><td>700</td></tr>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WINDOW FUNCTION DEEP DIVE -->
+  <div class="card">
+    <h3><span class="icon">🪟</span> Window Functions — What RANK() OVER Does</h3>
+    <p>Regular aggregates collapse rows. Window functions <strong>add a new column without collapsing</strong>. The <code>OVER(...)</code> defines the frame of rows to operate on.</p>
+    <br>
+    <div class="annotated">
+      <div class="ann-header"><span>Part of RANK() OVER</span><span>What it means</span></div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="fn">RANK</span>()</div>
+        <div class="ann-explain"><strong>The ranking function</strong>Assigns a rank number. Tied values share the same rank. The rank after a tie jumps (1,1,3 — not 1,1,2).</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="kw">OVER</span> (...)</div>
+        <div class="ann-explain"><strong>"Look at this window of rows"</strong>Required for all window functions. Defines the scope. Without OVER, RANK() is a syntax error.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code"><span class="kw">ORDER BY</span> <span class="fn">SUM</span>(order_amount) <span class="kw">DESC</span></div>
+        <div class="ann-explain"><strong>Rank by total spend, highest first</strong>The customer with the highest SUM gets rank 1. DESC = descending = biggest number = lowest rank number.</div>
+      </div>
+    </div>
+
+    <p style="font-weight:800;margin:16px 0 10px">RANK vs DENSE_RANK vs ROW_NUMBER — know all three:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>Function</th><th>Ties?</th><th>Example scores: 1000, 1000, 700</th></tr>
+      <tr><td><code>ROW_NUMBER()</code></td><td>No ties — always unique</td><td>1, 2, 3</td></tr>
+      <tr><td><code>RANK()</code></td><td>Ties share rank, next skips</td><td>1, 1, 3 ← gap!</td></tr>
+      <tr><td><code>DENSE_RANK()</code></td><td>Ties share rank, no gaps</td><td>1, 1, 2 ← no gap</td></tr>
+    </table></div>
+  </div>
+
+  <div class="alert alert-warn"><div class="alert-icon">⚠️</div><div class="alert-body"><strong>Can't filter by RANK in WHERE</strong> SQL runs WHERE before SELECT (before window functions exist). Use a CTE: <code>WITH r AS (SELECT ..., RANK() OVER(...) AS rk FROM ... GROUP BY ...) SELECT * FROM r WHERE rk &lt;= 3</code></div></div>
+
+  <div class="alert alert-tip"><div class="alert-icon">💡</div><div class="alert-body"><strong>SQL Execution Order — memorise this!</strong> FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. This is why you can't reference a SELECT alias in WHERE — WHERE runs before SELECT.</div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ PART 3 — LINQ ══ -->
+<div class="section" id="part3">
+  <div class="part-header">
+    <div class="part-num num-purple">3</div>
+    <div>
+      <h2>LINQ Challenge in C#</h2>
+      <div style="display:flex;gap:8px;margin-top:5px"><span class="pill pill-purple">LINQ</span><span class="pill pill-blue">Lambda Expressions</span><span class="pill pill-green">Nested Objects</span></div>
+    </div>
+  </div>
+
+  <div class="story story-purple">
+    <div class="label">📋 Problem</div>
+    <p>Find the <strong>Top 2 customers who spent the most money</strong>. Each Order has a list of OrderItems. Each item has Quantity and Price. Total = Quantity × Price per item, summed across all items and all orders per customer.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="icon">🧸</span> Receipts in a Box Analogy</h3>
+    <p>A box of receipts. Each receipt (Order) belongs to a customer and has several line items. To find who spent the most: add up each item (qty × price), total each receipt, group by customer, sum their receipts, sort, take top 2.</p>
+    <p style="margin-top:8px"><strong>LINQ does exactly this — one clean chain of operations.</strong></p>
+  </div>
+
+  <!-- LAMBDAS FIRST -->
+  <div class="card">
+    <h3><span class="icon">λ</span> Before LINQ: Understanding Lambda Expressions</h3>
+    <p style="margin-bottom:14px">Lambdas appear in every LINQ call. The pattern is always the same:</p>
+
+    <div class="lambda-box">
+      <div class="lambda-title">Anatomy of a Lambda</div>
+      <div class="lambda-parts">
+        <div class="lambda-row"><div class="lp lp-var">o</div><div class="lp-label">input param</div></div>
+        <div class="lambda-row"><div class="lp lp-arr">=&gt;</div><div class="lp-label">"goes to"</div></div>
+        <div class="lambda-row"><div class="lp lp-body">o.Customer</div><div class="lp-label">what to return</div></div>
+      </div>
+      <div class="lambda-explain">
+        <p>Read as: <strong>"For each element — I'm calling it <code>o</code> — give me its Customer property."</strong></p>
+        <p style="margin-top:6px">The name <code>o</code> is a variable you make up. You could call it <code>order</code>, <code>x</code>, anything. It's like a loop variable.</p>
+      </div>
+    </div>
+
+    <p style="font-weight:800;margin:14px 0 10px">Read these aloud until they feel natural:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>Lambda</th><th>Read as</th></tr>
+      <tr><td><code>o => o.Customer</code></td><td>For each order <code>o</code>, give me its Customer name</td></tr>
+      <tr><td><code>x => x.TotalSpend</code></td><td>For each result <code>x</code>, give me its TotalSpend value</td></tr>
+      <tr><td><code>i => i.Quantity * i.Price</code></td><td>For each item <code>i</code>, give me Quantity × Price</td></tr>
+      <tr><td><code>(a,b) => a[0].CompareTo(b[0])</code></td><td>Compare two arrays by their first element</td></tr>
+    </table></div>
+  </div>
+
+  <!-- DATA MODEL -->
+  <div class="card">
+    <h3><span class="icon">🏗️</span> The Data Model</h3>
+    <div class="code-wrap">
+      <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="code-lang">C# — Classes</span></div>
+      <pre>
+<span class="cm">// One Order = one receipt. Belongs to one Customer, has many items.</span>
+<span class="kw">class</span> <span class="tp">Order</span>
+{
+    <span class="kw">public int</span>              OrderId  { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span>           Customer { <span class="kw">get</span>; <span class="kw">set</span>; }  <span class="cm">// "Alice", "Bob"...</span>
+    <span class="kw">public</span> <span class="tp">List</span>&lt;<span class="tp">OrderItem</span>&gt; Items    { <span class="kw">get</span>; <span class="kw">set</span>; }  <span class="cm">// list of line items</span>
+}
+
+<span class="cm">// One OrderItem = one line on the receipt.</span>
+<span class="kw">class</span> <span class="tp">OrderItem</span>
+{
+    <span class="kw">public string</span>  Product  { <span class="kw">get</span>; <span class="kw">set</span>; }  <span class="cm">// "Laptop", "Mouse"...</span>
+    <span class="kw">public int</span>     Quantity { <span class="kw">get</span>; <span class="kw">set</span>; }  <span class="cm">// how many bought</span>
+    <span class="kw">public decimal</span> Price    { <span class="kw">get</span>; <span class="kw">set</span>; }  <span class="cm">// price per unit</span>
+    <span class="cm">// Cost of this line = Quantity × Price</span>
+}</pre>
+    </div>
+    <div class="tbl-wrap" style="margin-top:14px"><table>
+      <tr><th>Customer</th><th>Order</th><th>Items</th><th>Order Total</th><th>Customer Total</th></tr>
+      <tr><td>Alice</td><td>#1</td><td>Laptop(1×50000)+Mouse(2×500)</td><td>51,000</td><td rowspan="2" style="font-weight:800;color:#1d4ed8">81,000 🥇</td></tr>
+      <tr><td>Alice</td><td>#3</td><td>Phone(1×30000)</td><td>30,000</td></tr>
+      <tr><td>Bob</td><td>#2</td><td>Keyboard(1×2000)+Monitor(1×15000)</td><td>17,000</td><td>17,000</td></tr>
+      <tr><td>Charlie</td><td>#4</td><td>Tablet(2×20000)</td><td>40,000</td><td style="font-weight:800;color:#15803d">40,000 🥈</td></tr>
+    </table></div>
+  </div>
+
+  <!-- THE SOLUTION -->
+  <div class="card">
+    <h3><span class="icon">💻</span> Complete LINQ Solution</h3>
+    <div class="code-wrap">
+      <div class="code-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="code-lang">C# — LINQ</span></div>
+      <pre>
+<span class="kw">var</span> topCustomers = orders
+    .<span class="fn">GroupBy</span>(o => o.Customer)
+    .<span class="fn">Select</span>(g => <span class="kw">new</span>
+    {
+        Customer   = g.Key,
+        TotalSpend = g.<span class="fn">Sum</span>(o => o.Items.<span class="fn">Sum</span>(item => item.Quantity * item.Price))
+    })
+    .<span class="fn">OrderByDescending</span>(x => x.TotalSpend)
+    .<span class="fn">Take</span>(<span class="num">2</span>)
+    .<span class="fn">ToList</span>();
+
+<span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> topCustomers)
+    <span class="tp">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"{c.Customer}: {c.TotalSpend:N0}"</span>);
+<span class="cm">// Alice:   81,000</span>
+<span class="cm">// Charlie: 40,000</span></pre>
+    </div>
+  </div>
+
+  <!-- LINE BY LINE LINQ -->
+  <div class="card">
+    <h3><span class="icon">🔬</span> Every LINQ Method — Line by Line</h3>
+    <div class="annotated">
+      <div class="ann-header"><span>LINQ Code</span><span>What It Does</span></div>
+      <div class="ann-row">
+        <div class="ann-code">orders</div>
+        <div class="ann-explain"><strong>The source</strong>A <code>List&lt;Order&gt;</code> with 4 orders. Every LINQ chain starts from a collection. LINQ works on anything that implements IEnumerable.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code">.<span class="fn">GroupBy</span>(o => o.Customer)</div>
+        <div class="ann-explain"><strong>Group orders by customer name</strong><code>o</code> is each Order. We group by its Customer property. Result: a collection of groups. One group = all orders for one customer. Alice's group contains Order#1 and Order#3. Bob's group contains Order#2.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code">.<span class="fn">Select</span>(g => <span class="kw">new</span> { ... })</div>
+        <div class="ann-explain"><strong>Transform each group into a summary</strong><code>g</code> is one customer's group. <code>new { ... }</code> creates an anonymous object — like a mini class with no name. We define two properties: Customer name and TotalSpend. This is equivalent to SQL's SELECT clause.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code">Customer = g.Key,</div>
+        <div class="ann-explain"><strong>g.Key = the value you grouped by</strong>When you <code>GroupBy(o => o.Customer)</code>, the Key is the customer name string. For Alice's group, <code>g.Key</code> = "Alice". This is how you access the grouping value.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code">TotalSpend =<br>  g.<span class="fn">Sum</span>(o =><br>    o.Items.<span class="fn">Sum</span>(item =><br>      item.Quantity * item.Price))</div>
+        <div class="ann-explain"><strong>Nested Sum — two levels deep</strong><em>Inner Sum:</em> For each item in one order → compute Quantity×Price → sum them → gives one order's total.<br><em>Outer Sum:</em> For each order in the customer's group → get that order's total (inner sum) → add all order totals → gives customer's grand total.<br>Read inside-out: "per item: cost. per order: sum costs. per customer: sum order totals."</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code">.<span class="fn">OrderByDescending</span>(x => x.TotalSpend)</div>
+        <div class="ann-explain"><strong>Sort by TotalSpend, biggest first</strong><code>x</code> is each anonymous summary object. We sort by its TotalSpend property, descending. After this: Alice(81k), Charlie(40k), Bob(17k).</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code">.<span class="fn">Take</span>(2)</div>
+        <div class="ann-explain"><strong>Keep only the top 2</strong>Takes the first 2 elements from the sorted sequence. Equivalent to SQL <code>TOP 2</code> or <code>LIMIT 2</code>. After sorting, these are Alice and Charlie.</div>
+      </div>
+      <div class="ann-row">
+        <div class="ann-code">.<span class="fn">ToList</span>()</div>
+        <div class="ann-explain"><strong>Execute! Return a concrete List</strong>LINQ is lazy — nothing runs until forced. <code>ToList()</code> forces execution and materialises the results into a <code>List&lt;T&gt;</code> you can use. Without this, iterating twice would re-run everything.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NESTED SUM WALKTHROUGH -->
+  <div class="card">
+    <h3><span class="icon">🔁</span> Tracing the Nested Sum for Alice Step by Step</h3>
+    <div class="steps">
+      <div class="step"><div class="step-left"><div class="step-circle" style="background:var(--purple)">1</div><div class="step-line"></div></div><div class="step-body"><strong>GroupBy → Alice's group = [Order#1, Order#3]</strong><p>g.Key = "Alice". The group contains 2 Order objects.</p></div></div>
+      <div class="step"><div class="step-left"><div class="step-circle" style="background:var(--purple)">2</div><div class="step-line"></div></div><div class="step-body"><strong>Outer Sum runs over Order#1 and Order#3</strong><p><code>g.Sum(o => ...)</code> will call the inner expression for each order, then add results.</p></div></div>
+      <div class="step"><div class="step-left"><div class="step-circle" style="background:var(--purple)">3</div><div class="step-line"></div></div><div class="step-body"><strong>Inner Sum for Order#1 (Laptop + Mouse)</strong><p>Laptop: 1×50000=50000. Mouse: 2×500=1000. Order#1 total = <span class="highlight">51,000</span></p></div></div>
+      <div class="step"><div class="step-left"><div class="step-circle" style="background:var(--purple)">4</div><div class="step-line"></div></div><div class="step-body"><strong>Inner Sum for Order#3 (Phone)</strong><p>Phone: 1×30000=30000. Order#3 total = <span class="highlight">30,000</span></p></div></div>
+      <div class="step"><div class="step-left"><div class="step-circle" style="background:var(--purple)">5</div><div class="step-line"></div></div><div class="step-body"><strong>Outer Sum: 51,000 + 30,000 = 81,000</strong><p>TotalSpend for Alice = <span class="highlight">81,000</span> ✅ Alice is rank 1.</p></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="icon">📚</span> LINQ ↔ SQL Quick Reference</h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>LINQ Method</th><th>SQL equivalent</th><th>What it does</th></tr>
+      <tr><td><code>.Where(x => cond)</code></td><td>WHERE cond</td><td>Filter rows</td></tr>
+      <tr><td><code>.Select(x => new{...})</code></td><td>SELECT ...</td><td>Transform/project</td></tr>
+      <tr><td><code>.GroupBy(x => key)</code></td><td>GROUP BY key</td><td>Group by a key</td></tr>
+      <tr><td><code>.OrderByDescending(x => val)</code></td><td>ORDER BY val DESC</td><td>Sort descending</td></tr>
+      <tr><td><code>.Take(n)</code></td><td>TOP n / LIMIT n</td><td>First n items</td></tr>
+      <tr><td><code>.Sum(x => val)</code></td><td>SUM(val)</td><td>Sum a field</td></tr>
+      <tr><td><code>.Count()</code></td><td>COUNT(*)</td><td>Count items</td></tr>
+      <tr><td><code>.ToList()</code></td><td>— (forces execution)</td><td>Materialise to list</td></tr>
+    </table></div>
+  </div>
+
+  <div class="alert alert-warn"><div class="alert-icon">⚠️</div><div class="alert-body"><strong>Deferred Execution</strong> Most LINQ methods (Where, Select, GroupBy, OrderBy, Take) are lazy — they build a recipe but don't run until forced. <code>ToList()</code>, <code>Count()</code>, <code>Sum()</code>, <code>First()</code> force execution. Always <code>.ToList()</code> to materialise once — iterating a lazy query twice runs it twice (2 DB trips with EF Core).</div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ Q&A ══ -->
+<div class="section" id="qa">
+  <div class="part-header">
+    <div class="part-num num-orange">Q&amp;A</div>
+    <div>
+      <h2>Interview Q&amp;A Practice</h2>
+      <p class="sub">18 questions across all 3 parts. Question shown at the top — tap to reveal the full model answer with explanation.</p>
+    </div>
+  </div>
+
+  <!-- DSA -->
+  <div class="qa-cat-header">
+    <div style="width:13px;height:13px;border-radius:4px;background:var(--blue);flex-shrink:0"></div>
+    <h3>DSA — Merge Intervals</h3>
+    <span class="pill pill-blue" style="margin-left:8px">5 Questions</span>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">1</div><div class="qa-q-text"><div class="q-label">Algorithm design</div><div class="q-text">How would you merge overlapping intervals? Walk me through your approach before writing any code.</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>First, I'd sort the intervals by their start time.</strong> Without sorting, overlapping intervals could be anywhere in the list, requiring O(n²) comparisons. Sorting ensures any overlapping intervals are adjacent, enabling a single O(n) pass.</p>
+      <p>Then I'd keep a "current" interval. For each next interval I check: does it start before (or at) the current end? If yes — overlap — extend current.end to Max(current.end, next.end). If no — no overlap — save current to results, and make next the new current.</p>
+      <p>After the loop, add the last current interval to results. Time: O(n log n) due to sorting. Space: O(n) for the result list.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">2</div><div class="qa-q-text"><div class="q-label">Edge case</div><div class="q-text">What happens with exactly adjacent intervals like [1,3] and [3,5]? Should they merge?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>Yes — they merge into [1,5].</strong></p>
+      <p>The overlap condition is <code>next.start &lt;= current.end</code>. Since 3 ≤ 3 is true, they merge. This is correct: [1,3] and [3,5] share the point 3 and form a continuous range [1,5] with no gap.</p>
+      <p>If the problem says they should NOT merge, you'd use strict less-than: <code>next.start &lt; current.end</code>. Always clarify this with the interviewer — it's a legitimate ambiguity worth calling out.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">3</div><div class="qa-q-text"><div class="q-label">Complexity</div><div class="q-text">What is the time and space complexity of your solution? Explain why.</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>Time: O(n log n)</strong> — dominated by sorting. Sorting n intervals is O(n log n). The single loop afterwards is O(n). Total = O(n log n).</p>
+      <p><strong>Space: O(n)</strong> — in the worst case (no overlaps at all), the result list contains all n intervals. If we count only auxiliary space (not the output), it's O(1) — just the current variable and the loop counter.</p>
+      <p>Tip: always explain the WHY, not just the value. "O(n log n) because sorting dominates" is a much better answer than just "O(n log n)".</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">4</div><div class="qa-q-text"><div class="q-label">Bug catch</div><div class="q-text">Your solution works on [[1,3],[2,6],[8,10]] but fails on [[3,5],[1,4]]. Why, and how do you fix it?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>The input is unsorted.</strong> Starting with [3,5] as current, we check [1,4]: since 1 &gt; 5 is false (1 is less than 5, not greater), we'd actually try to merge... wait — let me re-examine. 1 ≤ 5 is TRUE, so we'd extend current.end = Max(5,4) = 5. Output: [[1,4] merged incorrectly]. Actually the real bug is: we saved [3,5] and set current=[1,4]. Then loop ends. Output: [[3,5],[1,4]] — unsorted output, wrong intervals.</p>
+      <p><strong>Fix: always sort first.</strong> After sorting: [[1,4],[3,5]]. Now 3 ≤ 4 → merge → [1,5]. Correct! This is exactly the candidate's mistake in the interview template. Never assume sorted input.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">5</div><div class="qa-q-text"><div class="q-label">C# syntax</div><div class="q-text">How do you sort a 2D int array in C# by the first element of each sub-array?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p>Use <code>Array.Sort</code> with a lambda comparator:</p>
+      <div class="code-block">Array.Sort(intervals, (a, b) => a[0].CompareTo(b[0]));</div>
+      <p><code>a</code> and <code>b</code> are two sub-arrays being compared. <code>a[0]</code> is the first element. <code>CompareTo</code> returns negative (a&lt;b), zero (equal), or positive (a&gt;b) — exactly what Sort expects.</p>
+      <p>Alternative using LINQ: <code>intervals = intervals.OrderBy(x => x[0]).ToArray();</code> — cleaner but creates a new array instead of sorting in-place.</p>
+    </div></div>
+  </div>
+
+  <!-- SQL -->
+  <div class="qa-cat-header">
+    <div style="width:13px;height:13px;border-radius:4px;background:var(--green);flex-shrink:0"></div>
+    <h3>SQL Customer Analytics</h3>
+    <span class="pill pill-green" style="margin-left:8px">7 Questions</span>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">6</div><div class="qa-q-text"><div class="q-label">Core concept</div><div class="q-text">What does GROUP BY do in SQL? What happens if you forget it when using SUM or COUNT?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>GROUP BY divides rows into buckets by a shared value, then runs aggregate functions (SUM, COUNT, AVG, MAX) separately on each bucket.</strong></p>
+      <p>If you forget GROUP BY when using SUM: <code>SELECT customer_name, SUM(order_amount) FROM orders</code> — SQL gives an error or returns one row for the entire table (depending on the DB). You'd get the grand total of ALL customers combined, not per-customer totals.</p>
+      <p>Rule to remember: any column in SELECT that is not inside an aggregate function MUST appear in GROUP BY.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">7</div><div class="qa-q-text"><div class="q-label">Syntax detail</div><div class="q-text">What is the difference between COUNT(*) and COUNT(column_name)?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>COUNT(*)</strong> counts every row — even rows where all columns are NULL.</p>
+      <p><strong>COUNT(column_name)</strong> counts only rows where that specific column is NOT NULL. If some rows have a null value in that column, they're excluded.</p>
+      <p>In this query <code>COUNT(order_id)</code> is used because order_id is a primary key (never null), so both give the same result. But knowing the distinction matters — it's a common interview question and a source of real bugs when columns can be null.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">8</div><div class="qa-q-text"><div class="q-label">Window functions</div><div class="q-text">What is a window function? How is RANK() OVER different from using GROUP BY?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>A window function calculates across a set of rows without collapsing them into a single row.</strong></p>
+      <p><strong>GROUP BY + aggregates:</strong> 5 rows → 3 rows. Rows are collapsed. You lose access to individual rows.</p>
+      <p><strong>Window function RANK():</strong> 3 grouped rows → still 3 rows, but with an added rank column. Rows are NOT collapsed. You keep all the data plus the rank.</p>
+      <p>The <code>OVER(...)</code> clause defines the "window" — the set of rows the function operates on and how they're ordered. Without OVER, RANK() would be a syntax error in standard SQL.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">9</div><div class="qa-q-text"><div class="q-label">Ranking functions</div><div class="q-text">What is the difference between RANK(), DENSE_RANK(), and ROW_NUMBER()? Give a concrete example.</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p>Say three customers spent 1000, 1000, and 700 (a tie at the top):</p>
+      <ul>
+        <li><strong>ROW_NUMBER():</strong> 1, 2, 3 — always unique, arbitrary order for ties. No concept of "tied".</li>
+        <li><strong>RANK():</strong> 1, 1, 3 — tied values share rank 1, but the next rank jumps to 3 (skips 2). Gap!</li>
+        <li><strong>DENSE_RANK():</strong> 1, 1, 2 — tied values share rank 1, next rank is 2. No gap.</li>
+      </ul>
+      <p>Use DENSE_RANK when you don't want gaps (most business reports). Use RANK when position-in-sort-order matters. Use ROW_NUMBER when you need a unique identifier for each row (e.g., pagination).</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">10</div><div class="qa-q-text"><div class="q-label">Common mistake</div><div class="q-text">I want only the top 3 spenders. Can I write WHERE spend_rank &lt;= 3? Why or why not?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>No, this will fail with an error.</strong> SQL's logical execution order is: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. Window functions (including RANK) are calculated during the SELECT phase — after WHERE has already run.</p>
+      <p>So when WHERE tries to use <code>spend_rank</code>, that column doesn't exist yet.</p>
+      <p><strong>Correct approach — use a CTE:</strong></p>
+      <div class="code-block">WITH ranked AS (
+  SELECT customer_name,
+         SUM(order_amount)                          AS total,
+         RANK() OVER (ORDER BY SUM(order_amount) DESC) AS rk
+  FROM   orders
+  GROUP BY customer_name
+)
+SELECT * FROM ranked WHERE rk &lt;= 3;</div>
+      <p>The CTE computes the rank first, then the outer query filters on it. This is a very common senior SQL interview pattern.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">11</div><div class="qa-q-text"><div class="q-label">Execution order</div><div class="q-text">In what order does SQL actually execute the clauses of a SELECT statement?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p>SQL does NOT execute top-to-bottom. The logical execution order is:</p>
+      <ol>
+        <li><strong>FROM</strong> — identify the source table(s)</li>
+        <li><strong>WHERE</strong> — filter individual rows (before grouping)</li>
+        <li><strong>GROUP BY</strong> — group the remaining rows</li>
+        <li><strong>HAVING</strong> — filter groups (like WHERE but after grouping)</li>
+        <li><strong>SELECT</strong> — compute columns, apply aliases, run window functions</li>
+        <li><strong>ORDER BY</strong> — sort the final result</li>
+        <li><strong>LIMIT / TOP</strong> — trim the result set</li>
+      </ol>
+      <p>This explains: why you can't use a SELECT alias in WHERE (WHERE runs before SELECT), why window functions can't be in WHERE, and why HAVING is used to filter aggregates (e.g., <code>HAVING SUM(amount) > 1000</code>).</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">12</div><div class="qa-q-text"><div class="q-label">WHERE vs HAVING</div><div class="q-text">What is the difference between WHERE and HAVING? When do you use each?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>WHERE filters individual rows before grouping. HAVING filters groups after grouping.</strong></p>
+      <p>Use WHERE when filtering based on a raw column value: <code>WHERE order_amount > 100</code> — remove individual orders under 100 before any grouping.</p>
+      <p>Use HAVING when filtering based on an aggregate result: <code>HAVING SUM(order_amount) > 500</code> — only keep customers whose total exceeds 500, after grouping.</p>
+      <p>You can combine both: <code>WHERE order_amount > 50 GROUP BY customer HAVING COUNT(*) > 2</code> — first remove orders under 50, then group, then only keep customers with more than 2 remaining orders.</p>
+    </div></div>
+  </div>
+
+  <!-- LINQ -->
+  <div class="qa-cat-header">
+    <div style="width:13px;height:13px;border-radius:4px;background:var(--purple);flex-shrink:0"></div>
+    <h3>LINQ in C#</h3>
+    <span class="pill pill-purple" style="margin-left:8px">6 Questions</span>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">13</div><div class="qa-q-text"><div class="q-label">Fundamentals</div><div class="q-text">What is LINQ? Why use it instead of a manual foreach loop?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>LINQ (Language Integrated Query) is a set of extension methods and keywords in C# for querying and transforming collections in a declarative, readable style.</strong></p>
+      <p>Instead of: "create a new list, loop through items, check each one with an if, add matching ones to the list" — you write: <code>items.Where(x => condition).ToList()</code>. The intent is clear in one line.</p>
+      <p>Key advantages: readable and composable (chain operations), works on any IEnumerable (arrays, lists, dictionaries, EF Core DbSets), type-safe at compile time, and with EF Core it translates C# to SQL automatically.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">14</div><div class="qa-q-text"><div class="q-label">Lambda</div><div class="q-text">Explain this line: <code>orders.GroupBy(o => o.Customer)</code>. What does each part mean?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><code>o => o.Customer</code> is a lambda expression (an inline function).</p>
+      <ul>
+        <li><strong><code>o</code></strong> — input parameter. Represents one Order from the collection. The name is arbitrary — you could call it <code>order</code> or <code>x</code>.</li>
+        <li><strong><code>=></code></strong> — reads as "goes to" or "such that".</li>
+        <li><strong><code>o.Customer</code></strong> — the return value. For each Order, return its Customer property.</li>
+      </ul>
+      <p>So the whole call means: "From the orders list, group them by each order's Customer property." The result is an <code>IEnumerable&lt;IGrouping&lt;string, Order&gt;&gt;</code> — a collection of groups where each group's Key is a unique customer name.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">15</div><div class="qa-q-text"><div class="q-label">GroupBy internals</div><div class="q-text">After GroupBy, what is <code>g</code> in the next <code>.Select(g => ...)</code>? What properties does it have?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><code>g</code> is one <code>IGrouping&lt;string, Order&gt;</code> — a single customer's group of orders. It has two important things:</p>
+      <ul>
+        <li><strong><code>g.Key</code></strong> — the grouping value (the string you grouped by). For Alice's group, <code>g.Key</code> = "Alice".</li>
+        <li><strong><code>g</code> itself is IEnumerable&lt;Order&gt;</strong> — you can iterate it or call LINQ methods on it. So <code>g.Sum(o => ...)</code> sums across all of Alice's orders.</li>
+      </ul>
+      <p>This is exactly how <code>TotalSpend = g.Sum(...)</code> works — it's summing over all orders in that one customer's group.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">16</div><div class="qa-q-text"><div class="q-label">Nested sum</div><div class="q-text">Why does the LINQ solution have two nested Sum() calls? Explain each one.</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p>Because the data is nested two levels: Customer → Orders → Items. We need to sum at each level.</p>
+      <p><strong>Inner Sum</strong> — <code>o.Items.Sum(item => item.Quantity * item.Price)</code>: For one Order <code>o</code>, loop its Items, multiply Quantity × Price for each item, and sum them. This gives one order's total value.</p>
+      <p><strong>Outer Sum</strong> — <code>g.Sum(o => [inner sum])</code>: For all orders <code>o</code> in the customer's group, get each order's total (inner sum), then add all those order totals. This gives the customer's grand total across all orders.</p>
+      <p>The reason for two levels: a single <code>g.Sum(o => o.Price)</code> wouldn't work — Order doesn't have a Price; the price is on each Item inside the order.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">17</div><div class="qa-q-text"><div class="q-label">Deferred execution</div><div class="q-text">What is deferred execution in LINQ? Why does it matter in production code with EF Core?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>Deferred execution means the LINQ query doesn't execute when you write it — it executes only when you iterate over the results.</strong></p>
+      <p>Methods like <code>Where</code>, <code>Select</code>, <code>GroupBy</code>, <code>OrderBy</code>, <code>Take</code>, <code>Skip</code> are deferred — they build an expression tree (a "recipe") but don't run it.</p>
+      <p>Execution is forced by: <code>ToList()</code>, <code>ToArray()</code>, <code>foreach</code>, <code>Count()</code>, <code>First()</code>, <code>Sum()</code> etc.</p>
+      <p><strong>Why it matters with EF Core:</strong> If you iterate a LINQ query twice (e.g., once to check <code>Any()</code> and once in <code>foreach</code>), it hits the database TWICE. This is the N+1 problem. Fix: call <code>.ToList()</code> once to materialise the data, then use the in-memory list as many times as needed.</p>
+    </div></div>
+  </div>
+
+  <div class="qa-item" onclick="this.classList.toggle('open')">
+    <div class="qa-question"><div class="qa-num">18</div><div class="qa-q-text"><div class="q-label">Senior-level</div><div class="q-text">What is the N+1 problem in EF Core LINQ? How do you prevent it?</div></div><div class="qa-arrow">▼</div></div>
+    <div class="qa-answer"><div class="ans-label">✅ Model Answer</div><div class="ans-body">
+      <p><strong>The N+1 problem: you load a list of entities (1 query), then loop over them accessing a related navigation property — triggering a new database query for each item (N more queries). Total: N+1 round trips.</strong></p>
+      <p>Example of the bug:</p>
+      <div class="code-block">var orders = context.Orders.ToList();        // 1 DB query
+foreach (var o in orders)
+    Console.WriteLine(o.Customer.Name);       // 1 DB query PER order → N queries!</div>
+      <p><strong>Fix 1 — Eager loading with .Include():</strong></p>
+      <div class="code-block">var orders = context.Orders
+    .Include(o => o.Customer)   // JOIN in SQL — 1 query total
+    .ToList();</div>
+      <p><strong>Fix 2 — Select only what you need (projection):</strong></p>
+      <div class="code-block">var names = context.Orders
+    .Select(o => o.Customer.Name)   // SQL handles the JOIN
+    .ToList();</div>
+      <p>This is one of the most valued topics in senior .NET interviews — it demonstrates real production awareness, not just syntax knowledge.</p>
+    </div></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>WEX .NET L1 Interview · Complete Tutorial with Deep Dives</p>
+  <p style="margin-top:8px"><strong>DSA + SQL + LINQ</strong> — all three parts, line by line, with 18 Q&amp;As. Go get that offer! 🚀</p>
+</div>
+
+</body>
+</html>
