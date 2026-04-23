@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>System Design Guide - .NET 9</title>
+<style>
+body { margin:0; font-family: Arial; display:flex; }
+nav { width:260px; height:100vh; overflow:auto; background:#f4f4f4; padding:15px; }
+main { flex:1; padding:20px; }
+h2 { border-bottom:2px solid #ccc; }
+pre { background:#111; color:#0f0; padding:10px; overflow:auto; }
+.code { background:#222; color:#eee; }
+</style>
+</head>
+<body>
+
+<nav>
+<h3>🟢 Foundations</h3>
+<a href="#start">Start Interview</a>
+<a href="#math">Back-of-envelope</a>
+<a href="#scaling">Scaling</a>
+<a href="#lb">Load Balancer</a>
+<a href="#db">Database</a>
+<a href="#cache">Cache</a>
+<a href="#gateway">API Gateway</a>
+<a href="#cdn">CDN</a>
+
+<h3>🟡 Intermediate</h3>
+<a href="#micro">Microservices</a>
+<a href="#queue">Message Queue</a>
+<a href="#shard">Sharding</a>
+<a href="#replica">Replication</a>
+<a href="#cap">CAP</a>
+<a href="#hash">Consistent Hashing</a>
+<a href="#rate">Rate Limit</a>
+<a href="#idem">Idempotency</a>
+
+<h3>🔴 Advanced</h3>
+<a href="#saga">Saga</a>
+<a href="#cqrs">CQRS</a>
+<a href="#event">Event Sourcing</a>
+<a href="#cb">Circuit Breaker</a>
+
+<h3>🎨 Designs</h3>
+<a href="#url">URL Shortener</a>
+<a href="#chat">Chat</a>
+<a href="#youtube">YouTube</a>
+<a href="#twitter">Twitter</a>
+</nav>
+
+<main>
+
+<!-- FULL DEEP SECTION EXAMPLE -->
+
+<section id="start">
+<h2>1. How to Start Any System Design Interview</h2>
+
+<p><b>Story:</b> Like entering a hospital—you first talk to receptionist.</p>
+
+<p><b>What breaks:</b> If you skip → wrong treatment → wrong system.</p>
+
+<p><b>Math:</b><br>
+1M users × 10 req/day = 10M/day ≈ 115 req/sec</p>
+
+<p><b>Questions:</b></p>
+<ul>
+<li>Scale?</li>
+<li>Read vs Write?</li>
+<li>Latency?</li>
+<li>Consistency?</li>
+<li>Availability?</li>
+</ul>
+
+<p><b>Say:</b> “Based on this I assume X, Y, Z—shall I proceed?”</p>
+
+<pre>
+USER → SERVER → DB
+</pre>
+
+<pre>
+USER → LB → APP → CACHE → DB
+</pre>
+
+<p><b>Tradeoff:</b> Ask questions vs jump coding</p>
+
+<pre class="code">
+// WRONG
+app.MapGet("/", () => "Hi");
+
+// RIGHT
+builder.Services.AddScoped<IService, Service>();
+</pre>
+
+<p><b>Scale:</b> 100 → 1 server → 1M → cache + LB</p>
+
+<p><b>Interview Script:</b><br>
+"Let me clarify requirements before designing."</p>
+
+<p><b>Failure:</b> Wrong assumptions → redesign</p>
+
+<p><b>Memory:</b> Interview = diagnose before treatment</p>
+</section>
+
+<!-- PATTERN FOR ALL OTHER TOPICS -->
+
+<section id="lb">
+<h2>Load Balancer</h2>
+<pre>
+USER → LB → S1,S2,S3
+</pre>
+<p>Distributes traffic → prevents overload</p>
+</section>
+
+<section id="cache">
+<h2>Caching</h2>
+<pre>
+APP → CACHE → DB
+</pre>
+<p>Speeds up reads</p>
+</section>
+
+<section id="micro">
+<h2>Microservices</h2>
+<pre>
+User → API → [Order][Payment][User]
+</pre>
+<p>Break system into smaller services</p>
+</section>
+
+<section id="queue">
+<h2>Message Queue</h2>
+<pre>
+Producer → Queue → Consumer
+</pre>
+<p>Async processing</p>
+</section>
+
+<section id="saga">
+<h2>Saga Pattern</h2>
+<pre>
+Order → Payment → Fail → Refund
+</pre>
+<p>Distributed transactions with rollback</p>
+</section>
+
+<section id="cqrs">
+<h2>CQRS</h2>
+<pre>
+WRITE → DB1
+READ → DB2
+</pre>
+<p>Separate read/write</p>
+</section>
+
+<section id="url">
+<h2>URL Shortener</h2>
+<pre>
+User → API → DB
+</pre>
+<p>Map short to long URL</p>
+</section>
+
+<section id="chat">
+<h2>Chat App</h2>
+<pre>
+User → WS → Server → DB
+</pre>
+<p>Real-time messaging</p>
+</section>
+
+<section id="youtube">
+<h2>YouTube</h2>
+<pre>
+Upload → Storage → CDN → User
+</pre>
+<p>Video delivery system</p>
+</section>
+
+<section id="twitter">
+<h2>Twitter</h2>
+<pre>
+Write → Fanout → Feed
+</pre>
+<p>Feed generation</p>
+</section>
+
+</main>
+</body>
+</html>
