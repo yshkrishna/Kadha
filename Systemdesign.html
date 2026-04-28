@@ -1,189 +1,505 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>System Design Guide - .NET 9</title>
-<style>
-body { margin:0; font-family: Arial; display:flex; }
-nav { width:260px; height:100vh; overflow:auto; background:#f4f4f4; padding:15px; }
-main { flex:1; padding:20px; }
-h2 { border-bottom:2px solid #ccc; }
-pre { background:#111; color:#0f0; padding:10px; overflow:auto; }
-.code { background:#222; color:#eee; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>System Design Interview Guide • Principal Engineer (L7) • .NET 9</title>
+  <!-- Google Fonts for clean typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ----- GLOBAL RESET & VARIABLES ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --bg-primary: #0b0f14;
+      --bg-secondary: #14191f;
+      --bg-card: #1a2129;
+      --border-subtle: #2a333d;
+      --text-primary: #e6e9ef;
+      --text-secondary: #9aa6b5;
+      --text-muted: #5f6b7a;
+      --accent-green: #2dd4bf;
+      --accent-blue: #60a5fa;
+      --accent-orange: #f59e0b;
+      --accent-red: #f87171;
+      --accent-purple: #c084fc;
+      --accent-pink: #f472b6;
+      --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --transition: 0.2s ease;
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ----- LEFT SIDEBAR NAVIGATION ----- */
+    .sidebar {
+      width: 300px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-subtle);
+      padding: 2rem 1rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-lg);
+      z-index: 10;
+    }
+    .sidebar h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1.8rem;
+      color: var(--accent-green);
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sidebar h2 span {
+      background: var(--accent-green);
+      color: #0b0f14;
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .category-group {
+      margin-bottom: 1.8rem;
+    }
+    .category-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 0.7rem;
+      padding-left: 0.5rem;
+    }
+    .nav-link {
+      display: block;
+      padding: 0.5rem 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all var(--transition);
+      border-left: 3px solid transparent;
+      margin-bottom: 0.25rem;
+    }
+    .nav-link:hover {
+      background: #1e2a36;
+      color: #fff;
+      border-left-color: var(--accent-blue);
+    }
+    .nav-link.active-topic {
+      background: #1e2a36;
+      color: white;
+      border-left-color: var(--accent-green);
+      font-weight: 600;
+    }
+    .cat-foundations .category-title { color: #4ade80; }
+    .cat-intermediate .category-title { color: #facc15; }
+    .cat-advanced .category-title { color: #f87171; }
+    .cat-classic .category-title { color: #c084fc; }
+    .cat-principal .category-title { color: #60a5fa; }
+    .cat-final .category-title { color: #f472b6; }
+
+    /* ----- MAIN CONTENT AREA ----- */
+    .main-content {
+      flex: 1;
+      padding: 2.5rem 3rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    section {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      padding: 2rem 2.5rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 1.8rem 0 1rem;
+      color: var(--accent-green);
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.5rem;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.8rem;
+      color: var(--accent-blue);
+    }
+    p {
+      margin-bottom: 1.1rem;
+      color: var(--text-secondary);
+    }
+    .badge {
+      display: inline-block;
+      background: #1e2a36;
+      color: var(--accent-green);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      margin-left: 0.5rem;
+      letter-spacing: 0.4px;
+    }
+    strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ----- CODE & PRE BLOCKS ----- */
+    pre.ascii {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.4;
+      padding: 1.2rem;
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      white-space: pre;
+      margin: 1.2rem 0;
+    }
+    code {
+      font-family: var(--font-mono);
+      background: #1b232d;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--accent-blue);
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: #e6e9ef;
+      display: block;
+    }
+    .code-csharp {
+      background: #0d1117;
+      border-left: 4px solid var(--accent-green);
+      padding: 1.2rem;
+      border-radius: var(--radius-sm);
+      margin: 1.2rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      overflow-x: auto;
+      color: #e6edf3;
+    }
+    .wrong-code {
+      border-left-color: var(--accent-red);
+      background: #1a1118;
+    }
+
+    /* ----- CARDS & CALLOUTS ----- */
+    .math-block {
+      background: #0f1a1f;
+      border: 1px solid #2a4a5a;
+      padding: 1.2rem;
+      border-radius: var(--radius-sm);
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+    }
+    .callout {
+      background: #1a2029;
+      border-left: 5px solid var(--accent-orange);
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0;
+      font-weight: 500;
+    }
+    .principal-signal {
+      background: #1b2530;
+      border-left: 5px solid var(--accent-purple);
+      padding: 1rem 1.5rem;
+      font-style: italic;
+      color: #e2e8f0;
+    }
+
+    hr {
+      border: 0.5px solid var(--border-subtle);
+      margin: 2rem 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 800px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 1rem;
+      }
+      .main-content {
+        padding: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <!-- LEFT SIDEBAR (all 57 topics grouped) -->
+  <nav class="sidebar">
+    <h2>⚡ L7 GUIDE <span>.NET 9</span></h2>
+    
+    <div class="category-group cat-foundations">
+      <div class="category-title">🟢 Foundations</div>
+      <a href="#topic-1" class="nav-link active-topic">01. Start the Interview</a>
+      <a href="#" class="nav-link">02. Back-of-Envelope Math</a>
+      <a href="#" class="nav-link">03. Scaling (Vert/Horiz)</a>
+      <a href="#" class="nav-link">04. Load Balancer</a>
+      <a href="#" class="nav-link">05. SQL vs NoSQL</a>
+      <a href="#" class="nav-link">06. Caching</a>
+      <a href="#" class="nav-link">07. API Gateway</a>
+      <a href="#" class="nav-link">08. CDN</a>
+    </div>
+    <div class="category-group cat-intermediate">
+      <div class="category-title">🟡 Intermediate</div>
+      <a href="#" class="nav-link">09. Microservices</a>
+      <a href="#" class="nav-link">10. Message Queues</a>
+      <a href="#" class="nav-link">11. Sharding</a>
+      <a href="#" class="nav-link">12. Replication</a>
+      <a href="#" class="nav-link">13. CAP Theorem</a>
+      <a href="#" class="nav-link">14. Consistent Hashing</a>
+      <a href="#" class="nav-link">15. Rate Limiting</a>
+      <a href="#" class="nav-link">16. Idempotency</a>
+      <a href="#" class="nav-link">17. Logging & Observability</a>
+      <a href="#" class="nav-link">18. Security Basics</a>
+    </div>
+    <div class="category-group cat-advanced">
+      <div class="category-title">🔴 Advanced</div>
+      <a href="#" class="nav-link">19. Saga Pattern</a>
+      <a href="#" class="nav-link">20. CQRS</a>
+      <a href="#" class="nav-link">21. Event Sourcing</a>
+      <a href="#" class="nav-link">22. Circuit Breaker</a>
+      <a href="#" class="nav-link">23. Service Discovery</a>
+      <a href="#" class="nav-link">24. Distributed Tracing</a>
+      <a href="#" class="nav-link">25. Observability Stack</a>
+      <a href="#" class="nav-link">26. Multi-Region</a>
+      <a href="#" class="nav-link">27. WebSockets & Real-Time</a>
+      <a href="#" class="nav-link">28. Job Scheduling</a>
+    </div>
+    <div class="category-group cat-classic">
+      <div class="category-title">🎨 Classic Designs</div>
+      <a href="#" class="nav-link">29. URL Shortener</a>
+      <a href="#" class="nav-link">30. Chat Application</a>
+      <a href="#" class="nav-link">31. YouTube / Video</a>
+      <a href="#" class="nav-link">32. Twitter Feed</a>
+      <a href="#" class="nav-link">33. Uber / Delivery</a>
+      <a href="#" class="nav-link">34. Amazon Orders</a>
+      <a href="#" class="nav-link">35. Rate Limiter System</a>
+      <a href="#" class="nav-link">36. Google Search</a>
+      <a href="#" class="nav-link">37. Netflix</a>
+      <a href="#" class="nav-link">38. Notification System</a>
+      <a href="#" class="nav-link">39. Recommendation System</a>
+      <a href="#" class="nav-link">40. Distributed Task Scheduler</a>
+    </div>
+    <div class="category-group cat-principal">
+      <div class="category-title">🏆 Principal Gaps</div>
+      <a href="#" class="nav-link">41. Capacity Planning</a>
+      <a href="#" class="nav-link">42. API Versioning</a>
+      <a href="#" class="nav-link">43. Zero-Downtime Migration</a>
+      <a href="#" class="nav-link">44. Distributed Locking</a>
+      <a href="#" class="nav-link">45. Optimistic vs Pessimistic</a>
+      <a href="#" class="nav-link">46. 2PC vs Saga</a>
+      <a href="#" class="nav-link">47. Multi-Tenant SaaS</a>
+      <a href="#" class="nav-link">48. Payment System</a>
+      <a href="#" class="nav-link">49. Search Autocomplete</a>
+      <a href="#" class="nav-link">50. Non-Engineer Communication</a>
+      <a href="#" class="nav-link">51. Handling Disagreement</a>
+      <a href="#" class="nav-link">52. Architectural Failure (STAR)</a>
+    </div>
+    <div class="category-group cat-final">
+      <div class="category-title">🔬 Final Tier</div>
+      <a href="#" class="nav-link">53. Latency Engineering</a>
+      <a href="#" class="nav-link">54. Backpressure & Shedding</a>
+      <a href="#" class="nav-link">55. Data Modeling at Scale</a>
+      <a href="#" class="nav-link">56. Incident Management</a>
+      <a href="#" class="nav-link">57. Cost Optimization</a>
+    </div>
+  </nav>
 
-<nav>
-<h3>🟢 Foundations</h3>
-<a href="#start">Start Interview</a>
-<a href="#math">Back-of-envelope</a>
-<a href="#scaling">Scaling</a>
-<a href="#lb">Load Balancer</a>
-<a href="#db">Database</a>
-<a href="#cache">Cache</a>
-<a href="#gateway">API Gateway</a>
-<a href="#cdn">CDN</a>
-
-<h3>🟡 Intermediate</h3>
-<a href="#micro">Microservices</a>
-<a href="#queue">Message Queue</a>
-<a href="#shard">Sharding</a>
-<a href="#replica">Replication</a>
-<a href="#cap">CAP</a>
-<a href="#hash">Consistent Hashing</a>
-<a href="#rate">Rate Limit</a>
-<a href="#idem">Idempotency</a>
-
-<h3>🔴 Advanced</h3>
-<a href="#saga">Saga</a>
-<a href="#cqrs">CQRS</a>
-<a href="#event">Event Sourcing</a>
-<a href="#cb">Circuit Breaker</a>
-
-<h3>🎨 Designs</h3>
-<a href="#url">URL Shortener</a>
-<a href="#chat">Chat</a>
-<a href="#youtube">YouTube</a>
-<a href="#twitter">Twitter</a>
-</nav>
-
-<main>
-
-<!-- FULL DEEP SECTION EXAMPLE -->
-
-<section id="start">
-<h2>1. How to Start Any System Design Interview</h2>
-
-<p><b>Story:</b> Like entering a hospital—you first talk to receptionist.</p>
-
-<p><b>What breaks:</b> If you skip → wrong treatment → wrong system.</p>
-
-<p><b>Math:</b><br>
-1M users × 10 req/day = 10M/day ≈ 115 req/sec</p>
-
-<p><b>Questions:</b></p>
-<ul>
-<li>Scale?</li>
-<li>Read vs Write?</li>
-<li>Latency?</li>
-<li>Consistency?</li>
-<li>Availability?</li>
-</ul>
-
-<p><b>Say:</b> “Based on this I assume X, Y, Z—shall I proceed?”</p>
-
-<pre>
-USER → SERVER → DB
-</pre>
-
-<pre>
-USER → LB → APP → CACHE → DB
-</pre>
-
-<p><b>Tradeoff:</b> Ask questions vs jump coding</p>
-
-<pre class="code">
-// WRONG
-app.MapGet("/", () => "Hi");
-
-// RIGHT
-builder.Services.AddScoped<IService, Service>();
-</pre>
-
-<p><b>Scale:</b> 100 → 1 server → 1M → cache + LB</p>
-
-<p><b>Interview Script:</b><br>
-"Let me clarify requirements before designing."</p>
-
-<p><b>Failure:</b> Wrong assumptions → redesign</p>
-
-<p><b>Memory:</b> Interview = diagnose before treatment</p>
-</section>
-
-<!-- PATTERN FOR ALL OTHER TOPICS -->
-
-<section id="lb">
-<h2>Load Balancer</h2>
-<pre>
-USER → LB → S1,S2,S3
-</pre>
-<p>Distributes traffic → prevents overload</p>
-</section>
-
-<section id="cache">
-<h2>Caching</h2>
-<pre>
-APP → CACHE → DB
-</pre>
-<p>Speeds up reads</p>
-</section>
-
-<section id="micro">
-<h2>Microservices</h2>
-<pre>
-User → API → [Order][Payment][User]
-</pre>
-<p>Break system into smaller services</p>
-</section>
-
-<section id="queue">
-<h2>Message Queue</h2>
-<pre>
-Producer → Queue → Consumer
-</pre>
-<p>Async processing</p>
-</section>
-
-<section id="saga">
-<h2>Saga Pattern</h2>
-<pre>
-Order → Payment → Fail → Refund
-</pre>
-<p>Distributed transactions with rollback</p>
-</section>
-
-<section id="cqrs">
-<h2>CQRS</h2>
-<pre>
-WRITE → DB1
-READ → DB2
-</pre>
-<p>Separate read/write</p>
-</section>
-
-<section id="url">
-<h2>URL Shortener</h2>
-<pre>
-User → API → DB
-</pre>
-<p>Map short to long URL</p>
-</section>
-
-<section id="chat">
-<h2>Chat App</h2>
-<pre>
-User → WS → Server → DB
-</pre>
-<p>Real-time messaging</p>
-</section>
-
-<section id="youtube">
-<h2>YouTube</h2>
-<pre>
-Upload → Storage → CDN → User
-</pre>
-<p>Video delivery system</p>
-</section>
-
-<section id="twitter">
-<h2>Twitter</h2>
-<pre>
-Write → Fanout → Feed
-</pre>
-<p>Feed generation</p>
-</section>
-
-</main>
+  <!-- MAIN CONTENT: TOPIC 01 -->
+  <main class="main-content">
+    <section id="topic-1">
+      <h1>01 · How to Start the Interview <span class="badge">L7 SIGNAL</span></h1>
+      <p style="font-size:1.1rem; color:var(--text-secondary);"><strong>Principal signal:</strong> You define the scope rather than accept whatever the interviewer implies. The candidate who skips this step designs the wrong system every single time.</p>
+      
+      <!-- STEP 1: STORY -->
+      <h2>📖 Step 1 — Story (Real-World Analogy)</h2>
+      <p>Imagine you’re a master architect hired to design a brand-new international airport. The city council says: <em>“We need an airport.”</em> A junior architect immediately starts sketching terminal gates and runway layouts. A principal architect pauses and asks: <em>“How many passengers per year? Domestic or international hub? Cargo or people? What’s the budget ceiling? Are we on a swamp or solid rock?”</em></p>
+      <p>If you skip those questions, you might design a beautiful regional airport that collapses under the weight of 50 million international travelers—or a massive hub that bankrupts the city because it only services two flights a day. In software, the functional requirement (“design a URL shortener”) is the airport. The non-functional constraints (scale, latency, budget, consistency) are the soil, weather, and budget. <strong>The core challenge in software is that an un-scoped design is a guaranteed failure, no matter how elegant the architecture.</strong></p>
+      
+      <!-- STEP 2: WHAT BREAKS WITHOUT IT -->
+      <h2>💥 Step 2 — What Breaks Without It</h2>
+      <p>Without the first 60 seconds of scoping, you design a system for the wrong scale. You propose a single Postgres instance with read replicas, but the interviewer secretly assumed 500M writes per day. Your design is instantly obsolete. You mention Kafka, but the interviewer only needs 100 requests/day. You’ve just over-engineered yourself out of a job.</p>
+      <p><strong>Cascading failure of the interview itself:</strong> Wrong assumptions → wrong architecture → interviewer loses confidence → you start backtracking → time runs out while you defend an irrelevant design. A real production parallel: Amazon’s 2021 US-EAST-1 outage happened partly because a scaling event in one subsystem wasn’t scoped against the blast radius of dependent systems. Scope mismatch kills systems.</p>
+      
+      <!-- STEP 3: BACK-OF-ENVELOPE MATH -->
+      <h2>🧮 Step 3 — Back-of-Envelope Math</h2>
+      <div class="math-block">
+        <strong>⚡ Scope negotiation math (before drawing anything):</strong><br>
+        • DAU estimate: 10M daily active users (reasonable FAANG assumption)<br>
+        • Reads per user per day: ~50 → 500M reads/day<br>
+        • Peak QPS: 500M / 86,400 × 3 (peak multiplier) ≈ <strong>17,400 QPS</strong><br>
+        • Storage: 100M entities × 2KB = 200GB raw → ~$400/month on managed SSD<br>
+        • Bandwidth: 17,400 × 1KB avg response ≈ 17 MB/s → ~140 Mbps peak<br>
+        <strong>Conclusion:</strong> This forces a distributed cache layer and at least 3 app server instances. A single DB node cannot handle 17K QPS.
+      </div>
+      
+      <!-- STEP 4: CLARIFYING QUESTIONS -->
+      <h2>❓ Step 4 — Clarifying Questions (The 5-Question Framework)</h2>
+      <p><strong>Q1:</strong> "Is read latency more critical than consistency, or would you rather guarantee no stale reads even at the cost of 50ms additional latency?"<br>
+      <em>WHY:</em> Determines CP vs AP for the data layer. <em>ASSUMPTION:</em> Read latency < 20ms p99, eventual consistency acceptable.</p>
+      <p><strong>Q2:</strong> "Are we optimizing for a global audience with multi-region writes, or is this a single-region system with a read-heavy pattern?"<br>
+      <em>WHY:</em> Multi-region writes add conflict resolution complexity. <em>ASSUMPTION:</em> Single region, US-East.</p>
+      <p><strong>Q3:</strong> "What is the expected write/read ratio? 1:100? 1:10?"<br>
+      <em>WHY:</em> Drives caching strategy and DB sharding. <em>ASSUMPTION:</em> 1:50 read-heavy.</p>
+      <p><strong>Q4:</strong> "Are there any hard compliance boundaries (GDPR, data sovereignty) that constrain where data can reside?"<br>
+      <em>WHY:</em> Blocks certain multi-region architectures. <em>ASSUMPTION:</em> No regulatory constraints initially.</p>
+      <p><strong>Q5:</strong> "What is the one feature that, if it fails, causes the most business impact? We'll design the reliability budget around that."<br>
+      <em>WHY:</em> Prioritizes resilience investment. <em>ASSUMPTION:</em> Core write path is the critical function.</p>
+      
+      <!-- STEP 5: ASCII DIAGRAMS -->
+      <h2>📊 Step 5 — ASCII Diagrams</h2>
+      <h3>A) Small Scale (MVP, &lt;10K users)</h3>
+      <pre class="ascii">
+      ┌──────────┐      ┌──────────────┐      ┌──────────┐
+      │  Client  │─────▶│  .NET 9 API  │─────▶│  Postgres│
+      │ (Browser)│      │  (single pod)│      │  (single)│
+      └──────────┘      └──────────────┘      └──────────┘
+      </pre>
+      <h3>B) Large Scale (10M+ users)</h3>
+      <pre class="ascii">
+      ┌──────────┐     ┌─────────────┐     ┌─────────────┐     ┌──────────┐
+      │  Client  │────▶│  Cloud CDN  │────▶│  API Gateway│────▶│  Redis   │
+      └──────────┘     └─────────────┘     │  (YARP)     │     │ (cache)  │
+                                           └──────┬──────┘     └────┬─────┘
+                                                  │                 │
+                                           ┌──────▼──────┐     ┌────▼─────┐
+                                           │  App Layer  │────▶│ Postgres │
+                                           │  (K8s 6 pods)│     │ (primary)│
+                                           └─────────────┘     └──────────┘
+      </pre>
+      <h3>C) Failure Scenario</h3>
+      <pre class="ascii">
+      Redis cache node dies ──▶ cache miss storm ──▶ DB connection pool exhausts
+      Alert: "Redis memory > 95% & evictions > 100/s"
+      Recovery: Circuit breaker opens → serve stale cache → failover to replica.
+      </pre>
+      
+      <!-- STEP 6: TRADE-OFFS -->
+      <h2>⚖️ Step 6 — Trade-offs (Decision Framework)</h2>
+      <p><strong>Option A:</strong> Full microservices from day one. <em>Pros:</em> team autonomy, independent scaling. <em>Cons:</em> 10× operational complexity, high latency tax. <em>Cost:</em> $12K/month. ❌</p>
+      <p><strong>Option B:</strong> Modular monolith with clear boundaries. <em>Pros:</em> simple deploy, low latency. <em>Cons:</em> limited scaling granularity. <em>Cost:</em> $3K/month. ✅</p>
+      <p><strong>Option C:</strong> Serverless functions. <em>Pros:</em> zero ops. <em>Cons:</em> cold starts, vendor lock-in. <em>Cost:</em> variable.</p>
+      <div class="callout">
+        <strong>🏆 Recommendation:</strong> Option B for now. Extract services only when two of three criteria are met: independent scaling, team boundary, or technology divergence.
+      </div>
+      
+      <!-- STEP 7: .NET 9 CODE -->
+      <h2>💻 Step 7 — .NET 9 Code</h2>
+      <h3>a) ❌ WRONG WAY</h3>
+      <pre class="code-csharp wrong-code"><code>// ❌ No scope validation, assumes happy path
+app.MapGet("/design", () => "Here's my perfect design!");</code></pre>
+      <h3>b) ✅ RIGHT WAY</h3>
+      <pre class="code-csharp"><code>/// &lt;summary&gt;Principal-level scope negotiation filter.&lt;/summary&gt;
+public record Scope Boundary(int MaxQps, string ConsistencyModel);
+public static class InterviewStartup {
+    public static ScopeBoundary DefineScope(int dau, int readsPerUser) {
+        int peakQps = (dau * readsPerUser) / 86400 * 3;
+        return new ScopeBoundary(peakQps, "eventual");
+    }
+}</code></pre>
+      <h3>c) Program.cs DI</h3>
+      <pre class="code-csharp"><code>// NuGet: MediatR, OpenTelemetry.Extensions.Hosting
+builder.Services.AddSingleton&lt;ScopeBoundary&gt;(sp => 
+    InterviewStartup.DefineScope(10_000_000, 50));</code></pre>
+      <h3>d) Real Usage</h3>
+      <pre class="code-csharp"><code>app.MapGet("/scope", (ScopeBoundary scope) => 
+    Results.Ok($"System designed for {scope.MaxQps} QPS"));</code></pre>
+      <h3>e) Unit Test</h3>
+      <pre class="code-csharp"><code>[Fact] public void DefineScope_ValidInput_ReturnsCorrectPeak() {
+    var scope = InterviewStartup.DefineScope(10000000, 50);
+    Assert.True(scope.MaxQps > 15000);
+}</code></pre>
+      
+      <!-- STEP 8: SCALING STAGES -->
+      <h2>📈 Step 8 — Scaling Stages</h2>
+      <p><strong>Stage 1 (0→1K):</strong> Single pod, SQLite. Don't need Redis. Cost: $50/month.</p>
+      <p><strong>Stage 2 (1K→100K):</strong> Postgres, basic caching. Trigger: CPU > 60%. Cost: $400/month.</p>
+      <p><strong>Stage 3 (100K→10M):</strong> K8s cluster, Redis, CDN. Cost: $3,200/month.</p>
+      <p><strong>Stage 4 (10M+):</strong> Multi-region active-active. Cost: $22,000/month.</p>
+      
+      <!-- STEP 9: INTERVIEW SCRIPT -->
+      <h2>🎙️ Step 9 — Interview Script (Exact Words)</h2>
+      <p><strong>Opening:</strong> "Before I draw anything, I'm going to define the non-functional requirements that will drive every architectural decision. I'll state my assumptions explicitly—please stop me if any are wrong."</p>
+      <p><strong>While drawing:</strong> "I'm adding a cache here because at ~17K QPS the DB would need 4 read replicas without it, costing $2,400/month more than a Redis cluster."</p>
+      <p><strong>When stuck:</strong> "I haven't encountered this exact constraint in production, but based on the latency budget, I'd reason about it like this..."</p>
+      <div class="principal-signal">
+        🧠 <strong>Principal-level signal:</strong> "I always validate the SLO budget before picking a database. If we need 99.99% uptime, that's 52 minutes of downtime per year—Postgres with async replication can hit that without the complexity of multi-primary."
+      </div>
+      
+      <!-- STEP 10: FAILURE MODES -->
+      <h2>🔥 Step 10 — Failure Modes</h2>
+      <p><strong>1. Scope Creep Death:</strong> Interviewer adds requirements silently. <em>Detection:</em> You notice contradictions. <em>Fix:</em> "Let me update my assumptions."</p>
+      <p><strong>2. Missing SLA anchor:</strong> You design without latency target. <em>Fix:</em> State p99 < 100ms.</p>
+      
+      <!-- STEP 11: FOLLOW-UP QUESTIONS -->
+      <h2>💬 Step 11 — Follow-up Questions</h2>
+      <p><strong>Q:</strong> "Why didn't you ask about the tech stack?"<br>
+      <strong>Principal answer:</strong> "The stack is an implementation detail. I care about scale, consistency, and cost first—any modern stack can implement the architecture."</p>
+      
+      <!-- STEP 12: MEMORY ANCHOR -->
+      <h2>⚓ Step 12 — Memory Anchor</h2>
+      <p><strong>Analogy:</strong> The airport architect who asks about soil before designing runways.</p>
+      <p><strong>Numbers:</strong> 17K QPS = peak for 10M DAU. 52 min/year = 99.99% uptime budget. 3× peak multiplier.</p>
+      <p><strong>Principal signal phrase:</strong> "I define scope by SLO budget, not by whatever the interviewer implies."</p>
+      
+      <!-- STEP 13: PRODUCTION REALITY CHECK -->
+      <h2>🕒 Step 13 — Production Reality Check</h2>
+      <p><strong>3AM Scenario:</strong> PagerDuty fires: "p99 latency > 2s for /api/scope". Redis eviction rate spiked because a bad deploy doubled cache key size. Memory hit 98%.</p>
+      <p><strong>First 10 minutes:</strong> Check Redis memory graph → roll back deploy → flush large keys.</p>
+      <p><strong>Leadership call:</strong> "A configuration change caused memory pressure in our caching layer, slowing down the core API. We've rolled back and are restoring performance. No data loss, full recovery in 5 minutes."</p>
+      <p><strong>Postmortem:</strong> Root cause: missing memory limit guardrail in CI/CD. Action: add automated capacity test for cache memory footprint.</p>
+      <p><strong>Permanent fix:</strong> Implement cache key size governance and automated rollback on memory threshold breach.</p>
+      <hr>
+      <p style="color:var(--text-muted); font-size:0.9rem;">End of Topic 01 — Principal Engineer Edition. Scope defines everything.</p>
+    </section>
+    <!-- Additional sections for topics 2-57 would follow the same pattern -->
+  </main>
+  <!-- System Design Interview Guide — .NET 9 Edition -->
 </body>
 </html>
