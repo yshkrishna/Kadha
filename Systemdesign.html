@@ -6,28 +6,39 @@
     <title>System Design Interview Guide · Principal Engineer L7 · .NET 9</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-card: #ffffff;
-            --border: #dee2e6;
-            --text: #212529;
-            --text-secondary: #495057;
-            --text-muted: #6c757d;
-            --accent-green: #099268;
-            --accent-blue: #1864ab;
-            --accent-orange: #e67700;
-            --accent-red: #c92a2a;
-            --accent-purple: #7b2d8e;
-            --accent-pink: #a61e4d;
+            --bg: #0a0a0f;
+            --bg-surface: #111118;
+            --bg-card: #16161f;
+            --bg-elevated: #1c1c28;
+            --border: #252530;
+            --border-active: #3d3d55;
+            --text: #e8e8f0;
+            --text-secondary: #a0a0b5;
+            --text-muted: #6b6b80;
+            --accent-green: #2dd4bf;
+            --accent-blue: #60a5fa;
+            --accent-orange: #f59e0b;
+            --accent-red: #f87171;
+            --accent-purple: #c084fc;
+            --accent-pink: #f472b6;
+            --accent-yellow: #fbbf24;
+            --gradient-1: linear-gradient(135deg, #2dd4bf 0%, #60a5fa 100%);
+            --gradient-2: linear-gradient(135deg, #c084fc 0%, #f472b6 100%);
+            --gradient-3: linear-gradient(135deg, #f59e0b 0%, #f87171 100%);
             --font-body: 'Inter', system-ui, -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --radius: 12px;
-            --radius-sm: 6px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.6);
+            --radius-xs: 4px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -36,310 +47,516 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
         body {
-            background: var(--bg-secondary);
+            background: var(--bg);
             color: var(--text);
             font-family: var(--font-body);
             line-height: 1.7;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-image: 
+                radial-gradient(ellipse at 20% 0%, rgba(45, 212, 191, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(96, 165, 250, 0.03) 0%, transparent 50%);
+            min-height: 100vh;
         }
 
-        /* Mobile-First Top Navigation */
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-active); }
+
+        /* Top Navigation Bar */
         .top-nav {
-            background: var(--bg);
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 0.75rem 0;
             position: sticky;
             top: 0;
             z-index: 100;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            white-space: nowrap;
-            box-shadow: var(--shadow);
+            padding: 0.75rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
         .top-nav-inner {
             display: flex;
-            gap: 0.5rem;
-            padding: 0 1rem;
+            gap: 6px;
+            padding: 0 1.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
+        .top-nav-inner::-webkit-scrollbar { display: none; }
         .top-nav a {
-            display: inline-block;
-            padding: 0.4rem 0.9rem;
-            background: var(--bg-secondary);
+            display: inline-flex;
+            align-items: center;
+            padding: 0.45rem 0.9rem;
+            background: var(--bg-surface);
             color: var(--text-secondary);
             text-decoration: none;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
             border: 1px solid var(--border);
             flex-shrink: 0;
-            transition: all 0.2s;
+            transition: all var(--transition);
+            white-space: nowrap;
+            letter-spacing: -0.2px;
         }
-        .top-nav a:hover,
+        .top-nav a:hover {
+            background: var(--bg-elevated);
+            color: var(--text);
+            border-color: var(--border-active);
+            transform: translateY(-1px);
+        }
         .top-nav a.active {
-            background: var(--accent-green);
-            color: white;
-            border-color: var(--accent-green);
+            background: var(--gradient-1);
+            color: #000;
+            border-color: transparent;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
         }
 
         /* Main Layout */
-        .container {
-            max-width: 800px;
+        .app-container {
+            display: flex;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 1.5rem 1rem 3rem;
+            min-height: calc(100vh - 60px);
         }
 
-        /* Sidebar - Collapsible on Mobile */
+        /* Sidebar */
         .sidebar {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow);
+            width: 280px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 1rem;
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-md);
+            z-index: 50;
         }
-        .sidebar h2 {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--accent-green);
+        .sidebar-header {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
         }
-        .sidebar h2 span {
-            background: var(--accent-green);
-            color: white;
-            padding: 0.15rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
+        .sidebar-header .logo {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-1);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #000;
+        }
+        .sidebar-header h2 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+        .sidebar-header h2 span {
+            display: block;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
         .category-group {
-            margin-bottom: 0.75rem;
+            margin-bottom: 1.2rem;
         }
         .category-title {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 0.4rem;
-            padding-left: 0.25rem;
+            margin-bottom: 0.5rem;
+            padding: 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
+        .cat-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-green { background: #4ade80; }
+        .dot-yellow { background: #facc15; }
+        .dot-red { background: #f87171; }
+        .dot-purple { background: #c084fc; }
+        .dot-blue { background: #60a5fa; }
+        .dot-pink { background: #f472b6; }
         .nav-links {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.3rem;
+            gap: 3px;
         }
         .nav-link {
             display: inline-block;
-            padding: 0.25rem 0.6rem;
-            color: var(--text-secondary);
+            padding: 0.3rem 0.5rem;
+            color: var(--text-muted);
             text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            border-radius: var(--radius-xs);
+            font-size: 0.7rem;
             font-weight: 500;
+            font-family: var(--font-mono);
+            transition: all var(--transition);
             border: 1px solid transparent;
-            transition: all 0.15s;
         }
-        .nav-link:hover,
+        .nav-link:hover {
+            background: var(--bg-elevated);
+            color: var(--text);
+            border-color: var(--border);
+        }
         .nav-link.active-topic {
-            background: #e6fcf5;
+            background: rgba(45, 212, 191, 0.1);
             color: var(--accent-green);
-            border-color: var(--accent-green);
+            border-color: rgba(45, 212, 191, 0.3);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem 2.5rem 4rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
+        .progress-fill {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-fill-inner {
+            height: 100%;
+            background: var(--gradient-1);
+            border-radius: 2px;
+            width: 3.5%;
+            transition: width 0.5s;
+        }
+        .progress-text {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-family: var(--font-mono);
         }
 
         /* Section Cards */
         section {
-            background: var(--bg);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 2.5rem;
+            margin-bottom: 2rem;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
         }
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        section:hover::before {
+            opacity: 1;
+        }
+        section:hover {
+            border-color: var(--border-active);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Typography */
         h1 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.4rem;
             color: var(--text);
-            letter-spacing: -0.3px;
+            letter-spacing: -0.5px;
             line-height: 1.3;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
         }
-        h2 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin: 1.5rem 0 0.8rem;
-            color: var(--accent-green);
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 0.4rem;
-        }
-        h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin: 1.2rem 0 0.6rem;
-            color: var(--accent-blue);
-        }
-        p {
-            margin-bottom: 0.9rem;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-        strong {
-            color: var(--text);
-            font-weight: 600;
-        }
-        em {
-            color: var(--text-muted);
+        .topic-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-1);
+            color: #000;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 800;
+            flex-shrink: 0;
         }
         .badge {
             display: inline-block;
-            background: #e6fcf5;
+            background: rgba(45, 212, 191, 0.1);
             color: var(--accent-green);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
-            padding: 0.15rem 0.6rem;
-            border-radius: 12px;
-            margin-left: 0.4rem;
-            vertical-align: middle;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(45, 212, 191, 0.2);
         }
         .subtitle {
             font-size: 0.9rem;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            padding-left: 0.5rem;
+            border-left: 3px solid var(--border);
+        }
+        h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 2rem 0 0.9rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.3px;
+        }
+        h2 .step-icon {
+            font-size: 1.3rem;
+        }
+        h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 1.3rem 0 0.6rem;
+            color: var(--accent-blue);
+            letter-spacing: -0.2px;
+        }
+        p {
+            margin-bottom: 0.9rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+        em {
+            color: var(--text-muted);
+            font-style: italic;
         }
 
         /* Code Blocks */
         pre.ascii {
-            background: #f1f3f5;
-            color: var(--text);
+            background: #0d0d14;
+            color: #c9d1d9;
             font-family: var(--font-mono);
             font-size: 0.7rem;
             line-height: 1.5;
-            padding: 1rem;
+            padding: 1.2rem 1.5rem;
             border-radius: var(--radius-sm);
             overflow-x: auto;
             border: 1px solid var(--border);
             white-space: pre;
             margin: 1rem 0;
+            letter-spacing: 0.3px;
         }
         .code-csharp {
-            background: #f8f9fa;
-            border-left: 4px solid var(--accent-green);
-            padding: 1rem;
+            background: #0d0d14;
+            border-left: 3px solid var(--accent-green);
+            padding: 1.2rem 1.5rem;
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
             margin: 1rem 0;
             font-family: var(--font-mono);
-            font-size: 0.75rem;
+            font-size: 0.73rem;
             overflow-x: auto;
-            color: var(--text);
-            line-height: 1.6;
+            color: #e6edf3;
+            line-height: 1.7;
+            position: relative;
+        }
+        .code-csharp::after {
+            content: 'C# .NET 9';
+            position: absolute;
+            top: 0.5rem;
+            right: 1rem;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
         .wrong-code {
             border-left-color: var(--accent-red);
-            background: #fff5f5;
+            background: #140d0d;
+        }
+        .wrong-code::after {
+            content: '❌ WRONG';
+            color: var(--accent-red);
         }
         code {
             font-family: var(--font-mono);
-            background: #f1f3f5;
-            padding: 0.1rem 0.3rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.15rem 0.4rem;
             border-radius: 3px;
             font-size: 0.8rem;
-            color: #c92a2a;
+            color: var(--accent-blue);
         }
         .code-csharp code {
             background: transparent;
             padding: 0;
             color: inherit;
+            font-size: inherit;
         }
 
         /* Callouts */
         .math-block {
-            background: #f8f9fa;
-            border: 1px solid var(--border);
-            padding: 1rem 1.2rem;
+            background: #0d1414;
+            border: 1px solid #1a3a3a;
+            padding: 1.2rem 1.5rem;
             border-radius: var(--radius-sm);
             margin: 1.2rem 0;
             font-family: var(--font-mono);
-            font-size: 0.8rem;
-            line-height: 1.7;
+            font-size: 0.73rem;
+            line-height: 1.8;
             overflow-x: auto;
+            color: #c9d1d9;
+        }
+        .math-block strong {
+            color: var(--accent-green);
         }
         .callout {
-            background: #fff9db;
-            border-left: 4px solid var(--accent-orange);
-            padding: 0.9rem 1.2rem;
+            background: #1a1810;
+            border-left: 3px solid var(--accent-orange);
+            padding: 1rem 1.5rem;
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
             margin: 1.2rem 0;
             font-weight: 500;
             font-size: 0.9rem;
+            color: #e8d5a0;
+        }
+        .callout strong {
+            color: var(--accent-orange);
         }
         .principal-signal {
-            background: #f3f0ff;
-            border-left: 4px solid var(--accent-purple);
-            padding: 0.9rem 1.2rem;
+            background: #15101a;
+            border-left: 3px solid var(--accent-purple);
+            padding: 1rem 1.5rem;
             font-style: italic;
-            color: var(--text);
+            color: #d5c0e8;
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
             margin: 1.2rem 0;
             font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .principal-signal strong {
+            color: var(--accent-purple);
+            font-style: normal;
         }
 
         hr {
             border: none;
             border-top: 1px solid var(--border);
-            margin: 1.5rem 0;
+            margin: 2rem 0;
+        }
+        .topic-end {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         /* Responsive */
-        @media (max-width: 600px) {
-            .container {
-                padding: 1rem 0.75rem 2rem;
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                padding: 1.5rem 1rem 3rem;
+            }
+        }
+        @media (max-width: 640px) {
+            .top-nav-inner {
+                padding: 0 0.75rem;
+                gap: 4px;
+            }
+            .top-nav a {
+                padding: 0.35rem 0.65rem;
+                font-size: 0.7rem;
             }
             section {
-                padding: 1.2rem 1rem;
-                border-radius: var(--radius-sm);
+                padding: 1.5rem 1rem;
+                border-radius: var(--radius-md);
             }
             h1 {
                 font-size: 1.4rem;
             }
             h2 {
-                font-size: 1.1rem;
+                font-size: 1rem;
             }
-            pre.ascii {
-                font-size: 0.6rem;
+            .code-csharp, pre.ascii, .math-block {
+                font-size: 0.65rem;
+                padding: 0.8rem;
             }
-            .code-csharp {
-                font-size: 0.7rem;
-            }
-            .top-nav-inner {
-                gap: 0.3rem;
-                padding: 0 0.5rem;
-            }
-            .top-nav a {
-                padding: 0.3rem 0.6rem;
-                font-size: 0.7rem;
+            .topic-number {
+                width: 32px;
+                height: 32px;
+                font-size: 0.75rem;
             }
         }
-
-        /* Print styles */
-        @media print {
-            .top-nav,
-            .sidebar {
-                display: none;
-            }
+        @media (max-width: 400px) {
             section {
-                break-inside: avoid;
-                box-shadow: none;
-                border: 1px solid #ddd;
+                padding: 1.2rem 0.75rem;
+            }
+            h1 {
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Mobile-Friendly Top Navigation -->
-    <nav class="top-nav" aria-label="Quick topic navigation">
+    <!-- Top Navigation -->
+    <nav class="top-nav">
         <div class="top-nav-inner">
             <a href="#topic-1" class="active">01. Start Interview</a>
             <a href="#topic-2">02. Envelope Math</a>
@@ -351,19 +568,21 @@
             <a href="#">08. CDN</a>
             <a href="#">09. Microservices</a>
             <a href="#">10. Message Queues</a>
-            <a href="#">11. Sharding</a>
             <a href="#">48. Payments</a>
             <a href="#">57. Cost Opt</a>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="app-container">
 
-        <!-- Sidebar with All 57 Topics (Grouped) -->
+        <!-- Sidebar -->
         <aside class="sidebar">
-            <h2>📋 57 Topics <span>L7 Guide</span></h2>
+            <div class="sidebar-header">
+                <div class="logo">L7</div>
+                <h2>System Design<span>Principal Engineer · .NET 9</span></h2>
+            </div>
             <div class="category-group">
-                <div class="category-title">🟢 Foundations</div>
+                <div class="category-title"><span class="cat-dot dot-green"></span> Foundations</div>
                 <div class="nav-links">
                     <a href="#topic-1" class="nav-link active-topic">01</a>
                     <a href="#topic-2" class="nav-link">02</a>
@@ -376,7 +595,7 @@
                 </div>
             </div>
             <div class="category-group">
-                <div class="category-title">🟡 Intermediate</div>
+                <div class="category-title"><span class="cat-dot dot-yellow"></span> Intermediate</div>
                 <div class="nav-links">
                     <a href="#" class="nav-link">09</a><a href="#" class="nav-link">10</a>
                     <a href="#" class="nav-link">11</a><a href="#" class="nav-link">12</a>
@@ -386,7 +605,7 @@
                 </div>
             </div>
             <div class="category-group">
-                <div class="category-title">🔴 Advanced</div>
+                <div class="category-title"><span class="cat-dot dot-red"></span> Advanced</div>
                 <div class="nav-links">
                     <a href="#" class="nav-link">19</a><a href="#" class="nav-link">20</a>
                     <a href="#" class="nav-link">21</a><a href="#" class="nav-link">22</a>
@@ -396,7 +615,7 @@
                 </div>
             </div>
             <div class="category-group">
-                <div class="category-title">🎨 Classic Designs</div>
+                <div class="category-title"><span class="cat-dot dot-purple"></span> Classic Designs</div>
                 <div class="nav-links">
                     <a href="#" class="nav-link">29</a><a href="#" class="nav-link">30</a>
                     <a href="#" class="nav-link">31</a><a href="#" class="nav-link">32</a>
@@ -407,7 +626,7 @@
                 </div>
             </div>
             <div class="category-group">
-                <div class="category-title">🏆 Principal Gaps</div>
+                <div class="category-title"><span class="cat-dot dot-blue"></span> Principal Gaps</div>
                 <div class="nav-links">
                     <a href="#" class="nav-link">41</a><a href="#" class="nav-link">42</a>
                     <a href="#" class="nav-link">43</a><a href="#" class="nav-link">44</a>
@@ -418,7 +637,7 @@
                 </div>
             </div>
             <div class="category-group">
-                <div class="category-title">🔬 Final Tier</div>
+                <div class="category-title"><span class="cat-dot dot-pink"></span> Final Tier</div>
                 <div class="nav-links">
                     <a href="#" class="nav-link">53</a><a href="#" class="nav-link">54</a>
                     <a href="#" class="nav-link">55</a><a href="#" class="nav-link">56</a>
@@ -427,46 +646,60 @@
             </div>
         </aside>
 
-        <!-- ==================== TOPIC 01 ==================== -->
-        <section id="topic-1">
-            <h1>01 · How to Start the Interview <span class="badge">L7 SIGNAL</span></h1>
-            <p class="subtitle"><strong>Principal signal:</strong> You define the scope rather than accept whatever the interviewer implies. The candidate who skips this step designs the wrong system every single time.</p>
+        <!-- Main Content -->
+        <main class="main-content">
 
-            <h2>📖 Story (Real-World Analogy)</h2>
-            <p>Imagine you're a master architect hired to design a brand-new international airport. The city council says: <em>"We need an airport."</em> A junior architect immediately starts sketching terminal gates and runway layouts. A principal architect pauses and asks: <em>"How many passengers per year? Domestic or international hub? Cargo or people? What's the budget ceiling? Are we on a swamp or solid rock?"</em></p>
-            <p>If you skip those questions, you might design a beautiful regional airport that collapses under the weight of 50 million international travelers—or a massive hub that bankrupts the city because it only services two flights a day. <strong>The core challenge in software is that an un-scoped design is a guaranteed failure, no matter how elegant the architecture.</strong></p>
-
-            <h2>💥 What Breaks Without It</h2>
-            <p>Without the first 60 seconds of scoping, you design a system for the wrong scale. You propose a single Postgres instance with read replicas, but the interviewer secretly assumed 500M writes per day. Your design is instantly obsolete. You mention Kafka, but the interviewer only needs 100 requests/day. You've just over-engineered yourself out of a job.</p>
-            <p><strong>Cascading failure of the interview itself:</strong> Wrong assumptions → wrong architecture → interviewer loses confidence → you start backtracking → time runs out while you defend an irrelevant design.</p>
-
-            <h2>🧮 Back-of-Envelope Math</h2>
-            <div class="math-block">
-                <strong>Scope negotiation math (before drawing anything):</strong><br>
-                • DAU estimate: 10M daily active users (reasonable FAANG assumption)<br>
-                • Reads per user per day: ~50 → 500M reads/day<br>
-                • Peak QPS: 500M / 86,400 × 3 (peak multiplier) ≈ <strong>17,400 QPS</strong><br>
-                • Storage: 100M entities × 2KB = 200GB raw → ~$400/month on managed SSD<br>
-                • Bandwidth: 17,400 × 1KB avg response ≈ 17 MB/s → ~140 Mbps peak<br>
-                <strong>Conclusion:</strong> This forces a distributed cache layer and at least 3 app server instances.
+            <!-- Progress Indicator -->
+            <div class="progress-bar">
+                <span style="font-size:0.8rem;">📖</span>
+                <div class="progress-fill"><div class="progress-fill-inner"></div></div>
+                <span class="progress-text">2/57</span>
             </div>
 
-            <h2>❓ Clarifying Questions (The 5-Question Framework)</h2>
-            <p><strong>Q1:</strong> "Is read latency more critical than consistency, or would you rather guarantee no stale reads even at the cost of 50ms additional latency?"<br><em>WHY:</em> Determines CP vs AP for data layer. <em>ASSUMPTION:</em> Read latency &lt;20ms p99, eventual consistency acceptable.</p>
-            <p><strong>Q2:</strong> "Are we optimizing for a global audience with multi-region writes, or single-region read-heavy?"<br><em>WHY:</em> Multi-region writes add conflict resolution. <em>ASSUMPTION:</em> Single region, US-East.</p>
-            <p><strong>Q3:</strong> "What is the expected write/read ratio? 1:100? 1:10?"<br><em>WHY:</em> Drives caching strategy and DB sharding. <em>ASSUMPTION:</em> 1:50 read-heavy.</p>
-            <p><strong>Q4:</strong> "Any hard compliance boundaries (GDPR, data sovereignty) that constrain data location?"<br><em>WHY:</em> Blocks certain multi-region architectures. <em>ASSUMPTION:</em> No regulatory constraints.</p>
-            <p><strong>Q5:</strong> "What is the one feature that, if it fails, causes the most business impact?"<br><em>WHY:</em> Prioritizes reliability investment. <em>ASSUMPTION:</em> Core write path is critical.</p>
+            <!-- ==================== TOPIC 01 ==================== -->
+            <section id="topic-1">
+                <h1>
+                    <span class="topic-number">01</span>
+                    How to Start the Interview
+                    <span class="badge">L7 SIGNAL</span>
+                </h1>
+                <p class="subtitle"><strong>Principal signal:</strong> You define the scope rather than accept whatever the interviewer implies. The candidate who skips this step designs the wrong system every single time.</p>
 
-            <h2>📊 ASCII Diagrams</h2>
-            <h3>A) Small Scale (MVP, &lt;10K users)</h3>
-            <pre class="ascii">
+                <h2><span class="step-icon">📖</span> Step 1 — Story (Real-World Analogy)</h2>
+                <p>Imagine you're a master architect hired to design a brand-new international airport. The city council says: <em>"We need an airport."</em> A junior architect immediately starts sketching terminal gates and runway layouts. A principal architect pauses and asks: <em>"How many passengers per year? Domestic or international hub? Cargo or people? What's the budget ceiling? Are we on a swamp or solid rock?"</em></p>
+                <p>If you skip those questions, you might design a beautiful regional airport that collapses under the weight of 50 million international travelers—or a massive hub that bankrupts the city because it only services two flights a day. In software, the functional requirement ("design a URL shortener") is the airport. The non-functional constraints (scale, latency, budget, consistency) are the soil, weather, and budget. <strong>The core challenge in software is that an un-scoped design is a guaranteed failure, no matter how elegant the architecture.</strong></p>
+
+                <h2><span class="step-icon">💥</span> Step 2 — What Breaks Without It</h2>
+                <p>Without the first 60 seconds of scoping, you design a system for the wrong scale. You propose a single Postgres instance with read replicas, but the interviewer secretly assumed 500M writes per day. Your design is instantly obsolete. You mention Kafka, but the interviewer only needs 100 requests/day. You've just over-engineered yourself out of a job.</p>
+                <p><strong>Cascading failure of the interview itself:</strong> Wrong assumptions → wrong architecture → interviewer loses confidence → you start backtracking → time runs out while you defend an irrelevant design. A real production parallel: Amazon's 2021 US-EAST-1 outage happened partly because a scaling event in one subsystem wasn't scoped against the blast radius of dependent systems. Scope mismatch kills systems.</p>
+
+                <h2><span class="step-icon">🧮</span> Step 3 — Back-of-Envelope Math</h2>
+                <div class="math-block">
+                    <strong>⚡ Scope negotiation math (before drawing anything):</strong><br>
+                    • DAU estimate: 10M daily active users (reasonable FAANG assumption)<br>
+                    • Reads per user per day: ~50 → 500M reads/day<br>
+                    • Peak QPS: 500M / 86,400 × 3 (peak multiplier) ≈ <strong>17,400 QPS</strong><br>
+                    • Storage: 100M entities × 2KB = 200GB raw → ~$400/month on managed SSD<br>
+                    • Bandwidth: 17,400 × 1KB avg response ≈ 17 MB/s → ~140 Mbps peak<br>
+                    <strong>Conclusion:</strong> This forces a distributed cache layer and at least 3 app server instances. A single DB node cannot handle 17K QPS.
+                </div>
+
+                <h2><span class="step-icon">❓</span> Step 4 — Clarifying Questions (The 5-Question Framework)</h2>
+                <p><strong>Q1:</strong> "Is read latency more critical than consistency, or would you rather guarantee no stale reads even at the cost of 50ms additional latency?"<br><em>WHY:</em> Determines CP vs AP for the data layer. <em>ASSUMPTION:</em> Read latency &lt;20ms p99, eventual consistency acceptable.</p>
+                <p><strong>Q2:</strong> "Are we optimizing for a global audience with multi-region writes, or is this a single-region system with a read-heavy pattern?"<br><em>WHY:</em> Multi-region writes add conflict resolution complexity. <em>ASSUMPTION:</em> Single region, US-East.</p>
+                <p><strong>Q3:</strong> "What is the expected write/read ratio? 1:100? 1:10?"<br><em>WHY:</em> Drives caching strategy and DB sharding. <em>ASSUMPTION:</em> 1:50 read-heavy.</p>
+                <p><strong>Q4:</strong> "Are there any hard compliance boundaries (GDPR, data sovereignty) that constrain where data can reside?"<br><em>WHY:</em> Blocks certain multi-region architectures. <em>ASSUMPTION:</em> No regulatory constraints initially.</p>
+                <p><strong>Q5:</strong> "What is the one feature that, if it fails, causes the most business impact? We'll design the reliability budget around that."<br><em>WHY:</em> Prioritizes resilience investment. <em>ASSUMPTION:</em> Core write path is the critical function.</p>
+
+                <h2><span class="step-icon">📊</span> Step 5 — ASCII Diagrams</h2>
+                <h3>A) Small Scale (MVP, &lt;10K users)</h3>
+                <pre class="ascii">
 ┌──────────┐      ┌──────────────┐      ┌──────────┐
 │  Client  │─────▶│  .NET 9 API  │─────▶│  Postgres│
 │ (Browser)│      │  (single pod)│      │  (single)│
 └──────────┘      └──────────────┘      └──────────┘</pre>
-            <h3>B) Large Scale (10M+ users)</h3>
-            <pre class="ascii">
+                <h3>B) Large Scale (10M+ users)</h3>
+                <pre class="ascii">
 ┌──────────┐     ┌─────────────┐     ┌─────────────┐     ┌──────────┐
 │  Client  │────▶│  Cloud CDN  │────▶│  API Gateway│────▶│  Redis   │
 └──────────┘     └─────────────┘     │  (YARP)     │     │ (cache)  │
@@ -476,26 +709,26 @@
                                      │  App Layer  │────▶│ Postgres │
                                      │  (K8s 6 pods)│     │ (primary)│
                                      └─────────────┘     └──────────┘</pre>
-            <h3>C) Failure Scenario</h3>
-            <pre class="ascii">
+                <h3>C) Failure Scenario</h3>
+                <pre class="ascii">
 Redis cache node dies ──▶ cache miss storm ──▶ DB connection pool exhausts
 Alert: "Redis memory &gt;95% &amp; evictions &gt;100/s"
 Recovery: Circuit breaker opens → serve stale cache → failover to replica.</pre>
 
-            <h2>⚖️ Trade-offs (Decision Framework)</h2>
-            <p><strong>Option A:</strong> Full microservices from day one. <em>Pros:</em> team autonomy, independent scaling. <em>Cons:</em> 10× operational complexity. <em>Cost:</em> $12K/month. ❌</p>
-            <p><strong>Option B:</strong> Modular monolith with clear boundaries. <em>Pros:</em> simple deploy, low latency. <em>Cons:</em> limited scaling granularity. <em>Cost:</em> $3K/month. ✅</p>
-            <p><strong>Option C:</strong> Serverless functions. <em>Pros:</em> zero ops. <em>Cons:</em> cold starts, vendor lock-in. <em>Cost:</em> variable.</p>
-            <div class="callout">
-                <strong>🏆 Recommendation:</strong> Option B for now. Extract services only when two of three criteria are met: independent scaling, team boundary, or technology divergence.
-            </div>
+                <h2><span class="step-icon">⚖️</span> Step 6 — Trade-offs (Decision Framework)</h2>
+                <p><strong>Option A:</strong> Full microservices from day one. <em>Pros:</em> team autonomy, independent scaling. <em>Cons:</em> 10× operational complexity, high latency tax. <em>Cost:</em> $12K/month. ❌</p>
+                <p><strong>Option B:</strong> Modular monolith with clear boundaries. <em>Pros:</em> simple deploy, low latency. <em>Cons:</em> limited scaling granularity. <em>Cost:</em> $3K/month. ✅</p>
+                <p><strong>Option C:</strong> Serverless functions. <em>Pros:</em> zero ops. <em>Cons:</em> cold starts, vendor lock-in. <em>Cost:</em> variable.</p>
+                <div class="callout">
+                    <strong>🏆 Recommendation:</strong> Option B for now. Extract services only when two of three criteria are met: independent scaling, team boundary, or technology divergence.
+                </div>
 
-            <h2>💻 .NET 9 Code</h2>
-            <h3>a) ❌ WRONG WAY</h3>
-            <pre class="code-csharp wrong-code"><code>// ❌ No scope validation, assumes happy path
+                <h2><span class="step-icon">💻</span> Step 7 — .NET 9 Code</h2>
+                <h3>a) ❌ WRONG WAY</h3>
+                <pre class="code-csharp wrong-code"><code>// ❌ No scope validation, assumes happy path
 app.MapGet("/design", () => "Here's my perfect design!");</code></pre>
-            <h3>b) ✅ RIGHT WAY</h3>
-            <pre class="code-csharp"><code>/// &lt;summary&gt;Principal-level scope negotiation filter.&lt;/summary&gt;
+                <h3>b) ✅ RIGHT WAY</h3>
+                <pre class="code-csharp"><code>/// &lt;summary&gt;Principal-level scope negotiation filter.&lt;/summary&gt;
 public record ScopeBoundary(int MaxQps, string ConsistencyModel);
 public static class InterviewStartup {
     public static ScopeBoundary DefineScope(int dau, int readsPerUser) {
@@ -503,110 +736,119 @@ public static class InterviewStartup {
         return new ScopeBoundary(peakQps, "eventual");
     }
 }</code></pre>
-            <h3>c) Program.cs DI</h3>
-            <pre class="code-csharp"><code>// NuGet: MediatR, OpenTelemetry.Extensions.Hosting
+                <h3>c) Program.cs DI</h3>
+                <pre class="code-csharp"><code>// NuGet: MediatR, OpenTelemetry.Extensions.Hosting
 builder.Services.AddSingleton&lt;ScopeBoundary&gt;(sp =>
     InterviewStartup.DefineScope(10_000_000, 50));</code></pre>
-            <h3>d) Real Usage</h3>
-            <pre class="code-csharp"><code>app.MapGet("/scope", (ScopeBoundary scope) =>
+                <h3>d) Real Usage</h3>
+                <pre class="code-csharp"><code>app.MapGet("/scope", (ScopeBoundary scope) =>
     Results.Ok($"System designed for {scope.MaxQps} QPS"));</code></pre>
-            <h3>e) Unit Test</h3>
-            <pre class="code-csharp"><code>[Fact] public void DefineScope_ValidInput_ReturnsCorrectPeak() {
+                <h3>e) Unit Test</h3>
+                <pre class="code-csharp"><code>[Fact] public void DefineScope_ValidInput_ReturnsCorrectPeak() {
     var scope = InterviewStartup.DefineScope(10000000, 50);
     Assert.True(scope.MaxQps &gt; 15000);
 }</code></pre>
 
-            <h2>📈 Scaling Stages</h2>
-            <p><strong>Stage 1 (0→1K):</strong> Single pod, SQLite. Don't need Redis. Cost: $50/month.</p>
-            <p><strong>Stage 2 (1K→100K):</strong> Postgres, basic caching. Trigger: CPU &gt;60%. Cost: $400/month.</p>
-            <p><strong>Stage 3 (100K→10M):</strong> K8s cluster, Redis, CDN. Cost: $3,200/month.</p>
-            <p><strong>Stage 4 (10M+):</strong> Multi-region active-active. Cost: $22,000/month.</p>
+                <h2><span class="step-icon">📈</span> Step 8 — Scaling Stages</h2>
+                <p><strong>Stage 1 (0→1K):</strong> Single pod, SQLite. Don't need Redis. Cost: $50/month.</p>
+                <p><strong>Stage 2 (1K→100K):</strong> Postgres, basic caching. Trigger: CPU &gt;60%. Cost: $400/month.</p>
+                <p><strong>Stage 3 (100K→10M):</strong> K8s cluster, Redis, CDN. Cost: $3,200/month.</p>
+                <p><strong>Stage 4 (10M+):</strong> Multi-region active-active. Cost: $22,000/month.</p>
 
-            <h2>🎙️ Interview Script (Exact Words)</h2>
-            <p><strong>Opening:</strong> "Before I draw anything, I'm going to define the non-functional requirements that will drive every architectural decision. I'll state my assumptions explicitly—please stop me if any are wrong."</p>
-            <p><strong>While drawing:</strong> "I'm adding a cache here because at ~17K QPS the DB would need 4 read replicas without it, costing $2,400/month more than a Redis cluster."</p>
-            <p><strong>When stuck:</strong> "I haven't encountered this exact constraint in production, but based on the latency budget, I'd reason about it like this..."</p>
-            <div class="principal-signal">
-                🧠 <strong>Principal-level signal:</strong> "I always validate the SLO budget before picking a database. If we need 99.99% uptime, that's 52 minutes of downtime per year—Postgres with async replication can hit that without the complexity of multi-primary."
-            </div>
+                <h2><span class="step-icon">🎙️</span> Step 9 — Interview Script (Exact Words)</h2>
+                <p><strong>Opening:</strong> "Before I draw anything, I'm going to define the non-functional requirements that will drive every architectural decision. I'll state my assumptions explicitly—please stop me if any are wrong."</p>
+                <p><strong>While drawing:</strong> "I'm adding a cache here because at ~17K QPS the DB would need 4 read replicas without it, costing $2,400/month more than a Redis cluster."</p>
+                <p><strong>When stuck:</strong> "I haven't encountered this exact constraint in production, but based on the latency budget, I'd reason about it like this..."</p>
+                <div class="principal-signal">
+                    🧠 <strong>Principal-level signal:</strong> "I always validate the SLO budget before picking a database. If we need 99.99% uptime, that's 52 minutes of downtime per year—Postgres with async replication can hit that without the complexity of multi-primary."
+                </div>
 
-            <h2>🔥 Failure Modes</h2>
-            <p><strong>1. Scope Creep Death:</strong> Interviewer adds requirements silently. <em>Detection:</em> You notice contradictions. <em>Fix:</em> "Let me update my assumptions."</p>
-            <p><strong>2. Missing SLA anchor:</strong> You design without latency target. <em>Fix:</em> State p99 &lt;100ms.</p>
+                <h2><span class="step-icon">🔥</span> Step 10 — Failure Modes</h2>
+                <p><strong>1. Scope Creep Death:</strong> Interviewer adds requirements silently. <em>Detection:</em> You notice contradictions. <em>Fix:</em> "Let me update my assumptions."</p>
+                <p><strong>2. Missing SLA anchor:</strong> You design without latency target. <em>Fix:</em> State p99 &lt;100ms.</p>
 
-            <h2>💬 Follow-up Questions</h2>
-            <p><strong>Q:</strong> "Why didn't you ask about the tech stack?"<br><strong>Principal answer:</strong> "The stack is an implementation detail. I care about scale, consistency, and cost first—any modern stack can implement the architecture."</p>
+                <h2><span class="step-icon">💬</span> Step 11 — Follow-up Questions</h2>
+                <p><strong>Q:</strong> "Why didn't you ask about the tech stack?"<br><strong>Principal answer:</strong> "The stack is an implementation detail. I care about scale, consistency, and cost first—any modern stack can implement the architecture."</p>
 
-            <h2>⚓ Memory Anchor</h2>
-            <p><strong>Analogy:</strong> The airport architect who asks about soil before designing runways.</p>
-            <p><strong>Numbers:</strong> 17K QPS = peak for 10M DAU. 52 min/year = 99.99% uptime budget. 3× peak multiplier.</p>
-            <p><strong>Principal signal phrase:</strong> "I define scope by SLO budget, not by whatever the interviewer implies."</p>
+                <h2><span class="step-icon">⚓</span> Step 12 — Memory Anchor</h2>
+                <p><strong>Analogy:</strong> The airport architect who asks about soil before designing runways.</p>
+                <p><strong>Numbers:</strong> 17K QPS = peak for 10M DAU. 52 min/year = 99.99% uptime budget. 3× = peak multiplier.</p>
+                <p><strong>Principal signal phrase:</strong> "I define scope by SLO budget, not by whatever the interviewer implies."</p>
 
-            <h2>🕒 Production Reality Check</h2>
-            <p><strong>3AM Scenario:</strong> PagerDuty fires: "p99 latency &gt;2s for /api/scope". Redis eviction rate spiked because a bad deploy doubled cache key size. Memory hit 98%.</p>
-            <p><strong>First 10 minutes:</strong> Check Redis memory graph → roll back deploy → flush large keys.</p>
-            <p><strong>Leadership call:</strong> "A configuration change caused memory pressure in our caching layer, slowing down the core API. We've rolled back and are restoring performance. No data loss, full recovery in 5 minutes."</p>
-            <p><strong>Postmortem:</strong> Root cause: missing memory limit guardrail in CI/CD. Action: add automated capacity test for cache memory footprint.</p>
-            <p><strong>Permanent fix:</strong> Implement cache key size governance and automated rollback on memory threshold breach.</p>
+                <h2><span class="step-icon">🕒</span> Step 13 — Production Reality Check</h2>
+                <p><strong>3AM Scenario:</strong> PagerDuty fires: "p99 latency &gt;2s for /api/scope". Redis eviction rate spiked because a bad deploy doubled cache key size. Memory hit 98%.</p>
+                <p><strong>First 10 minutes:</strong> Check Redis memory graph → roll back deploy → flush large keys.</p>
+                <p><strong>Leadership call:</strong> "A configuration change caused memory pressure in our caching layer, slowing down the core API. We've rolled back and are restoring performance. No data loss, full recovery in 5 minutes."</p>
+                <p><strong>Postmortem:</strong> Root cause: missing memory limit guardrail in CI/CD. Action: add automated capacity test for cache memory footprint.</p>
+                <p><strong>Permanent fix:</strong> Implement cache key size governance and automated rollback on memory threshold breach.</p>
 
-            <hr>
-            <p style="color:var(--text-muted); font-size:0.85rem;">End of Topic 01 — Principal Engineer Edition</p>
-        </section>
+                <hr>
+                <p class="topic-end">End of Topic 01 — Principal Engineer Edition</p>
+            </section>
 
-        <!-- ==================== TOPIC 02 ==================== -->
-        <section id="topic-2">
-            <h1>02 · Back-of-Envelope Math <span class="badge">L7 SIGNAL</span></h1>
-            <p class="subtitle"><strong>Principal signal:</strong> You use math to ELIMINATE options, not just size components. "At this QPS, Option B costs 3× more than Option A for the same SLA — ruled out."</p>
+            <!-- ==================== TOPIC 02 ==================== -->
+            <section id="topic-2">
+                <h1>
+                    <span class="topic-number">02</span>
+                    Back-of-Envelope Math
+                    <span class="badge">L7 SIGNAL</span>
+                </h1>
+                <p class="subtitle"><strong>Principal signal:</strong> You use math to ELIMINATE options, not just size components. "At this QPS, Option B costs 3× more than Option A for the same SLA — ruled out."</p>
 
-            <h2>📖 Story (Real-World Analogy)</h2>
-            <p>You're planning a massive wedding for 500 guests. A junior planner says: "Let's order cake!" A principal planner grabs a napkin and calculates: 500 guests × 1.5 slices per person = 750 slices. Each tier feeds 50 slices = 15 tiers minimum. The venue kitchen can only refrigerate 10 tiers. Without this math, you either run out of cake (angry guests) or order 30 tiers (bankrupt couple, wasted food).</p>
-            <p><strong>The core challenge in software is that intuition about scale is almost always wrong — math is the only truth-teller.</strong></p>
+                <h2><span class="step-icon">📖</span> Step 1 — Story (Real-World Analogy)</h2>
+                <p>You're planning a massive wedding for 500 guests. A junior planner says: "Let's order cake!" A principal planner grabs a napkin and calculates: 500 guests × 1.5 slices per person = 750 slices. Each tier feeds 50 slices = 15 tiers minimum. The venue kitchen can only refrigerate 10 tiers. Without this math, you either run out of cake (angry guests) or order 30 tiers (bankrupt couple, wasted food).</p>
+                <p>In software, the napkin math is the back-of-envelope calculation. It tells you whether your architecture can physically fit the problem before you write a single line of code. <strong>The core challenge in software is that intuition about scale is almost always wrong — math is the only truth-teller.</strong></p>
 
-            <h2>💥 What Breaks Without It</h2>
-            <p>Without envelope math, you design a system that looks beautiful on a whiteboard but melts at 1% of production traffic. You choose MongoDB because "it scales horizontally" — but your 50TB dataset doesn't fit in RAM, and without proper shard key math, one node melts while others idle.</p>
-            <p><strong>Cascading failure:</strong> Wrong capacity estimate → insufficient instances → connection pool exhaustion → cascading timeouts → outage. Real example: the 2012 Obama campaign's AWS migration underestimated peak donation traffic by 7× — one Oprah tweet drove 50,000 concurrent donations that crushed their payment pipeline.</p>
+                <h2><span class="step-icon">💥</span> Step 2 — What Breaks Without It</h2>
+                <p>Without envelope math, you design a system that looks beautiful on a whiteboard but melts at 1% of production traffic. You choose MongoDB because "it scales horizontally" — but your 50TB dataset doesn't fit in RAM, and without proper shard key math, one node melts while others idle. You provision 4 app servers for what actually needs 40. Your p99 latency hits 8 seconds on launch day.</p>
+                <p><strong>Cascading failure:</strong> Wrong capacity estimate → insufficient instances → connection pool exhaustion → cascading timeouts → outage. A real example: the 2012 Obama campaign's AWS migration underestimated peak donation traffic by 7×. Their envelope math missed the "celebrity endorsement multiplier" — one Oprah tweet drove 50,000 concurrent donations that crushed their payment pipeline.</p>
 
-            <h2>🧮 Back-of-Envelope Math (The Full Pipeline)</h2>
-            <div class="math-block">
-                <strong>📐 Standard Estimation Pipeline:</strong><br>
-                <strong>Step 1 — DAU to QPS:</strong><br>
-                • 100M monthly active users → ~3.3M DAU (3% daily active rate)<br>
-                • 3.3M users × 20 actions/day = 66M requests/day<br>
-                • 66M / 86,400 seconds = <strong>764 avg QPS</strong><br>
-                • × 3 peak multiplier = <strong>2,292 peak QPS</strong><br><br>
-                <strong>Step 2 — Storage:</strong><br>
-                • 500M records × 2KB avg size = <strong>1TB raw data</strong><br>
-                • × 3 (replication) = 3TB total<br>
-                • × 1.5 (indexes, WAL) = <strong>4.5TB provisioned</strong><br>
-                • ~$1,200/month managed Postgres SSD<br><br>
-                <strong>Step 3 — Bandwidth:</strong><br>
-                • 2,292 peak QPS × 5KB avg response = 11.5 MB/s ≈ <strong>92 Mbps</strong><br>
-                • ~$890/month data transfer costs<br><br>
-                <strong>Step 4 — Server Count:</strong><br>
-                • 2,292 QPS ÷ 500 QPS per .NET 9 pod = <strong>5 pods minimum</strong><br>
-                • + 2 for redundancy = <strong>7 pods</strong><br>
-                • ~$403/month compute<br><br>
-                <strong>💡 Surprising:</strong> Data transfer ($890) exceeds compute ($403). <strong>Total: ~$2,493/month.</strong>
-            </div>
+                <h2><span class="step-icon">🧮</span> Step 3 — Back-of-Envelope Math (The Full Pipeline)</h2>
+                <div class="math-block">
+                    <strong>📐 Standard Estimation Pipeline:</strong><br>
+                    <strong>Step 1 — DAU to QPS:</strong><br>
+                    • 100M monthly active users → ~3.3M DAU (3% daily active rate)<br>
+                    • 3.3M users × 20 actions/day = 66M requests/day<br>
+                    • 66M / 86,400 seconds = <strong>764 avg QPS</strong><br>
+                    • × 3 peak multiplier = <strong>2,292 peak QPS</strong><br><br>
+                    
+                    <strong>Step 2 — Storage:</strong><br>
+                    • 500M records × 2KB avg size = <strong>1TB raw data</strong><br>
+                    • × 3 (replication factor) = 3TB total<br>
+                    • × 1.5 (indexes, WAL, overhead) = <strong>4.5TB provisioned</strong><br>
+                    • 4.5TB managed Postgres SSD ≈ $1,200/month<br><br>
+                    
+                    <strong>Step 3 — Bandwidth:</strong><br>
+                    • 2,292 peak QPS × 5KB avg response = 11.5 MB/s ≈ <strong>92 Mbps</strong><br>
+                    • AWS egress to internet: 92 Mbps × $0.09/GB after free tier<br>
+                    • ~$890/month in data transfer costs<br><br>
+                    
+                    <strong>Step 4 — Server Count:</strong><br>
+                    • 2,292 QPS ÷ 500 QPS per .NET 9 pod (conservative) = <strong>5 pods minimum</strong><br>
+                    • + 2 for redundancy during rolling deploy = <strong>7 pods</strong><br>
+                    • 7 pods × 2 vCPU × $0.04/hr = ~$403/month compute<br><br>
+                    
+                    <strong>💡 Surprising Number:</strong> Data transfer costs ($890) exceed compute costs ($403). Most juniors optimize compute and completely miss the egress bill. <strong>This architecture costs ~$2,493/month at steady state.</strong>
+                </div>
 
-            <h2>❓ Clarifying Questions</h2>
-            <p><strong>Q1:</strong> "Is the 3× peak multiplier sufficient, or do we expect flash-crowd events (10× surge)?"<br><em>WHY:</em> 10× surge requires auto-scaling buffer. <em>ASSUMPTION:</em> 3× daily peak.</p>
-            <p><strong>Q2:</strong> "What's the read-to-write ratio? 100:1 means caching saves 99% of DB hits."<br><em>WHY:</em> Determines Redis ROI. <em>ASSUMPTION:</em> 50:1 read-heavy.</p>
-            <p><strong>Q3:</strong> "What is the acceptable data staleness window? 1 second? 5 minutes?"<br><em>WHY:</em> Long TTLs reduce DB load. <em>ASSUMPTION:</em> 30-second staleness acceptable.</p>
-            <p><strong>Q4:</strong> "Do we need full-text search?"<br><em>WHY:</em> Full-text requires Elasticsearch, adding $500+/month. <em>ASSUMPTION:</em> Exact match only.</p>
-            <p><strong>Q5:</strong> "What's the retention policy for logs?"<br><em>WHY:</em> Observability storage often exceeds app storage. <em>ASSUMPTION:</em> 30-day retention, 50GB/day.</p>
+                <h2><span class="step-icon">❓</span> Step 4 — Clarifying Questions</h2>
+                <p><strong>Q1:</strong> "Is the 3× peak multiplier sufficient, or do we expect flash-crowd events (10× surge) from marketing campaigns or breaking news?"<br><em>WHY:</em> 10× surge requires auto-scaling buffer or queue-based smoothing. <em>ASSUMPTION:</em> 3× daily peak, no flash crowds.</p>
+                <p><strong>Q2:</strong> "What's the read-to-write ratio? A 100:1 ratio means caching saves 99% of DB hits; a 1:1 ratio means caching adds cost without benefit."<br><em>WHY:</em> Determines whether Redis is net-positive or net-negative ROI. <em>ASSUMPTION:</em> 50:1 read-heavy.</p>
+                <p><strong>Q3:</strong> "What is the acceptable data staleness window? 1 second? 5 minutes? This changes whether we can cache aggressively."<br><em>WHY:</em> Long TTLs reduce DB load but may serve stale data. <em>ASSUMPTION:</em> 30-second staleness acceptable.</p>
+                <p><strong>Q4:</strong> "Do we need full-text search, or are exact-match and prefix queries sufficient? Full-text changes the storage engine math entirely."<br><em>WHY:</em> Full-text requires Elasticsearch/OpenSearch, adding $500+/month. <em>ASSUMPTION:</em> Exact match only.</p>
+                <p><strong>Q5:</strong> "What's the retention policy? 90 days of logs at 1TB/day is very different from 7 days at 10GB/day for the observability budget."<br><em>WHY:</em> Observability storage often exceeds application storage. <em>ASSUMPTION:</em> 30-day retention, 50GB/day.</p>
 
-            <h2>📊 ASCII Diagrams</h2>
-            <h3>A) Small Scale (Startup MVP)</h3>
-            <pre class="ascii">
+                <h2><span class="step-icon">📊</span> Step 5 — ASCII Diagrams</h2>
+                <h3>A) Small Scale (Startup MVP)</h3>
+                <pre class="ascii">
 ┌──────────┐      ┌──────────────┐      ┌──────────┐
 │  Users   │─────▶│  1 App Pod   │─────▶│ 1 DB Node│
 │  (1K DAU)│      │  (500 QPS)   │      │ (Postgres│
 └──────────┘      └──────────────┘      │  50GB)   │
                                         └──────────┘
 Monthly cost: ~$50 — no cache, no CDN needed</pre>
-            <h3>B) Large Scale (10M+ DAU)</h3>
-            <pre class="ascii">
+                <h3>B) Large Scale (10M+ DAU)</h3>
+                <pre class="ascii">
 ┌──────────┐     ┌─────────────┐     ┌──────────────┐
 │  Users   │────▶│  CloudFront  │────▶│  YARP GW ×2  │
 │ 10M DAU  │     │  (CDN 95% HR)│     │  (2.3K QPS)  │
@@ -625,9 +867,9 @@ Monthly cost: ~$50 — no cache, no CDN needed</pre>
                                  │  + 2 Read Replicas│
                                  │  4.5TB SSD        │
                                  └───────────────────┘
-Monthly cost: ~$2,500</pre>
-            <h3>C) Failure Scenario — Cache Stampede</h3>
-            <pre class="ascii">
+Monthly cost: ~$2,500 — Redis $400, DB $1,200, Compute $400, CDN $500</pre>
+                <h3>C) Failure Scenario — Cache Stampede</h3>
+                <pre class="ascii">
 Redis node fails → 90% cache miss → 2.3K QPS hit DB directly
 → DB max connections: 500 → 2,300 concurrent arriving
 → Connection pool exhausted in 3 seconds → HTTP 502 cascade
@@ -636,21 +878,27 @@ Alert: "redis_cache_hit_ratio &lt;50% for 30s"
 Detection: p99 latency jumps from 12ms → 8,000ms
 Mitigation: Circuit breaker opens → serve degraded responses</pre>
 
-            <h2>⚖️ Trade-offs (Decision Framework)</h2>
-            <p><strong>Option A — Over-provision:</strong> 20 pods, 5 DB replicas. $8,000/month. 70% idle.</p>
-            <p><strong>Option B — Math-Driven:</strong> 7 pods, 1 primary+2 replicas. $2,500/month. 60% utilization.</p>
-            <p><strong>Option C — Serverless:</strong> Lambda+Aurora. $4,200/month. Cold starts.</p>
-            <div class="callout">
-                <strong>🏆 Recommendation:</strong> Option B. Over-provisioning $5,500/month of idle capacity is architecturally lazy — it signals you didn't do the math.
-            </div>
+                <h2><span class="step-icon">⚖️</span> Step 6 — Trade-offs (Decision Framework)</h2>
+                <p><strong>Option A — Over-provision Everything:</strong> 20 pods, 5 DB replicas, Redis cluster, CDN. <br><em>Pros:</em> Handles 10× spikes, simple capacity planning. <em>Cons:</em> $8,000/month, 70% idle resources. <em>Best for:</em> Unpredictable traffic, unlimited budget.</p>
+                <p><strong>Option B — Math-Driven Right-Sizing:</strong> 7 pods, 1 primary + 2 replicas, Redis, CDN. <br><em>Pros:</em> $2,500/month, 60% utilization target, clear scaling triggers. <em>Cons:</em> Requires accurate math, risks under-provisioning if estimates wrong. <em>Best for:</em> Predictable traffic, cost-constrained.</p>
+                <p><strong>Option C — Serverless / Fully Managed:</strong> AWS Lambda + Aurora Serverless + CloudFront. <br><em>Pros:</em> Auto-scales to zero, no capacity math needed. <em>Cons:</em> Cold starts, $4,200/month at this scale, vendor lock-in. <em>Best for:</em> Bursty, low-average traffic.</p>
+                <div class="callout">
+                    <strong>🏆 Recommendation:</strong> Option B for this context. The math shows we need ~7 pods and a cache hit ratio above 85%. If traffic is unpredictable (variance > 5× daily), switch to Option C. <strong>Principal justification:</strong> Over-provisioning $5,500/month of idle capacity is architecturally lazy — it signals you didn't do the math.
+                </div>
 
-            <h2>💻 .NET 9 Code</h2>
-            <h3>a) ❌ WRONG WAY</h3>
-            <pre class="code-csharp wrong-code"><code>// ❌ Hardcoded limits without calculation — breaks at any scale change
+                <h2><span class="step-icon">💻</span> Step 7 — .NET 9 Code</h2>
+                <h3>a) ❌ WRONG WAY — No Envelope Math</h3>
+                <pre class="code-csharp wrong-code"><code>// ❌ Hardcoded limits without any calculation — breaks at any scale change
 var maxConnections = 100; // Why 100? No reason.
-var cacheTtl = TimeSpan.FromMinutes(5); // Why 5? Guessing.</code></pre>
-            <h3>b) ✅ RIGHT WAY</h3>
-            <pre class="code-csharp"><code>/// &lt;summary&gt;Capacity plan derived from back-of-envelope math.&lt;/summary&gt;
+var cacheTtl = TimeSpan.FromMinutes(5); // Why 5? Guessing.
+// This breaks because: at 2.3K QPS with 100 connections, average query must
+// complete in 43ms or less. If any query takes 100ms, queue depth explodes.</code></pre>
+                <h3>b) ✅ RIGHT WAY — Math-Driven Configuration</h3>
+                <pre class="code-csharp"><code>/// &lt;summary&gt;
+/// Capacity plan derived from back-of-envelope math.
+/// Peak QPS: 2,292 | DB capacity: 500 concurrent connections.
+/// Required cache hit ratio: ≥85% to keep DB safe.
+/// &lt;/summary&gt;
 public sealed record CapacityPlan
 {
     public int PeakQps { get; init; }
@@ -658,20 +906,26 @@ public sealed record CapacityPlan
     public double RequiredCacheHitRatio { get; init; }
     public int PodCount { get; init; }
 
-    public int ConnectionsPerPod =&gt; (int)(DbMaxConnections * 0.8 / PodCount);
-    public bool IsDbSafe(double actualCacheHitRatio) =&gt;
-        PeakQps * (1 - actualCacheHitRatio) &lt;= DbMaxConnections * 0.7;
+    /// &lt;summary&gt;Calculates safe connection pool size per pod.&lt;/summary&gt;
+    public int ConnectionsPerPod => (int)(DbMaxConnections * 0.8 / PodCount);
+    
+    /// &lt;summary&gt;Validates whether current cache hit ratio keeps DB safe.&lt;/summary&gt;
+    public bool IsDbSafe(double actualCacheHitRatio) =>
+        PeakQps * (1 - actualCacheHitRatio) <= DbMaxConnections * 0.7;
 }
 
 public static class CapacityPlanner
 {
+    /// &lt;summary&gt;Generates capacity plan from DAU and usage estimates.&lt;/summary&gt;
     public static CapacityPlan FromDau(int dailyActiveUsers, int actionsPerUser)
     {
         int totalDailyRequests = dailyActiveUsers * actionsPerUser;
         int avgQps = totalDailyRequests / 86_400;
-        int peakQps = avgQps * 3;
-        int podCount = (int)Math.Ceiling(peakQps / 500.0) + 2;
-        int dbMaxConnections = 500;
+        int peakQps = avgQps * 3; // 3× peak multiplier
+        
+        int podCount = (int)Math.Ceiling(peakQps / 500.0) + 2; // +2 for redundancy
+        int dbMaxConnections = 500; // Postgres default with connection pooling
+        
         return new CapacityPlan
         {
             PeakQps = peakQps,
@@ -681,81 +935,156 @@ public static class CapacityPlanner
         };
     }
 }</code></pre>
-            <h3>c) Program.cs DI</h3>
-            <pre class="code-csharp"><code>builder.Services.AddSingleton(sp =&gt; {
+                <h3>c) Program.cs — DI Registration</h3>
+                <pre class="code-csharp"><code>// NuGet packages: Microsoft.Extensions.DependencyInjection
+// Register capacity plan as a singleton — calculated once at startup
+builder.Services.AddSingleton(sp =>
+{
+    // Read from config with fallback to calculated defaults
     int dau = builder.Configuration.GetValue&lt;int&gt;("Capacity:DailyActiveUsers", 3_300_000);
     int actions = builder.Configuration.GetValue&lt;int&gt;("Capacity:ActionsPerUser", 20);
+    
     var plan = CapacityPlanner.FromDau(dau, actions);
+    
+    // Log the plan so it's visible in startup logs — critical for debugging
     var logger = sp.GetRequiredService&lt;ILogger&lt;CapacityPlan&gt;&gt;();
-    logger.LogInformation("Capacity plan: PeakQps={PeakQps}, Pods={Pods}", plan.PeakQps, plan.PodCount);
+    logger.LogInformation(
+        "Capacity plan loaded: PeakQps={PeakQps}, Pods={Pods}, RequiredCacheHR={CacheHR:P2}",
+        plan.PeakQps, plan.PodCount, plan.RequiredCacheHitRatio);
+    
     return plan;
-});</code></pre>
-            <h3>d) Real Usage</h3>
-            <pre class="code-csharp"><code>[HttpGet]
-public async Task&lt;IActionResult&gt; Search(string query)
+});
+
+// Register a health check that validates actual vs planned capacity
+builder.Services.AddHealthChecks()
+    .AddCheck&lt;CapacityHealthCheck&gt;("capacity_plan");</code></pre>
+                <h3>d) REAL USAGE — Controller with Capacity-Aware Logic</h3>
+                <pre class="code-csharp"><code>[ApiController]
+[Route("api/[controller]")]
+public class SearchController : ControllerBase
 {
-    double currentHitRatio = await _metrics.GetCacheHitRatioAsync();
-    if (!_capacity.IsDbSafe(currentHitRatio))
+    private readonly CapacityPlan _capacity;
+    private readonly IMetricsService _metrics;
+    private readonly ILogger&lt;SearchController&gt; _logger;
+
+    public SearchController(CapacityPlan capacity, IMetricsService metrics, ILogger&lt;SearchController&gt; logger)
     {
-        _logger.LogWarning("DB safety threshold breached. HR: {HR:P2}", currentHitRatio);
-        return StatusCode(503, new { Message = "Service degraded — retry with backoff." });
+        _capacity = capacity;
+        _metrics = metrics;
+        _logger = logger;
     }
-    return Ok(await ExecuteSearchAsync(query));
+
+    [HttpGet]
+    public async Task&lt;IActionResult&gt; Search(string query)
+    {
+        // Check if DB would be safe at current cache hit ratio
+        double currentHitRatio = await _metrics.GetCacheHitRatioAsync();
+        
+        if (!_capacity.IsDbSafe(currentHitRatio))
+        {
+            _logger.LogWarning(
+                "DB safety threshold breached. Current HR: {HR:P2}, Required: {Req:P2}",
+                currentHitRatio, _capacity.RequiredCacheHitRatio);
+            
+            // Circuit breaker should already be open, but this is defense-in-depth
+            return StatusCode(503, new { 
+                Message = "Service degraded — high load. Retry with exponential backoff.",
+                RetryAfterSeconds = 5 
+            });
+        }
+        
+        // Happy path: DB is safe, proceed with query
+        return Ok(await ExecuteSearchAsync(query));
+    }
 }</code></pre>
-            <h3>e) Unit Test</h3>
-            <pre class="code-csharp"><code>[Fact] public void FromDau_3MillionUsers_CalculatesCorrectPodCount()
+                <h3>e) UNIT TEST — Verifying Math Correctness</h3>
+                <pre class="code-csharp"><code>public class CapacityPlannerTests
 {
-    var plan = CapacityPlanner.FromDau(3_300_000, 20);
-    Assert.Equal(2292, plan.PeakQps);
-    Assert.Equal(7, plan.PodCount);
-    Assert.True(plan.RequiredCacheHitRatio &gt; 0.80);
-}
-[Fact] public void IsDbSafe_WhenCacheHitRatioBelowRequired_ReturnsFalse()
-{
-    var plan = CapacityPlanner.FromDau(3_300_000, 20);
-    Assert.False(plan.IsDbSafe(plan.RequiredCacheHitRatio - 0.10));
+    [Fact]
+    public void FromDau_3MillionUsers_CalculatesCorrectPodCount()
+    {
+        // Arrange: 3.3M DAU, 20 actions/user/day
+        // Expected: 3.3M × 20 = 66M requests/day
+        // 66M / 86400 = 764 avg QPS × 3 peak = 2,292 peak
+        // 2292 / 500 = 4.58 → 5 pods + 2 redundancy = 7 pods
+        
+        var plan = CapacityPlanner.FromDau(3_300_000, 20);
+        
+        Assert.Equal(2292, plan.PeakQps);
+        Assert.Equal(7, plan.PodCount);
+        Assert.True(plan.RequiredCacheHitRatio > 0.80, 
+            "Cache hit ratio must exceed 80% to protect DB");
+    }
+    
+    [Fact]
+    public void IsDbSafe_WhenCacheHitRatioBelowRequired_ReturnsFalse()
+    {
+        var plan = CapacityPlanner.FromDau(3_300_000, 20);
+        double insufficientHitRatio = plan.RequiredCacheHitRatio - 0.10;
+        
+        Assert.False(plan.IsDbSafe(insufficientHitRatio));
+    }
+    
+    [Fact]
+    public void ConnectionsPerPod_NeverExceedsMaxConnections()
+    {
+        var plan = CapacityPlanner.FromDau(3_300_000, 20);
+        int totalConnections = plan.ConnectionsPerPod * plan.PodCount;
+        
+        Assert.True(totalConnections <= plan.DbMaxConnections * 0.8,
+            $"Total connections {totalConnections} exceeds 80% of max {plan.DbMaxConnections}");
+    }
 }</code></pre>
 
-            <h2>📈 Scaling Stages</h2>
-            <p><strong>Stage 1 (0→1K):</strong> No envelope math needed. 1 pod, 1 DB. Cost: $50/month.</p>
-            <p><strong>Stage 2 (1K→100K):</strong> Math becomes necessary. Add read replica at 70% DB CPU. Cost: $400/month.</p>
-            <p><strong>Stage 3 (100K→10M):</strong> Redis cluster, CDN, 7+ pods. Cost: $2,500/month.</p>
-            <p><strong>Stage 4 (10M+):</strong> Sharding required. The surprising thing that breaks: data transfer costs exceed compute by 3×.</p>
+                <h2><span class="step-icon">📈</span> Step 8 — Scaling Stages</h2>
+                <p><strong>Stage 1 (0→1K users):</strong> No envelope math needed. 1 pod, 1 DB. Cost: $50/month. <em>Breaks first:</em> DB I/O saturation at ~200 QPS.</p>
+                <p><strong>Stage 2 (1K→100K users):</strong> Math becomes necessary. Add read replica at 70% DB CPU. Trigger: avg QPS > 300. Cost: $400/month.</p>
+                <p><strong>Stage 3 (100K→10M users):</strong> Redis cluster, CDN, 7+ pods. Math must be reviewed weekly. Trigger: p99 latency > 50ms. Cost: $2,500/month.</p>
+                <p><strong>Stage 4 (10M+ users):</strong> Sharding required. Envelope math now includes cross-shard query cost estimation. The surprising thing that breaks: data transfer costs exceed compute costs by 3×. Nobody budgets for egress.</p>
 
-            <h2>🎙️ Interview Script (Exact Words)</h2>
-            <p><strong>Opening:</strong> "Before I propose any architecture, I need to run the numbers. Can we agree on 10M DAU as a baseline? I'll use 3× peak multiplier unless you have a different spike pattern in mind."</p>
-            <p><strong>While drawing:</strong> "I'm sizing the cache cluster based on the math: at 2,300 peak QPS and 500 DB connections, I need 85% cache hit ratio minimum."</p>
-            <div class="principal-signal">
-                🧠 <strong>Principal-level signal:</strong> "I always calculate the <em>cost crossover point</em> where managed services become cheaper than self-managed. At ~$2,500/month, managed Postgres is cheaper than the engineering hours to patch our own instance."
-            </div>
-            <p><strong>Closing:</strong> "To summarize: 2.3K peak QPS, 50:1 read ratio → 7 pods, Redis with 85%+ hit ratio, 3 DB nodes. Total ~$2,500/month. Biggest risk: cache stampede."</p>
+                <h2><span class="step-icon">🎙️</span> Step 9 — Interview Script (Exact Words)</h2>
+                <p><strong>Opening:</strong> "Before I propose any architecture, I need to run the numbers. Can we agree on 10M DAU as a baseline? I'll use 3× peak multiplier unless you have a different spike pattern in mind."</p>
+                <p><strong>While drawing:</strong> "I'm sizing the cache cluster based on the math: at 2,300 peak QPS and 500 DB connections, I need 85% cache hit ratio minimum. Redis costs $400/month; the alternative is 3 more DB replicas at $900/month — cache is the right financial call."</p>
+                <p><strong>When asked "Why 3× peak multiplier?":</strong> "It's a standard assumption from Google's SRE book — daily traffic follows a sinusoidal pattern with peaks ~3× average. But I'm happy to use a different multiplier if you have production data showing a different pattern."</p>
+                <p><strong>When stuck:</strong> "I don't have the exact cost per GB for this cloud provider memorized, but I know it's roughly $0.09/GB for egress. Let me proceed with that estimate — we can plug in exact numbers later."</p>
+                <div class="principal-signal">
+                    🧠 <strong>Principal-level signal:</strong> "I always calculate the <em>cost crossover point</em> where managed services become cheaper than self-managed. At ~$2,500/month, managed Postgres is actually cheaper than the engineering hours to patch and monitor our own instance. Below $500/month, self-managed wins."
+                </div>
+                <p><strong>Closing:</strong> "To summarize: at 2.3K peak QPS with a 50:1 read ratio, the math shows we need 7 pods, Redis with 85%+ hit ratio, and 3 DB nodes. Total run rate ~$2,500/month. The biggest risk is cache stampede — I'd add circuit breakers and request collapsing. If I had more time, I'd model the cost at 100M DAU where we'd need sharding."</p>
 
-            <h2>🔥 Failure Modes</h2>
-            <p><strong>1. Underestimated Peak:</strong> Marketing drives 7× traffic. Detection: QPS exceeds plan by 2× for 5min. Fix: Manual scale + queue.</p>
-            <p><strong>2. Data Transfer Surprise:</strong> Cloud bill $12K instead of $2.5K. Fix: Enable compression, review CDN TTLs.</p>
-            <p><strong>3. Cache Hit Ratio Cliff:</strong> TTL 5min but data changes every 2min. Fix: Reduce TTL, write-through caching.</p>
-            <p><strong>4. Connection Pool Starvation:</strong> EF Core default MaxPoolSize not set. Fix: Explicit MaxPoolSize from CapacityPlan.</p>
-            <p><strong>5. Forgot Observability Storage:</strong> 50GB/day logs = $800/month surprise. Fix: Sampling, 14-day retention.</p>
+                <h2><span class="step-icon">🔥</span> Step 10 — Failure Modes</h2>
+                <p><strong>1. "The Ghost of Christmas Past" — Underestimated Peak:</strong><br><em>Scenario:</em> Marketing campaign drives 7× normal traffic. Your 3× peak math is wrong. <em>Detection:</em> "app_qps" metric exceeds planned peak by 2× for 5 minutes. <em>Impact:</em> Connection pool exhaustion, 50% of requests get HTTP 503. <em>Fix:</em> Manually scale pods to 3× current count. Add queue to absorb burst. <em>Prevention:</em> Auto-scale on QPS metric with 2-minute warm-up buffer. Use load shedding above 150% planned peak. <em>Real example:</em> HBO Max launch day — underestimated demand by 4×, crashed for 40% of users.</p>
+                <p><strong>2. "The Leaking Bucket" — Data Transfer Cost Surprise:</strong><br><em>Scenario:</em> Cloud bill arrives: $12,000 instead of expected $2,500. Egress to CDN wasn't calculated. <em>Detection:</em> AWS Cost Explorer shows DataTransfer-Out-Bytes spike. <em>Impact:</em> Budget overrun, emergency cost optimization meeting. <em>Fix:</em> Enable compression (gzip/brotli). Review CDN cache TTLs. <em>Prevention:</em> Include egress in envelope math from day one. Budget alert at 80% of monthly egress estimate.</p>
+                <p><strong>3. "Cache Hit Ratio Cliff" — Wrong TTL Kills Math:</strong><br><em>Scenario:</em> TTL set to 5 minutes, but data changes every 2 minutes. Actual hit ratio: 20%, not 85%. <em>Detection:</em> "redis_cache_hit_ratio" gauge drops below 50% for 10 minutes. <em>Impact:</em> DB load 5× higher than planned, p99 latency from 12ms → 800ms. <em>Fix:</em> Reduce TTL. Implement write-through caching for frequently updated data. <em>Prevention:</em> Monitor cache hit ratio per endpoint. Auto-tune TTL based on observed data change frequency.</p>
+                <p><strong>4. "Connection Pool Starvation" — Pod Count ÷ Connection Math Error:</strong><br><em>Scenario:</em> 7 pods × 71 connections each = 497 total. But EF Core default MaxPoolSize is 128 — pods are over-allocated. <em>Detection:</em> "db_pool_wait_count" > 0 for 30 consecutive seconds. <em>Impact:</em> Requests queued waiting for DB connection, timeout at 30s, HTTP 504. <em>Fix:</em> Set MaxPoolSize = ConnectionsPerPod explicitly in connection string. <em>Prevention:</em> Connection pool configuration must be derived from CapacityPlan, not left at defaults.</p>
+                <p><strong>5. "The Missing Dimension" — Forgot Observability Storage:</strong><br><em>Scenario:</em> Math covered app and DB, but 50GB/day of logs + metrics + traces = 1.5TB/month Loki/Prometheus storage. <em>Detection:</em> Observability bill arrives at $800/month, wasn't in the $2,500 budget. <em>Impact:</em> 32% budget overrun on observability alone. <em>Fix:</em> Implement sampling (10% successful traces, 100% errors). Set retention to 14 days. <em>Prevention:</em> Observability is a first-class cost dimension in envelope math, not an afterthought.</p>
 
-            <h2>💬 Follow-up Questions</h2>
-            <p><strong>Q:</strong> "Your math assumes uniform traffic. What if 90% of traffic hits 1% of endpoints?"<br><strong>Principal:</strong> "Pareto distribution changes everything. I'd cache ~20 hot keys aggressively — 2MB of Redis. The cold tail still needs DB planning. This actually <em>reduces</em> Redis cost from $400 to $50/month."</p>
+                <h2><span class="step-icon">💬</span> Step 11 — Follow-up Questions</h2>
+                <p><strong>Q1: "Your math assumes uniform traffic. What if 90% of traffic hits 1% of endpoints?"</strong><br><em>Bad answer:</em> "I'll add more pods."<br><em>Good answer:</em> "I'd identify the hot endpoints and apply per-endpoint caching with different TTLs."<br><em>Principal answer:</em> "The Pareto distribution changes my math entirely. If 90% of 2.3K QPS hits 1% of endpoints, I only need to cache ~20 hot keys aggressively — that's 2MB of Redis memory. But the remaining 230 QPS on the long tail still needs DB capacity planning. I'd model this as two separate systems: a tiny hot cache and a cold path. This actually <em>reduces</em> my Redis cost from $400 to $50/month because I don't need a large cluster."</p>
+                <p><strong>Q2: "How do you validate your envelope math before launch?"</strong><br><em>Bad answer:</em> "I trust the calculations."<br><em>Good answer:</em> "Load test at 2× planned peak and observe behavior."<br><em>Principal answer:</em> "I run a three-phase validation: (1) unit tests on the capacity planner itself — the math must be provably correct; (2) load test at 1×, 2×, and 3× planned peak with production-like data shapes — not just synthetic uniform data; (3) a chaos experiment where I disable the cache and verify that the circuit breaker activates before the DB melts. I also track the <em>actual</em> QPS-to-DB-connection ratio in production for the first week and auto-tune the plan. Most importantly, I set a burn-rate alert: if the actual/planned QPS ratio deviates by more than 30% for 24 hours, the plan is invalid and needs recalibration."</p>
+                <p><strong>Q3: "Your math says 7 pods. Why not 6 or 8?"</strong><br><em>Bad answer:</em> "The formula gave 7."<br><em>Good answer:</em> "7 gives us N+2 redundancy — we can lose 2 pods during a rolling deploy and still serve peak."<br><em>Principal answer:</em> "7 is the output of the formula, but the decision has nuance. 6 pods would handle peak at 382 QPS each if perfectly balanced — but with real-world load balancer imbalance (up to 20% skew), one pod could hit 458 QPS, exceeding the 500 QPS ceiling. 8 pods would give more headroom but cost $58/month more. At our scale, the $58 is worth the safety margin. So actually, I'd <em>revise</em> the plan to 8 pods and note that the formula is conservative by design. The real signal is the <em>sensitivity analysis</em> — which input changes would shift the pod count, and by how much."</p>
+                <p><strong>Q4: "What's the biggest risk in your math?"</strong><br><em>Bad answer:</em> "The DB might be slow."<br><em>Good answer:</em> "The cache hit ratio assumption — if it's wrong, everything cascades."<br><em>Principal answer:</em> "The biggest risk is the <em>unknown unknown</em>: an access pattern I didn't model. For example, if users start doing full-text search with wildcards, every query hits the DB because Redis can't cache pattern matches. My math assumed exact-match queries with predictable caching. I mitigate this by instrumenting per-endpoint cache hit ratios and setting an alert when any endpoint drops below 50% hit ratio for 10 minutes — that's my leading indicator that reality has diverged from my model. The secondary risk is the 3× peak multiplier — if it's actually 8× due to a viral event, my pod count is off by a factor of 2.6."</p>
+                <p><strong>Q5: "How does your envelope math change for a write-heavy system?"</strong><br><em>Bad answer:</em> "I'd add more DB replicas."<br><em>Good answer:</em> "Replicas don't help writes — I'd need sharding or a write-optimized DB."<br><em>Principal answer:</em> "For write-heavy (1:1 read:write), caching becomes almost useless — the cache hit ratio is inherently low because data changes between reads. My math shifts from 'cache to protect DB' to 'partition writes to scale DB.' At 2.3K writes/sec, a single Postgres node can handle ~2K writes/sec before I/O saturation. I'm right at the threshold, so I'd plan for sharding on day one, not as an afterthought. The cost model flips: instead of $400 Redis + $1,200 DB, I'm looking at $2,800 for a sharded DB cluster (4 shards × $700). I'd also evaluate whether a write-optimized engine like Cassandra saves money — at 2.3K writes/sec, Cassandra would be $1,600/month with lower operational burden for write scaling."</p>
+                <p><strong>Q6 (Curveball): "Your math is perfect, but the CTO cut your budget by 40%. What do you cut?"</strong><br><em>Bad answer:</em> "I can't — the math says we need this."<br><em>Good answer:</em> "I'd reduce redundancy or lower the peak multiplier assumption and accept the risk."<br><em>Principal answer:</em> "A 40% cut takes us from $2,500 to $1,500/month. Here's my triage: First, I'd drop the CDN ($500 saved) and serve directly from the API with aggressive response caching — this increases origin load by 95% but the math says we can absorb it at current scale. Second, I'd reduce from 7 to 5 pods ($115 saved) and accept that a pod failure during peak means 2-minute degraded performance instead of zero impact — that's a business risk decision, not a technical one. Third, I'd move from Redis cluster to a single Redis instance with no replication ($200 saved) and accept that Redis failure means a 5-minute outage while it restarts from AOF. I'd present this to the CTO as: 'Here's the $1,500 architecture and here are the three risks you're accepting. I need your sign-off on each.' The key is making the risk explicit and getting leadership buy-in, not hiding the trade-off."</p>
 
-            <h2>⚓ Memory Anchor</h2>
-            <p><strong>Analogy:</strong> The wedding planner's napkin — 500 guests × 1.5 slices = 750 slices.</p>
-            <p><strong>Numbers:</strong> 86,400 = seconds/day. 3× = peak multiplier. 500 QPS = per-pod capacity.</p>
-            <p><strong>Principal signal phrase:</strong> "I don't trust intuition at scale — every architectural decision is anchored in math."</p>
+                <h2><span class="step-icon">⚓</span> Step 12 — Memory Anchor</h2>
+                <p><strong>Analogy:</strong> The wedding planner's napkin — 500 guests × 1.5 slices = 750 slices. If the napkin math says 15 tiers and the fridge holds 10, you have a problem before you order the first ingredient.</p>
+                <p><strong>MUST-REMEMBER NUMBERS:</strong><br>• <strong>86,400</strong> = seconds in a day = ALWAYS divide daily requests by this to get average QPS.<br>• <strong>3×</strong> = standard peak-to-average multiplier = multiply average QPS by this for peak provisioning.<br>• <strong>500 QPS</strong> = conservative per-pod capacity for a .NET 9 API with typical DB calls = use this for pod count estimation.</p>
+                <p><strong>Principal signal phrase:</strong> "I don't trust intuition at scale — every architectural decision is anchored in math that I can show you on a napkin in 60 seconds."</p>
 
-            <h2>🕒 Production Reality Check</h2>
-            <p><strong>3AM Scenario:</strong> PagerDuty: "db_connection_pool_wait_count &gt;50 for 2min." Background job holding 80 connections. API pool starved.</p>
-            <p><strong>First 10 minutes:</strong> Check pg_stat_activity → identify query running 6min → pg_terminate_backend → verify pool recovers.</p>
-            <p><strong>Leadership call:</strong> "A scheduled maintenance job consumed more connections than allocated, temporarily slowing the app. We killed it, service recovered in 30 seconds. No data loss."</p>
-            <p><strong>Permanent fix:</strong> Connection pool partitioning — API and background jobs use separate Postgres users with separate limits. Cost: $0. Trade-off: background jobs may run slower.</p>
+                <h2><span class="step-icon">🕒</span> Step 13 — Production Reality Check</h2>
+                <p><strong>3AM SCENARIO:</strong><br>It's 3:07 AM. PagerDuty fires: "CRITICAL: db_connection_pool_wait_count > 50 for 2 minutes." The metric graph shows pool wait count climbing from 0 → 50 → 200 in 4 minutes. Meanwhile, "api_p99_latency" jumps from 15ms → 3,200ms. The Redis metrics show nothing wrong — cache hit ratio steady at 88%. The problem isn't cache. A background job started at 3:00 AM (scheduled maintenance window) is running a large aggregation query that's holding 80 connections open, starving the API pool. The capacity math was correct for normal traffic but didn't model the background job's connection consumption.</p>
+                <p><strong>FIRST 10 MINUTES:</strong><br>1. <strong>Check DB connections:</strong> SELECT count(*) FROM pg_stat_activity WHERE state = 'active' — shows 482 active connections, 80 from the background job host.<br>2. <strong>Identify the query:</strong> SELECT pid, query, now() - query_start AS duration FROM pg_stat_activity WHERE state = 'active' ORDER BY duration DESC — shows a SELECT with JOIN across 4 tables running for 6 minutes.<br>3. <strong>Kill the offending query:</strong> SELECT pg_terminate_backend(pid) for the background job connections.<br>4. <strong>Verify recovery:</strong> Pool wait count drops to 0 within 15 seconds. p99 latency returns to 15ms within 30 seconds.<br>5. <strong>Mute the background job:</strong> Disable the cron trigger until root cause is understood.</p>
+                <p><strong>LEADERSHIP CALL (30 minutes in):</strong><br>"At 3am, a scheduled database maintenance job consumed more connections than we'd allocated for it, which temporarily slowed down the main application. We killed the job and service recovered within 30 seconds. No data was lost — users experienced a brief 2-minute slowdown. We've paused that job and are adding connection limits so it can't impact production traffic again."</p>
+                <p><strong>POSTMORTEM:</strong><br><strong>Root cause:</strong> The background job's connection pool was not isolated from the API's connection pool. Both used the same Postgres cluster with a shared max_connections limit of 500. The envelope math calculated 497 connections for API pods but didn't reserve capacity for operational jobs.<br><strong>Timeline:</strong> 3:00 — job starts. 3:01 — connections begin accumulating. 3:05 — pool exhaustion begins. 3:07 — PagerDuty fires. 3:08 — on-call responds, diagnoses. 3:10 — query killed, recovery begins. 3:11 — service fully restored.<br><strong>Blameless framing:</strong> The capacity plan was correct for API traffic but the scope didn't include background jobs. This was a shared understanding gap, not an individual error.</p>
+                <p><strong>PERMANENT FIX:</strong><br><strong>Architectural change:</strong> Implement connection pool partitioning — API pods and background workers get separate Postgres users with separate connection limits (API: 450 max, background: 50 max). This is enforced at the database level via ALTER ROLE CONNECTION LIMIT, not just application config.<br><strong>Implementation time:</strong> 2 days (1 day to implement, 1 day to test and roll out).<br><strong>Cost:</strong> Zero additional infrastructure cost — just configuration changes.<br><strong>Trade-off:</strong> The background job may run slower with fewer connections. Acceptable — operational work should never impact customer-facing traffic. The alternative (separate DB cluster for background jobs) would cost $400/month and is overkill unless background jobs need more than 50 connections.</p>
 
-            <hr>
-            <p style="color:var(--text-muted); font-size:0.85rem;">End of Topic 02 · Back-of-Envelope Math · Principal Engineer Edition</p>
-        </section>
+                <hr>
+                <p class="topic-end">End of Topic 02 · Back-of-Envelope Math · Principal Engineer Edition</p>
+            </section>
 
+        </main>
     </div>
     <!-- System Design Interview Guide — .NET 9 Edition -->
 </body>
-              </html>
+</html>
