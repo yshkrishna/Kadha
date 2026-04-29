@@ -887,5 +887,613 @@ public class SearchController : ControllerBase
 <hr><p class="topic-end">End of Topic 02 · Back-of-Envelope Math · Principal Engineer Edition · All 13 Steps Complete</p>`;}
 })();
 </script>
+   <!-- TOPIC 03: SCALING — VERTICAL VS HORIZONTAL -->
+<section id="topic-3">
+<h1><span class="topic-number">03</span> Scaling — Vertical vs Horizontal <span class="badge">L7 SIGNAL</span></h1>
+<p class="subtitle"><strong>Principal signal:</strong> You know the exact cost crossover point. "Vertical scaling stops making economic sense at ~32 vCPU on AWS — beyond that, horizontal is cheaper per QPS AND more fault-tolerant."</p>
+
+<h2><span class="step-icon">📖</span> Step 1 — Story (Real-World Analogy)</h2>
+<p>You run a pizza shop. Business is booming. You have two choices: <strong>Vertical scaling</strong> — buy a bigger oven that bakes 50 pizzas at once instead of 10. Works great until the oven breaks — then you're selling zero pizzas. The bigger oven costs 4× the price of the smaller one but only produces 5× the output — diminishing returns. <strong>Horizontal scaling</strong> — buy 5 smaller ovens instead of one giant one. If one breaks, you still make 40 pizzas. If business doubles again, you buy 5 more. The 5 smaller ovens cost the same as the 1 giant one but produce the same output with better fault tolerance. <strong>The core challenge: knowing exactly when to stop buying bigger ovens and start adding more ovens — because past a certain size, the giant oven costs more per pizza than multiple small ones.</strong></p>
+
+<h2><span class="step-icon">💥</span> Step 2 — What Breaks Without It</h2>
+<p>You vertically scale your Postgres instance to 64 vCPU, 488GB RAM. It costs $26,000/month. At 5,000 QPS, it's still hitting I/O limits because a single Postgres process can only parallelize so much. You've spent a fortune and you still have a single point of failure. Meanwhile, the team down the hall spent $12,000/month on 8 smaller instances with read replicas — they handle 8,000 QPS and survived an AZ outage. <strong>Cascading failure:</strong> Vertically scale → hit cloud provider's instance limit → no more scaling possible → forced emergency migration to horizontal architecture under load → migration fails → outage. <strong>Real example:</strong> GitHub in 2018 — vertically scaled their MySQL cluster to the largest AWS instance available. Hit the ceiling. Had to shard horizontally while serving production traffic. Took 2 years.</p>
+
+<h2><span class="step-icon">🧮</span> Step 3 — Back-of-Envelope Math</h2>
+<div class="math-block">
+<strong>💰 THE COST CROSSOVER POINT:</strong><br>
+<strong>Vertical scaling (single large instance):</strong><br>
+• 2 vCPU (t3.medium): ~$30/month → $15/vCPU/month<br>
+• 8 vCPU (c5.2xlarge): ~$270/month → $33/vCPU/month<br>
+• 32 vCPU (c5.9xlarge): ~$1,400/month → $43/vCPU/month<br>
+• 64 vCPU (c5.18xlarge): ~$3,100/month → $48/vCPU/month<br>
+• 96 vCPU (c5.24xlarge): ~$4,800/month → $50/vCPU/month<br>
+<strong>Diminishing returns: cost per vCPU increases as instance size grows.</strong><br><br>
+<strong>Horizontal scaling (multiple small instances):</strong><br>
+• 8 × c5.2xlarge (64 vCPU total): 8 × $270 = $2,160/month → $33/vCPU<br>
+• vs 1 × c5.18xlarge (64 vCPU): $3,100/month → $48/vCPU<br>
+<strong>Horizontal is 30% cheaper at 64 vCPU equivalent + adds fault tolerance.</strong><br><br>
+<strong>📐 The Crossover Formula:</strong><br>
+• Below ~16 vCPU: vertical is simpler and often cheaper (no orchestration overhead)<br>
+• 16-32 vCPU: roughly equivalent — choose based on fault tolerance requirements<br>
+• Above ~32 vCPU: horizontal is cheaper per vCPU AND more fault-tolerant<br>
+<strong>→ Vertical scaling <span class="eliminated">eliminated above 32 vCPU on cost-per-unit grounds.</span></strong>
+</div>
+
+<h2><span class="step-icon">❓</span> Step 4 — Clarifying Questions</h2>
+<p><strong>Q1:</strong> "Is this a stateful workload (database) or stateless (web server)? Stateless scales horizontally trivially; stateful requires sharding or replication strategy." <em>WHY:</em> Determines whether horizontal scaling is a config change or an architectural migration. <em>ASSUMPTION:</em> Mix of stateful (DB) and stateless (API).</p>
+<p><strong>Q2:</strong> "What's the growth trajectory? 2× per year or 10× in 6 months? Faster growth makes horizontal investment pay back faster." <em>WHY:</em> If growth is slow, vertical might carry you for 2 years — horizontal investment not worth it yet. <em>ASSUMPTION:</em> 3× year-over-year growth.</p>
+<p><strong>Q3:</strong> "What's your tolerance for operational complexity? Horizontal scaling adds orchestration, service discovery, and monitoring overhead." <em>WHY:</em> Some teams prefer paying the vertical premium to avoid Kubernetes complexity. <em>ASSUMPTION:</em> Team has K8s experience.</p>
+<p><strong>Q4:</strong> "Is this multi-tenant (SaaS) where noisy neighbors are a concern? Horizontal lets you isolate tenants to specific instances." <em>WHY:</em> Vertical means all tenants share one instance — one bad tenant affects everyone. <em>ASSUMPTION:</em> Single-tenant or well-behaved multi-tenant.</p>
+<p><strong>Q5:</strong> "What's the SLA? If 99.99% uptime required, single-instance vertical is immediately eliminated — you need at least 2 instances for HA." <em>WHY:</em> Single point of failure is unacceptable above 99.9% uptime. <em>ASSUMPTION:</em> 99.99% targeted.</p>
+
+<h2><span class="step-icon">📊</span> Step 5 — ASCII Diagrams</h2>
+<h3>A) Vertical Scaling (Single Instance, &lt;32 vCPU)</h3>
+<pre class="ascii">┌─────────────────────────────────┐
+│         Single Large VM          │
+│  ┌─────────────────────────────┐│
+│  │   .NET 9 API (1 process)    ││
+│  │   Postgres (1 instance)     ││
+│  │   Redis (on-instance cache) ││
+│  └─────────────────────────────┘│
+│   32 vCPU | 128GB RAM | 1TB SSD  │
+└─────────────────────────────────┘
+Pros: Simple. No network latency between components.
+Cons: Single point of failure. Cannot scale past instance limit.
+Cost: ~$1,400/month. Best for: Early-stage, &lt;10K QPS.</pre>
+<h3>B) Horizontal Scaling (Stateless, &gt;32 vCPU equivalent)</h3>
+<pre class="ascii">                  ┌──────────────┐
+                  │  Load Balancer│
+                  │  (YARP/NLB)  │
+                  └───┬──┬──┬───┘
+                      │  │  │
+          ┌───────────┘  │  └───────────┐
+          ▼              ▼              ▼
+    ┌──────────┐  ┌──────────┐  ┌──────────┐
+    │ API Pod 1│  │ API Pod 2│  │ API Pod 3│  ... ×8
+    │ 4 vCPU   │  │ 4 vCPU   │  │ 4 vCPU   │
+    └────┬─────┘  └────┬─────┘  └────┬─────┘
+         │             │             │
+         └─────────────┼─────────────┘
+                       ▼
+              ┌────────────────┐
+              │  Postgres      │
+              │  (separate,    │
+              │   sharded)     │
+              └────────────────┘
+Pros: Fault-tolerant. Scales by adding pods. Any pod can die.
+Cons: Network latency between services. Orchestration complexity.
+Cost: 8 × $270 = $2,160/month. Best for: Production, &gt;10K QPS, HA required.</pre>
+<h3>C) Failure Scenario — Vertical Hit Ceiling</h3>
+<pre class="ascii">Traffic grows 3× → 96 vCPU instance at limit → no larger instance exists
+→ forced to horizontally scale under load → data migration required
+→ migration fails due to production pressure → extended outage
+Alert: "vm_cpu_utilization &gt; 85% for 7 days" (leading indicator)
+Prevention: Start horizontal planning at 60% of max instance size, not 95%.</pre>
+
+<h2><span class="step-icon">⚖️</span> Step 6 — Trade-offs</h2>
+<p><strong>Option A — All Vertical:</strong> Keep scaling up until you hit the cloud provider's instance limit. <em>Pros:</em> Simple deployment, no service discovery, no network hops. <em>Cons:</em> Single point of failure, diminishing cost efficiency past 32 vCPU, hard ceiling at max instance size (~128 vCPU on most clouds), impossible to do zero-downtime deployments. <em>Best for:</em> Internal tools, dev environments, applications with <1K QPS. <em>Cost at scale:</em> ~$4,800/month for 96 vCPU. <span class="eliminated">Eliminated above 32 vCPU on cost efficiency + fault tolerance.</span></p>
+<p><strong>Option B — Horizontal from Day One:</strong> Kubernetes cluster even for low traffic. <em>Pros:</em> Scales infinitely, fault-tolerant, zero-downtime deploys. <em>Cons:</em> Massive over-engineering for low scale — K8s cluster management costs $200/month minimum even for 2 pods. Adds network latency. <em>Best for:</em> Systems that will definitely grow to 50K+ QPS within 6 months. <em>Cost at low scale:</em> $400/month minimum. <span class="eliminated">Eliminated below 10K QPS — the K8s tax exceeds the compute cost.</span></p>
+<p><strong>Option C — Gradual Migration (Recommended):</strong> Start vertical on a VM or simple container. At ~16 vCPU, add a second instance for HA. At ~32 vCPU, migrate to horizontal with K8s. <em>Pros:</em> Complexity matches scale. Never paying for orchestration you don't need yet. Clear migration triggers based on CPU utilization. <em>Cons:</em> Requires migration effort at each stage. Team must be comfortable evolving architecture. <em>Best for:</em> Most startups and growing products. ✅ <strong>Recommended.</strong></p>
+<div class="callout"><strong>🏆 Recommendation:</strong> Option C with explicit triggers. Migrate to horizontal when: (1) single instance exceeds 60% of max available size, OR (2) you need zero-downtime deployments, OR (3) 99.99% uptime required. <strong>Principal justification:</strong> Premature horizontal scaling is the #1 cause of unnecessary infrastructure cost in startups. The K8s tax is real — don't pay it until your scale justifies it.</div>
+
+<h2><span class="step-icon">💻</span> Step 7 — .NET 9 Code</h2>
+<h3>a) ❌ WRONG WAY — Hardcoded Single Instance</h3>
+<pre class="code-csharp wrong-code"><code>// ❌ Assumes single instance — no health checks for load balancer, no graceful shutdown
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+app.MapGet("/", () => "Hello from single instance!");
+app.Run();
+// This breaks because: load balancer sends traffic to this instance even when it's shutting down.
+// No SIGTERM handler means in-flight requests are killed mid-processing.</code></pre>
+<h3>b) ✅ RIGHT WAY — Horizontal-Ready with Graceful Shutdown</h3>
+<pre class="code-csharp"><code>/// &lt;summary&gt;
+/// Configured for horizontal scaling: graceful shutdown, health checks, stateless design.
+/// Each instance can be killed at any time without data loss or request failure.
+/// &lt;/summary&gt;
+var builder = WebApplication.CreateBuilder(args);
+
+// Health checks required by K8s liveness/readiness probes
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () =&gt; HealthCheckResult.Healthy("Ready for traffic"));
+
+var app = builder.Build();
+
+// K8s readiness probe — only route traffic when healthy
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = _ =&gt; true // all checks must pass
+});
+
+// K8s liveness probe — restart if this fails
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ =&gt; true
+});
+
+// Graceful shutdown: stop receiving traffic, finish in-flight requests
+app.Lifetime.ApplicationStopping.Register(() =&gt;
+{
+    Console.WriteLine("SIGTERM received. Draining connections...");
+});
+
+app.MapGet("/", () =&gt; $"Instance: {Environment.MachineName}, Processing...");
+
+// Kestrel configured for graceful shutdown (default 30s timeout)
+app.Run();</code></pre>
+<h3>c) Program.cs — K8s-Ready Configuration</h3>
+<pre class="code-csharp"><code>// NuGet: Microsoft.Extensions.Diagnostics.HealthChecks
+// Configure Kestrel for horizontal scaling behind load balancer
+builder.WebHost.ConfigureKestrel(options =&gt;
+{
+    options.Limits.MaxConcurrentConnections = 500; // per-instance limit
+    options.Limits.KeepAliveTimeout = TimeSpan.FromSeconds(120);
+});
+// Add OpenTelemetry for distributed tracing across instances
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t =&gt; t.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation());</code></pre>
+<h3>d) Real Usage — Stateless Controller (Critical for Horizontal)</h3>
+<pre class="code-csharp"><code>[ApiController]
+[Route("api/orders")]
+public class OrdersController : ControllerBase
+{
+    // ✅ Stateless: stores nothing in-memory between requests.
+    // Any instance can handle any request — critical for horizontal scaling.
+    // Session state goes to Redis, not server memory.
+    [HttpGet("{id}")]
+    public async Task&lt;IActionResult&gt; GetOrder(string id, [FromServices] IDistributedCache cache)
+    {
+        // Check distributed cache — NOT in-memory cache
+        var cached = await cache.GetStringAsync($"order:{id}");
+        if (cached != null) return Ok(cached);
+        
+        var order = await FetchFromDb(id);
+        await cache.SetStringAsync($"order:{id}", order, new DistributedCacheEntryOptions
+        {
+            SlidingExpiration = TimeSpan.FromMinutes(5)
+        });
+        return Ok(order);
+    }
+}</code></pre>
+<h3>e) Unit Test — Horizontal Scale Readiness</h3>
+<pre class="code-csharp"><code>[Fact] public async Task HealthCheck_ReturnsHealthy_WhenReady()
+{
+    var client = new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
+    var response = await client.GetAsync("/health/ready");
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+}
+
+[Fact] public void NoInMemoryState_BetweenRequests()
+{
+    // Verify controller doesn't use static fields or in-memory caches
+    var controllerType = typeof(OrdersController);
+    var staticFields = controllerType.GetFields(BindingFlags.Static | BindingFlags.NonPublic);
+    Assert.Empty(staticFields); // No static state = safe for horizontal scaling
+}</code></pre>
+
+<h2><span class="step-icon">📈</span> Step 8 — Scaling Stages</h2>
+<p><strong>Stage 1 (0→1K users):</strong> Single VM (4 vCPU, 16GB RAM). .NET API + Postgres on same machine. Cost: $50/month. <em>First break:</em> CPU >70% sustained — upgrade to 8 vCPU ($100/month). No orchestration.</p>
+<p><strong>Stage 2 (1K→50K users):</strong> 2 VMs behind load balancer (HA). Separate DB instance. Cost: $400/month. <em>Trigger:</em> Single instance can't handle 50K users → add second. <em>First break now:</em> DB becomes bottleneck before API.</p>
+<p><strong>Stage 3 (50K→1M users):</strong> Kubernetes cluster (3-5 nodes, 10-20 pods). DB with read replicas. Redis cache. Cost: $2,500/month. <em>Trigger:</em> Need for zero-downtime deploys + auto-scaling.</p>
+<p><strong>Stage 4 (1M+ users):</strong> Multi-cluster K8s, sharded DB, multi-region. Cost: $15,000+/month. <em>Surprise:</em> The K8s cluster itself becomes a significant operational cost — dedicated cluster management team needed.</p>
+
+<h2><span class="step-icon">🎙️</span> Step 9 — Interview Script</h2>
+<p><strong>Opening:</strong> "Scaling strategy depends on where you are on the cost curve. Below ~16 vCPU, vertical is cheaper and simpler. Above ~32 vCPU, horizontal wins on both cost and fault tolerance. I'll design for both, with a migration path."</p>
+<p><strong>Drawing:</strong> "I'm putting a load balancer here because at 3+ instances, you need one. Below 2 instances, the LB itself costs more than the compute it's distributing — so I add it at stage 2, not stage 1." <strong>When asked "Why not horizontal from start?":</strong> "Kubernetes costs minimum $200/month in management overhead before you run a single pod. At 500 QPS, that's $0.40 per thousand requests just for orchestration. At 500K QPS, it's $0.0004 per thousand — the overhead amortizes. I match architecture complexity to scale."</p>
+<div class="principal-signal">🧠 <strong>L7 Signal:</strong> "The cloud providers' largest instances are traps — above 32 vCPU, you're paying a premium for density that you could get cheaper with multiple smaller instances. Plus, you can't do a rolling deploy on a single instance. The cost crossover is well-documented: at 64 vCPU, horizontal is 30% cheaper AND gives you zero-downtime deploys. <span class="eliminated">Single-instance eliminated</span> above 32 vCPU on both cost and operational grounds."</div>
+
+<h2><span class="step-icon">🔥</span> Step 10 — Failure Modes</h2>
+<div class="failure-grid">
+<div class="failure-item"><h4>1. Hit Instance Size Ceiling</h4><p><strong>Scenario:</strong> On largest available instance (128 vCPU), traffic still growing. No more vertical scaling possible. <strong>Detection:</strong> <span class="metric">vm_cpu_utilization >85% and instance_type == max_available</span>. <strong>Impact:</strong> Emergency horizontal migration under production load. <strong>Fix:</strong> Add horizontal tier alongside vertical (hybrid) while migrating. <strong>Prevention:</strong> Start horizontal planning at 60% of max instance size, not at the ceiling.</p></div>
+<div class="failure-item"><h4>2. Session State Sticky to One Instance</h4><p><strong>Scenario:</strong> In-memory session state on one instance. Load balancer sends user to different instance — session lost. <strong>Detection:</strong> "User logged out randomly" bug reports. <strong>Fix:</strong> Move session to Redis (distributed). <strong>Prevention:</strong> Design stateless from day one — even on single instance.</p></div>
+<div class="failure-item"><h4>3. Uneven Load Distribution</h4><p><strong>Scenario:</strong> Load balancer uses round-robin. One instance gets 40% of traffic due to long-lived connections. <strong>Detection:</strong> <span class="metric">per_instance_qps_stddev >20% of mean for 5 minutes</span>. <strong>Fix:</strong> Switch to least-connections algorithm. <strong>Prevention:</strong> Monitor per-instance QPS distribution.</p></div>
+<div class="failure-item"><h4>4. Database Becomes Bottleneck</h4><p><strong>Scenario:</strong> API scales horizontally to 50 pods — all hitting same DB. DB maxes out at 500 connections. <strong>Detection:</strong> <span class="metric">db_pool_wait_count >0 and pod_count >10</span>. <strong>Fix:</strong> Add read replicas, implement caching. <strong>Prevention:</strong> Model DB connection limits in capacity plan.</p></div>
+<div class="failure-item"><h4>5. K8s Overhead Exceeds Compute Cost</h4><p><strong>Scenario:</strong> Small workload (5 pods) on large K8s cluster. Cluster management costs exceed pod compute costs. <strong>Detection:</strong> Cloud bill shows K8s control plane + node overhead >50% of total. <strong>Fix:</strong> Downsize to simpler orchestration (ECS, App Service). <strong>Prevention:</strong> Don't use K8s for <10 pods unless you already have a cluster.</p></div>
+</div>
+
+<h2><span class="step-icon">💬</span> Step 11 — Follow-up Questions</h2>
+<p><strong>Q1: "When would you recommend staying vertical despite having the budget for horizontal?"</strong><br><em>Principal:</em> "When operational simplicity is the primary constraint. If I have a 3-person team with no K8s experience, and we're at 2K QPS growing slowly, vertical buys them 18 months of runway. The cost premium ($200/month vs $400/month for horizontal) is cheaper than hiring a K8s expert or taking engineers off feature work to learn orchestration. The technical 'best' architecture is the one the team can operate at 3am."</p>
+<p><strong>Q2 (Curveball): "What's the biggest lie told about horizontal scaling?"</strong><br><em>Principal:</em> "'Horizontal scaling is always better.' It's not. It adds network latency (every inter-service call is 1-5ms), operational complexity, and cost overhead at low scale. The industry over-corrected from 'scale up' to 'scale out' and now startups run 3-node K8s clusters for 200 QPS. That's architectural theater, not engineering. The honest answer: match your scaling strategy to your scale. Don't optimize for 1M QPS when you're at 200."</p>
+<p><strong>Q3: "How do you handle stateful workloads horizontally?"</strong><br><em>Principal:</em> "Stateful horizontal scaling is fundamentally harder than stateless. You need either (1) sharding with consistent hashing so each instance owns a subset of state, (2) shared-nothing architecture with replication, or (3) externalizing state to a distributed store. Postgres isn't horizontally scalable by default — you need sharding middleware or a distributed SQL engine like CockroachDB. The honest advice: if you're not at 5K+ QPS on your DB, think very hard before sharding. The operational complexity of distributed state is 10× that of stateless horizontal scaling."</p>
+
+<h2><span class="step-icon">⚓</span> Step 12 — Memory Anchor</h2>
+<p><strong>Analogy:</strong> Pizza shop: one giant oven vs five smaller ones. Giant oven costs more per pizza at large sizes and kills your business when it breaks.</p>
+<p><strong>Numbers:</strong> 32 vCPU = cost crossover (horizontal becomes cheaper). 500 QPS = per-pod .NET capacity. 60% = trigger to start planning horizontal — don't wait for 95%.</p>
+<p><strong>Phrase:</strong> "Vertical for simplicity, horizontal for scale — and I know exactly where the crossover point is."</p>
+
+<h2><span class="step-icon">🕒</span> Step 13 — Production Reality Check</h2>
+<p><strong>3AM SCENARIO:</strong> PagerDuty: <span class="metric">"vm_cpu_utilization 98% sustained 10min. api_p99_latency 15ms→4,000ms."</span> You're on a single large instance (64 vCPU) that handled traffic fine for 18 months. Tonight, a partner API integration went viral. Traffic 3× normal. The instance is at its limit — no larger size available in this cloud region.</p>
+<p><strong>First 10 minutes:</strong> 1. Confirm it's not a memory leak or GC thrashing — CPU is genuine request processing. 2. Check if any non-critical endpoints can be temporarily disabled (rate limiting on analytics?). 3. Deploy emergency rate limiter at API Gateway level — cap at 150% of normal traffic. 4. Assess: this isn't sustainable. Need horizontal tier. 5. Create P0 ticket: "Horizontal scaling required — single instance ceiling reached."</p>
+<p><strong>Leadership call:</strong> "Our largest server is at capacity. We've capped traffic to prevent an outage, which means some users are getting errors. We need to split the application across multiple servers — that's a 2-week migration we need to start immediately. For now, we've stabilized the system by limiting traffic to 150% of normal."</p>
+<p><strong>Postmortem root cause:</strong> No horizontal scaling plan existed. The team assumed vertical would carry them indefinitely. Cloud provider instance limit was never checked.</p>
+<p><strong>Permanent fix:</strong> Implement auto-scaling group with minimum 3 instances. Migration from single-instance to multi-instance with load balancer. Cost: $800/month more for compute + load balancer. Trade-off: more operational complexity, but no more scaling ceiling.</p>
+<hr><p class="topic-end">End of Topic 03 · Principal Engineer Edition</p>
+</section>
+
+<!-- TOPIC 04: LOAD BALANCER -->
+<section id="topic-4">
+<h1><span class="topic-number">04</span> Load Balancer <span class="badge">L7 SIGNAL</span></h1>
+<p class="subtitle"><strong>Principal signal:</strong> You mention connection draining and the graceful shutdown sequence unprompted — because you've been paged when someone forgot them.</p>
+
+<h2><span class="step-icon">📖</span> Step 1 — Story</h2>
+<p>A hotel reception desk with one check-in clerk. At 3pm, 200 guests arrive simultaneously. One clerk = 200-person line, 2-hour wait, angry guests. The hotel adds 4 more clerks and a line manager who directs guests to the shortest line. If a clerk goes on break, the manager stops sending guests to that line and lets the clerk finish with their current guest before leaving. <strong>That line manager is a load balancer. The "finish current guest before leaving" is connection draining. Skip connection draining, and guests in that clerk's line get turned away mid-check-in — they have to start over with another clerk.</strong></p>
+
+<h2><span class="step-icon">💥</span> Step 2 — What Breaks Without It</h2>
+<p>You deploy a new version of your API. Kubernetes sends SIGTERM to old pods. Old pods die immediately. 200 in-flight requests are terminated mid-processing. Users see HTTP 502 errors. Orders that were half-saved to the database are orphaned — payment captured but order not confirmed. <strong>Cascading failure:</strong> No graceful shutdown → in-flight requests fail → clients retry → new pods hit with doubled load → new pods overwhelmed → cascading failure from a routine deploy. <strong>Real example:</strong> Every company's first Kubernetes deploy without proper pod termination grace period. It's a rite of passage.</p>
+
+<h2><span class="step-icon">🧮</span> Step 3 — Back-of-Envelope Math</h2>
+<div class="math-block">
+<strong>📐 Load Balancer Capacity:</strong><br>
+• Layer 4 (NLB): handles millions of QPS — connection-based, no payload inspection<br>
+• Layer 7 (ALB/YARP): handles ~100K QPS per instance — content-based routing<br>
+• Health check interval: every 5-10 seconds typical<br>
+• Connection draining timeout: 30-300 seconds (must exceed longest request time)<br>
+• Stickiness (session affinity): adds ~1-2ms overhead per request<br><br>
+<strong>Decision points:</strong><br>
+• <strong>&lt;10K QPS:</strong> Single L7 LB (YARP) sufficient — $50/month<br>
+• <strong>10K-100K QPS:</strong> L7 LB with 2-3 instances for HA — $200/month<br>
+• <strong>&gt;100K QPS:</strong> L4 in front of L7 (NLB → ALB pattern) — scales to millions<br>
+<strong>→ Single LB <span class="eliminated">eliminated above 100K QPS</span> (capacity ceiling + SPOF).</strong>
+</div>
+
+<h2><span class="step-icon">❓</span> Step 4 — Clarifying Questions</h2>
+<p><strong>Q1:</strong> "Do we need content-based routing (URL path, headers, cookies) or just port-based? L7 for content routing, L4 for simple TCP." <em>ASSUMPTION:</em> L7 needed (API routes, auth at edge).<br>
+<strong>Q2:</strong> "Session stickiness required? If users must return to same backend, we need sticky sessions." <em>ASSUMPTION:</em> Stateless — no stickiness needed.<br>
+<strong>Q3:</strong> "What's the longest request timeout? Connection draining must exceed this." <em>ASSUMPTION:</em> 30s max request, 60s draining.<br>
+<strong>Q4:</strong> "Health check endpoint: simple /health or deep check (DB connectivity)?" <em>ASSUMPTION:</em> Shallow health check + separate deep check for alerting.<br>
+<strong>Q5:</strong> "Is this internet-facing or internal? Determines TLS termination strategy." <em>ASSUMPTION:</em> Internet-facing, TLS terminated at LB.</p>
+
+<h2><span class="step-icon">📊</span> Step 5 — ASCII Diagrams</h2>
+<h3>A) Small Scale (Single LB, &lt;10K QPS)</h3>
+<pre class="ascii">Client → YARP LB (1 instance, TLS termination) → API Pods ×3</pre>
+<h3>B) Large Scale (&gt;100K QPS)</h3>
+<pre class="ascii">Client → NLB (L4, high throughput) → YARP/ALB ×3 (L7, content routing) → API Pods ×N</pre>
+<h3>C) Failure: No Connection Draining</h3>
+<pre class="ascii">Deploy triggered → old pod gets SIGTERM → dies immediately → 50 in-flight requests lost → 502 errors
+Alert: "http_502_count > 10 in 30s during deploy window"
+Prevention: Graceful shutdown: LB stops routing, pod finishes requests, then dies.</pre>
+
+<h2><span class="step-icon">⚖️</span> Step 6 — Trade-offs</h2>
+<p><strong>Option A — L4 LB (NLB):</strong> Simple, high throughput, no content inspection. <em>Cons:</em> No header-based routing, no auth at edge. <span class="eliminated">Eliminated: needs L7 for API routing.</span></p>
+<p><strong>Option B — L7 LB (YARP/ALB):</strong> Content routing, auth, rate limiting at edge. Recommended. ✅</p>
+<p><strong>Option C — Custom LB (HAProxy on VMs):</strong> Maximum control, no cloud lock-in. <em>Cons:</em> Operational burden, patching. <span class="eliminated">Eliminated: managed or YARP sufficient.</span></p>
+<div class="callout"><strong>🏆 Recommendation:</strong> YARP for .NET ecosystem (same stack as API, config in code). NLB in front above 100K QPS.</div>
+
+<h2><span class="step-icon">💻</span> Step 7 — .NET 9 Code (YARP Configuration)</h2>
+<pre class="code-csharp"><code>// Program.cs — YARP reverse proxy with graceful shutdown
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+// Configure graceful shutdown
+builder.WebHost.ConfigureKestrel(o => o.Limits.MaxConcurrentConnections = 10000);</code></pre>
+<h3>appsettings.json</h3>
+<pre class="code-csharp"><code>{
+  "ReverseProxy": {
+    "Clusters": {
+      "api": {
+        "Destinations": {
+          "api1": { "Address": "http://api-pod-1:8080" },
+          "api2": { "Address": "http://api-pod-2:8080" }
+        },
+        "HealthCheck": { "Active": { "Enabled": true, "Interval": "00:00:05" } }
+      }
+    }
+  }
+}</code></pre>
+<h2><span class="step-icon">🎙️</span> Step 9 — Interview Script</h2>
+<p><strong>Opening:</strong> "I'll design the LB layer assuming it's the entry point for all traffic. TLS terminates here. I'm using YARP because it's .NET-native and supports connection draining out of the box."</p>
+<div class="principal-signal">🧠 <strong>L7 Signal:</strong> "Connection draining is not optional — it's the difference between a graceful deploy and a 502 spike. I set the draining timeout to 2× the longest request timeout. And I always test graceful shutdown in staging — you'd be surprised how many frameworks don't actually wait for in-flight requests when they receive SIGTERM."</div>
+
+<h2><span class="step-icon">🔥</span> Step 10 — Failure Modes</h2>
+<div class="failure-grid">
+<div class="failure-item"><h4>1. LB Becomes Bottleneck</h4><p><span class="metric">lb_connection_count > 80% of max</span>. Fix: Add NLB in front, scale out LB instances. Prevention: Monitor LB capacity alongside app capacity.</p></div>
+<div class="failure-item"><h4>2. Health Check False Positive</h4><p>Health check returns 200 but app can't reach DB. LB routes traffic to broken instance. Prevention: Health check includes DB connectivity check (but with timeout).</p></div>
+<div class="failure-item"><h4>3. Sticky Session Imbalance</h4><p>Sticky sessions + one heavy user = one pod overloaded. Prevention: Use distributed session store instead of stickiness.</p></div>
+<div class="failure-item"><h4>4. TLS Certificate Expiry</h4><p>Classic. <span class="metric">tls_cert_expiry_days < 30</span>. Prevention: Auto-renewal (Let's Encrypt, ACME).</p></div>
+</div>
+
+<h2><span class="step-icon">⚓</span> Step 12 — Memory Anchor</h2>
+<p><strong>Analogy:</strong> Hotel line manager directing guests to shortest queue, letting clerks finish before break.</p>
+<p><strong>Numbers:</strong> 100K QPS = single L7 LB ceiling. 60s = default connection draining. 5s = health check interval.</p>
+<p><strong>Phrase:</strong> "Connection draining is the difference between a graceful deploy and a 502 spike."</p>
+<hr><p class="topic-end">End of Topic 04 · Principal Engineer Edition</p>
+</section>
+
+<!-- TOPIC 05: DATABASE BASICS — SQL vs NoSQL -->
+<section id="topic-5">
+<h1><span class="topic-number">05</span> Database Basics — SQL vs NoSQL <span class="badge">L7 SIGNAL</span></h1>
+<p class="subtitle"><strong>Principal signal:</strong> You discuss the operational cost of each choice, not just feature comparisons. "Cassandra gives us write scale but adds 2 weeks of on-call training per engineer."</p>
+
+<h2><span class="step-icon">📖</span> Step 1 — Story</h2>
+<p>You're building a library catalog system. SQL is like a card catalog — every book has a fixed place, categories are strictly defined, and you can ask complex questions ("show me all books by French authors published between 1900-1950, sorted by title"). NoSQL is like a warehouse — you can throw boxes of books anywhere, retrieval is fast if you know the box ID, but asking "all French authors" means checking every box. <strong>The core challenge: SQL gives you query flexibility but scales vertically; NoSQL scales horizontally but limits how you query. Choose wrong, and you either can't answer business questions or can't handle the load.</strong></p>
+
+<h2><span class="step-icon">💥</span> Step 2 — What Breaks</h2>
+<p>You build a social media feed on Postgres. At 1M users, it works. At 50M users, the feed query (JOIN across 4 tables with ORDER BY and LIMIT) takes 8 seconds. You can't index your way out — the write volume (500K tweets/minute) means indexes slow inserts to a crawl. You need to migrate to Cassandra, but your data model is deeply relational. The migration takes 6 months. <strong>Cascading failure:</strong> Wrong DB choice → works at low scale → hits scaling wall → forced migration under load → extended downtime. <strong>Real example:</strong> Uber started with Postgres, outgrew it, migrated to MySQL, outgrew that, built their own distributed DB (Schemaless). The migration took years.</p>
+
+<h2><span class="step-icon">🧮</span> Step 3 — Back-of-Envelope Math</h2>
+<div class="math-block">
+<strong>📐 SQL (Postgres) Limits:</strong><br>
+• Read QPS: ~2K-5K per instance (indexed queries, 5-10ms)<br>
+• Write QPS: ~1K-2K per instance (with indexes; each index doubles write cost)<br>
+• Storage: effectively unlimited (TB scale)<br>
+• Connections: 100-500 practical limit<br>
+• Scaling: vertical + read replicas + sharding (complex)<br><br>
+<strong>📐 NoSQL (Cassandra/DynamoDB) Limits:</strong><br>
+• Read QPS: practically unlimited (linear scale with nodes)<br>
+• Write QPS: practically unlimited<br>
+• Storage: unlimited<br>
+• Query flexibility: very limited — must design for access patterns<br>
+• Operations: Cassandra requires dedicated expertise; DynamoDB is managed<br><br>
+<strong>Elimination Framework:</strong><br>
+• Need ACID transactions? → <span class="eliminated">NoSQL eliminated (most don't support multi-row ACID)</span><br>
+• Need complex JOINs/ad-hoc queries? → <span class="eliminated">NoSQL eliminated</span><br>
+• Need &gt;5K writes/sec AND simple access patterns? → <span class="eliminated">SQL eliminated (sharding too complex)</span><br>
+• Need &gt;5K writes/sec AND complex queries? → you have a hard problem (CQRS + event sourcing)</div>
+
+<h2><span class="step-icon">❓</span> Step 4 — Clarifying Questions</h2>
+<p><strong>Q1:</strong> "Do we need ACID transactions across multiple rows/tables? Payment systems need this; feeds don't." <em>ASSUMPTION:</em> Mixed — payments need ACID, feeds don't.<br>
+<strong>Q2:</strong> "What are the top 3 query patterns? Design for those, not for 'what if someday' queries." <em>ASSUMPTION:</em> Primary key lookups (80%), time-range queries (15%), search (5%).<br>
+<strong>Q3:</strong> "What's the write throughput? &gt;2K writes/sec per instance pushes you toward NoSQL or sharded SQL." <em>ASSUMPTION:</em> 500 writes/sec during peak.<br>
+<strong>Q4:</strong> "Who's operating this? Do we have NoSQL expertise on the team?" <em>ASSUMPTION:</em> Team knows Postgres well, limited NoSQL experience.<br>
+<strong>Q5:</strong> "Data shape: structured (fixed schema) or semi-structured (JSON, varying fields)?" <em>ASSUMPTION:</em> Mostly structured with some flexible fields.</p>
+
+<h2><span class="step-icon">📊</span> Step 5 — ASCII Diagrams</h2>
+<h3>A) SQL (Postgres) — Single Instance</h3>
+<pre class="ascii">App → [Postgres: users, orders, products tables with FK relationships]
+Queries: SELECT with JOINs, transactions across tables.
+Scaling: Vertical until ~5K QPS, then read replicas.</pre>
+<h3>B) NoSQL (DynamoDB) — Distributed</h3>
+<pre class="ascii">App → [DynamoDB: items with PK + SK, no JOINs]
+Queries: GetItem by PK, Query by PK+SK prefix. No cross-item transactions.
+Scaling: Horizontal, auto-sharded. Pay per request.</pre>
+<h3>C) Hybrid — The Real-World Pattern</h3>
+<pre class="ascii">App → [Postgres: payment, user auth (ACID)] + [DynamoDB: feed, sessions (scale)]
+                                   ↕ (event stream for sync)
+                              [Kafka: change data capture]</pre>
+
+<h2><span class="step-icon">⚖️</span> Step 6 — Trade-offs</h2>
+<p><strong>Option A — All SQL:</strong> Simple, ACID everywhere. <em>Cons:</em> Hits scaling wall at high write volumes. <span class="eliminated">Eliminated if writes &gt;2K/sec AND simple queries.</span></p>
+<p><strong>Option B — All NoSQL:</strong> Scales infinitely. <em>Cons:</em> No JOINs, eventual consistency, limited ad-hoc queries. <span class="eliminated">Eliminated if ACID needed for any path.</span></p>
+<p><strong>Option C — Hybrid (Recommended):</strong> SQL for transactional data, NoSQL for high-scale read/write paths. ✅</p>
+<div class="callout"><strong>🏆 Recommendation:</strong> Start with Postgres. Add NoSQL (DynamoDB or Redis) for specific high-scale paths. Don't introduce a second DB until the first one actually shows scaling limits. <strong>Principal justification:</strong> Every additional database type adds operational complexity — monitoring, backups, on-call training. Justify the complexity with concrete scaling numbers.</div>
+
+<h2><span class="step-icon">💻</span> Step 7 — .NET 9 Code</h2>
+<pre class="code-csharp"><code>// EF Core for SQL (ACID operations)
+builder.Services.AddDbContext&lt;AppDbContext&gt;(o => o.UseNpgsql(connectionString));
+
+// DynamoDB client for high-scale NoSQL operations
+builder.Services.AddAWSService&lt;IAmazonDynamoDB&gt;();
+builder.Services.AddSingleton&lt;IDynamoDBContext, DynamoDBContext&gt;();
+
+// Hybrid repository pattern
+public class FeedService {
+    readonly AppDbContext _sql; // for transactional data
+    readonly IDynamoDBContext _nosql; // for high-scale feed
+    public async Task AddToFeed(FeedItem item) {
+        await _nosql.SaveAsync(item); // fast, eventually consistent
+        await _sql.FeedAudit.AddAsync(item); // transactional record
+    }
+}</code></pre>
+<h2><span class="step-icon">🎙️</span> Step 9 — Interview Script</h2>
+<div class="principal-signal">🧠 <strong>L7 Signal:</strong> "I'm not choosing between SQL and NoSQL — I'm choosing per data domain. The payment path needs ACID → Postgres. The news feed needs high write throughput with simple queries → DynamoDB. The operational cost of running two databases is justified because the access patterns are genuinely different. What's not justified is choosing NoSQL for everything because 'it scales' and then building ACID yourself on top of it."</div>
+<h2><span class="step-icon">⚓</span> Step 12 — Memory Anchor</h2>
+<p><strong>Analogy:</strong> Library card catalog (SQL — structured, complex queries) vs warehouse (NoSQL — fast retrieval by ID, no complex searches).</p>
+<p><strong>Numbers:</strong> 2K writes/sec = Postgres ceiling. 5K QPS = single SQL instance read ceiling. 2 weeks = on-call training cost per new DB type.</p>
+<p><strong>Phrase:</strong> "Choose the database per data domain, not per system. The operational cost of wrong-choice migrations exceeds the licensing cost of running two databases."</p>
+<hr><p class="topic-end">End of Topic 05 · Principal Engineer Edition</p>
+</section>
+
+<!-- TOPIC 06: CACHING -->
+<section id="topic-6">
+<h1><span class="topic-number">06</span> Caching <span class="badge">L7 SIGNAL</span></h1>
+<p class="subtitle"><strong>Principal signal:</strong> You quantify the cache hit ratio needed to justify the Redis cluster cost — because you've seen caching layers that cost more than the DB they're protecting.</p>
+
+<h2><span class="step-icon">📖</span> Step 1 — Story</h2>
+<p>A librarian who memorizes the 50 most-requested books and keeps them on her desk. When a student asks for one of those 50, she hands it over instantly — no walking to the stacks. For the other 100,000 books, she walks to the stacks. If 85% of requests are for those 50 books, she saves 85% of her walking time. <strong>The librarian's desk is a cache. The 85% is the cache hit ratio. If only 10% of requests are for the top 50 books, the desk is wasted space — she's walking 90% of the time anyway. Caching only makes sense when the hit ratio justifies the cost of the cache.</strong></p>
+
+<h2><span class="step-icon">💥</span> Step 2 — What Breaks</h2>
+<p>Cache stampede: Your Redis instance goes down for 30 seconds. All 20K QPS that were hitting cache now hit the database directly. DB connection pool (500 max) exhausts in 2 seconds. Everything is down. <strong>Cascading failure:</strong> Cache miss → DB overload → DB slow → app times out → retries increase load → DB completely unresponsive. <strong>Real example:</strong> Reddit's 2021 outage — cache TTL change caused hit ratio drop from 95% to 30%, DB melted, site down for hours.</p>
+
+<h2><span class="step-icon">🧮</span> Step 3 — Back-of-Envelope Math</h2>
+<div class="math-block">
+<strong>💰 Caching Economics:</strong><br>
+• Redis cluster (3 nodes, HA): $400/month<br>
+• Postgres read replica: $350/month (handles ~2K QPS)<br>
+• Cache hit ratio needed to justify Redis: 85%+ (below this, replicas are cheaper)<br><br>
+<strong>Calculation:</strong><br>
+• 20K QPS, 85% cache hit = 3K DB QPS (needs 2 replicas at $700)<br>
+• 20K QPS, 50% cache hit = 10K DB QPS (needs 6 replicas at $2,100 — Redis wasted)<br>
+• 20K QPS, 95% cache hit = 1K DB QPS (1 replica, $350 — Redis highly justified)<br><br>
+<strong>→ Caching <span class="eliminated">eliminated if sustained hit ratio below 70%</span> (cheaper to add DB replicas)</strong></div>
+
+<h2><span class="step-icon">❓</span> Step 4 — Clarifying Questions</h2>
+<p><strong>Q1:</strong> "What's the expected data access pattern? Pareto distribution (90% traffic on 1% data) or uniform?" <em>ASSUMPTION:</em> Pareto — typical web traffic.<br>
+<strong>Q2:</strong> "What's the cost of serving stale data? For a stock ticker, 1-second staleness is unacceptable. For a blog, 5 minutes is fine." <em>ASSUMPTION:</em> 30-second staleness acceptable.<br>
+<strong>Q3:</strong> "What's the read:write ratio? If writes are frequent, cache invalidation complexity increases." <em>ASSUMPTION:</em> 50:1 read-heavy.<br>
+<strong>Q4:</strong> "Do we need distributed cache (shared across instances) or can we use in-memory per-instance?" <em>ASSUMPTION:</em> Distributed needed (multiple pods, consistent data).<br>
+<strong>Q5:</strong> "What's the cache stampede prevention strategy?" <em>ASSUMPTION:</em> Jitter + distributed lock on cache miss.</p>
+
+<h2><span class="step-icon">📊</span> Step 5 — ASCII Diagrams</h2>
+<h3>A) Simple Cache-Aside</h3>
+<pre class="ascii">App → check Redis → HIT? return | MISS? → query DB → store in Redis → return</pre>
+<h3>B) Cache Stampede Prevention</h3>
+<pre class="ascii">Multiple pods detect cache miss simultaneously → all query DB → DB overloaded
+Fix: ONLY ONE pod queries DB (distributed lock), others wait → stores in Redis → all return</pre>
+<h3>C) Failure: Cache Stampede</h3>
+<pre class="ascii">Redis down → 100% miss → DB hit with 20K QPS → connection pool exhausts → cascade
+Alert: redis_cache_hit_ratio < 50% for 30s | Fix: Circuit breaker, serve stale if available</pre>
+
+<h2><span class="step-icon">⚖️</span> Step 6 — Trade-offs</h2>
+<p><strong>Option A — No Cache:</strong> Simple, no consistency issues. <em>Cons:</em> DB must handle all read load. <span class="eliminated">Eliminated above 5K QPS.</span></p>
+<p><strong>Option B — Redis Cache-Aside:</strong> Flexible, most common pattern. ✅ <strong>Recommended.</strong></p>
+<p><strong>Option C — Write-Through Cache:</strong> Cache always consistent with DB. <em>Cons:</em> Every write hits both cache and DB — doubles write latency. <span class="eliminated">Eliminated unless consistency is critical.</span></p>
+<div class="callout"><strong>🏆 Recommendation:</strong> Cache-aside with jittered TTL + distributed lock for stampede prevention. Monitor hit ratio per endpoint.</div>
+
+<h2><span class="step-icon">💻</span> Step 7 — .NET 9 Code (IDistributedCache)</h2>
+<pre class="code-csharp"><code>// Program.cs
+builder.Services.AddStackExchangeRedisCache(o => o.Configuration = "redis:6379");
+
+// Usage with stampede prevention
+public async Task&lt;string&gt; GetWithLock(string key, IDistributedCache cache) {
+    var cached = await cache.GetStringAsync(key);
+    if (cached != null) return cached;
+    // Distributed lock prevents stampede
+    if (await _lock.AcquireAsync($"lock:{key}", TimeSpan.FromSeconds(5))) {
+        try {
+            var data = await FetchFromDb(key);
+            await cache.SetStringAsync(key, data, new DistributedCacheEntryOptions {
+                SlidingExpiration = TimeSpan.FromSeconds(30)
+            });
+            return data;
+        } finally { await _lock.ReleaseAsync($"lock:{key}"); }
+    }
+    // Another pod is fetching — retry cache after delay
+    await Task.Delay(100);
+    return await cache.GetStringAsync(key) ?? "fallback";
+}</code></pre>
+<h2><span class="step-icon">🎙️</span> Step 9 — Interview Script</h2>
+<div class="principal-signal">🧠 <strong>L7 Signal:</strong> "I don't add caching because 'it's faster.' I add caching because the math shows it saves $2,300/month in DB costs at our scale. A Redis cluster costs $400/month. If the cache hit ratio drops below 70%, the Redis cluster is actually losing money — it's cheaper to add DB replicas. I monitor the cache hit ratio per endpoint and have an alert if any endpoint drops below 50% for 10 minutes. That alert fires before the DB melts, not after."</div>
+<h2><span class="step-icon">⚓</span> Step 12 — Memory Anchor</h2>
+<p><strong>Analogy:</strong> Librarian's desk with 50 most-requested books. Worth it if 85% of kids ask for those 50 books.</p>
+<p><strong>Numbers:</strong> 85% = minimum cache hit ratio for Redis ROI. 30s = default TTL for web data. $400/month = Redis HA cluster cost.</p>
+<p><strong>Phrase:</strong> "Caching is an economic decision, not a performance one — the hit ratio must justify the Redis bill."</p>
+<hr><p class="topic-end">End of Topic 06 · Principal Engineer Edition</p>
+</section>
+
+<!-- TOPIC 07: API GATEWAY -->
+<section id="topic-7">
+<h1><span class="topic-number">07</span> API Gateway <span class="badge">L7 SIGNAL</span></h1>
+<p class="subtitle"><strong>Principal signal:</strong> You discuss how the gateway itself must be HA and what happens during a gateway rolling deployment — because you've caused an outage by deploying the gateway.</p>
+
+<h2><span class="step-icon">📖</span> Step 1 — Story</h2>
+<p>The security desk at a corporate headquarters. Everyone entering the building must pass through: show ID (authentication), state their destination (routing), get a visitor badge (rate limiting — one badge per person), and if they're banned, they're turned away (authorization). The security desk doesn't do any actual office work — it just routes approved visitors to the right floor. <strong>The API Gateway is the security desk. It handles cross-cutting concerns so your services don't have to. But if the security desk goes down, nobody enters the building — even if every office upstairs is fully staffed.</strong></p>
+
+<h2><span class="step-icon">💥</span> Step 2 — What Breaks</h2>
+<p>You deploy a new version of the API Gateway. The rollout restarts all gateway instances simultaneously (misconfigured maxUnavailable). For 30 seconds, zero gateways are running. Every API request fails with 503. Your backend services are healthy, but unreachable. <strong>Cascading failure:</strong> Gateway single point of failure → all traffic blocked → downstream services appear healthy but idle → business completely down for 30 seconds. <strong>Real example:</strong> AWS us-east-1 outage in 2021 started with a networking issue that took down API Gateway in that region — every service behind it became unreachable, even healthy ones.</p>
+
+<h2><span class="step-icon">🧮</span> Step 3 — Back-of-Envelope Math</h2>
+<div class="math-block">
+<strong>Gateway Capacity Planning:</strong><br>
+• YARP/Kestrel: ~50K QPS per gateway instance (L7, with auth overhead)<br>
+• At 20K QPS: 2 instances for HA (handles 1 instance failure)<br>
+• Gateway adds ~2-5ms latency per request (auth, routing, logging)<br>
+• Rate limiting overhead: Redis call adds ~1ms<br>
+• Gateway cost: ~$100-200/month for 2 HA instances<br><br>
+<strong>→ Gateway <span class="eliminated">eliminated as single instance</span> — SPOF for entire system.</strong></div>
+
+<h2><span class="step-icon">❓</span> Step 4 — Clarifying Questions</h2>
+<p><strong>Q1:</strong> "What cross-cutting concerns must the gateway handle? Auth, rate limiting, logging, CORS?" <em>ASSUMPTION:</em> Auth, rate limiting, request logging.<br>
+<strong>Q2:</strong> "Do we need per-endpoint rate limiting or just global? Per-endpoint requires more sophisticated config." <em>ASSUMPTION:</em> Global + per-tenant rate limiting.<br>
+<strong>Q3:</strong> "Is the gateway doing transformation (XML→JSON, request enrichment) or just routing?" <em>ASSUMPTION:</em> Routing + auth only. No transformation (that's backend logic).<br>
+<strong>Q4:</strong> "How many backend services? More than 50 makes gateway configuration management critical." <em>ASSUMPTION:</em> 5-10 microservices.<br>
+<strong>Q5:</strong> "Gateway deployment strategy: rolling with maxSurge or blue/green?" <em>ASSUMPTION:</em> Rolling deploy, max 1 unavailable at a time.</p>
+
+<h2><span class="step-icon">📊</span> Step 5 — ASCII Diagrams</h2>
+<h3>A) Single Gateway (Dangerous)</h3>
+<pre class="ascii">Client → [Gateway] → Service A, B, C
+Risk: Gateway = SPOF. Deploy takes down everything.</pre>
+<h3>B) HA Gateway (Recommended)</h3>
+<pre class="ascii">Client → NLB → [Gateway 1, Gateway 2] → Service A, B, C
+Rolling deploy: drain Gateway 1 → restart → drain Gateway 2 → restart.
+Zero downtime if configured correctly.</pre>
+<h3>C) Failure: Gateway Deployment Outage</h3>
+<pre class="ascii">Both gateways restart simultaneously (bad config) → 0 gateways → all 503.
+Alert: "gateway_healthy_instance_count < 2 for 10s"
+Prevention: PodDisruptionBudget: max 1 unavailable. MaxSurge: 1 extra during deploy.</pre>
+
+<h2><span class="step-icon">⚖️</span> Step 6 — Trade-offs</h2>
+<p><strong>Option A — No Gateway:</strong> Each service handles auth/rate limiting itself. <em>Cons:</em> Duplicated logic, inconsistent security. <span class="eliminated">Eliminated for any multi-service system.</span></p>
+<p><strong>Option B — YARP (.NET-native):</strong> Same stack as API, config in code. ✅ <strong>Recommended.</strong></p>
+<p><strong>Option C — Cloud-native (API Gateway/Apigee):</strong> Fully managed, rich features. <em>Cons:</em> Vendor lock-in, per-request pricing at scale. <span class="eliminated">Eliminated below 100K QPS (managed cost exceeds self-hosted).</span></p>
+<div class="callout"><strong>🏆 Recommendation:</strong> YARP for .NET ecosystem. It's free, and the team already knows the stack. Add cloud API Gateway only if you need features YARP doesn't have (API key management, usage plans, etc.).</div>
+
+<h2><span class="step-icon">💻</span> Step 7 — .NET 9 Code (YARP + Rate Limiting)</h2>
+<pre class="code-csharp"><code>// Program.cs
+builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+builder.Services.AddRateLimiter(o => {
+    o.AddFixedWindowLimiter("global", c => {
+        c.PermitLimit = 10000;
+        c.Window = TimeSpan.FromSeconds(1);
+    });
+});
+app.UseRateLimiter();
+app.MapReverseProxy();</code></pre>
+<h2><span class="step-icon">🎙️</span> Step 9 — Interview Script</h2>
+<div class="principal-signal">🧠 <strong>L7 Signal:</strong> "The gateway is the most dangerous component to deploy because it's a failure domain for everything behind it. I configure PodDisruptionBudget so only one gateway instance can be unavailable at a time. I run 3 gateway instances minimum — one can be down for deployment, one can fail, and one still serves traffic. And I test gateway deploys in staging by intentionally killing instances during rollout to verify zero errors. You'd be surprised how many teams never test this and cause a full outage on their first production gateway deploy."</div>
+<h2><span class="step-icon">⚓</span> Step 12 — Memory Anchor</h2>
+<p><strong>Analogy:</strong> Corporate security desk — everyone passes through it. If it's closed, the building is closed.</p>
+<p><strong>Numbers:</strong> 3 = minimum gateway instances for safe rolling deploy. 2-5ms = latency overhead. 50K QPS = single YARP instance capacity.</p>
+<p><strong>Phrase:</strong> "The gateway is a failure domain for everything behind it — deploy like one mistake takes down the company."</p>
+<hr><p class="topic-end">End of Topic 07 · Principal Engineer Edition</p>
+</section>
+
+<!-- TOPIC 08: CDN -->
+<section id="topic-8">
+<h1><span class="topic-number">08</span> CDN <span class="badge">L7 SIGNAL</span></h1>
+<p class="subtitle"><strong>Principal signal:</strong> You distinguish between the two CDN goals — latency reduction vs origin offload — and note that combining them naively leads to stale personalized data incidents.</p>
+
+<h2><span class="step-icon">📖</span> Step 1 — Story</h2>
+<p>A newspaper company with one printing press in New York. Readers in Tokyo wait 2 weeks for delivery. The company builds printing presses in Tokyo, London, and Sydney — now Tokyo readers get the paper same-day. But here's the trick: the front page (same worldwide) can be printed at all locations. The "local news" section (different per city) must be customized per printing press. <strong>The CDN is the worldwide printing press network. The front page is cacheable static content. The local news is personalized content that shouldn't be cached the same way — or Tokyo readers get New York local news.</strong></p>
+
+<h2><span class="step-icon">💥</span> Step 2 — What Breaks</h2>
+<p>You configure your CDN to cache everything aggressively. A user logs in, and the CDN serves the cached "Login" button (because the homepage was cached for anonymous users). The user can't access their account. Or worse: user A's personalized dashboard is cached and served to user B. <strong>Cascading failure:</strong> Aggressive caching → personalized data leaks between users → PII incident → security team purges entire CDN → origin melts under sudden full load. <strong>Real example:</strong> Steam's 2015 caching bug served other users' account pages to random visitors. Root cause: CDN cached personalized responses.</p>
+
+<h2><span class="step-icon">🧮</span> Step 3 — Back-of-Envelope Math</h2>
+<div class="math-block">
+<strong>CDN Cost-Benefit Analysis:</strong><br>
+• Origin serving 20K QPS: ~$3,000/month compute + $1,200/month egress<br>
+• CDN absorbing 90% of reads: 2K QPS at origin, ~$500/month CDN + reduced egress ($300)<br>
+• CDN cost: $500/month. Savings: $2,700 (compute) + $900 (egress) = $3,600/month<br>
+<strong>CDN pays for itself 7.2× over at this scale.</strong><br>
+• For latency: reduces response time from 150ms (cross-continent) to 10ms (edge)<br><br>
+<strong>→ No CDN <span class="eliminated">eliminated above 5K QPS with global users</span> (cost + latency).</strong></div>
+
+<h2><span class="step-icon">❓</span> Step 4 — Clarifying Questions</h2>
+<p><strong>Q1:</strong> "Primary goal: latency reduction (global users) or origin offload (cost savings)? Different TTL and caching strategies." <em>ASSUMPTION:</em> Both — global audience, cost-conscious.<br>
+<strong>Q2:</strong> "What content can be cached at edge? Static assets (images, CSS) are easy. API responses need careful cache-control headers." <em>ASSUMPTION:</em> Static assets + public API responses.<br>
+<strong>Q3:</strong> "Personalized content: how do we prevent serving user A's data to user B?" <em>ASSUMPTION:</em> Don't cache personalized responses. Use edge-side includes or client-side personalization.<br>
+<strong>Q4:</strong> "Cache invalidation strategy: TTL-based (simple) or API-based purge (precise but complex)?" <em>ASSUMPTION:</em> TTL-based with fast purge capability for emergencies.<br>
+<strong>Q5:</strong> "Multi-region origin or single origin behind CDN? Multi-region adds complexity but reduces origin-CDN latency." <em>ASSUMPTION:</em> Single origin (US-East), CDN handles global distribution.</p>
+
+<h2><span class="step-icon">📊</span> Step 5 — ASCII Diagrams</h2>
+<h3>A) No CDN</h3>
+<pre class="ascii">Tokyo user → 150ms → Origin (US-East) → 150ms response. Total: 300ms.
+All 20K QPS hit origin directly.</pre>
+<h3>B) With CDN</h3>
+<pre class="ascii">Tokyo user → 5ms → CDN Edge (Tokyo) → CACHE HIT? → return 5ms
+                                         → CACHE MISS? → 100ms → Origin → cache → return</pre>
+<h3>C) Failure: Personalization Leak</h3>
+<pre class="ascii">CDN caches /api/profile (personalized) → User B gets User A's cached profile → PII leak
+Fix: Set Cache-Control: private, no-store on personalized endpoints.</pre>
+
+<h2><span class="step-icon">⚖️</span> Step 6 — Trade-offs</h2>
+<p><strong>Option A — No CDN:</strong> Simple, no consistency issues. <em>Cons:</em> High latency for global users, high origin costs. <span class="eliminated">Eliminated for global products above 5K QPS.</span></p>
+<p><strong>Option B — CDN for static only:</strong> Safe, no PII risk. <em>Cons:</em> Leaves significant savings on table. ✅ <strong>Starting point.</strong></p>
+<p><strong>Option C — CDN for everything:</strong> Maximum savings and speed. <em>Cons:</em> Risk of caching personalized data. Needs careful cache-control headers per endpoint.</p>
+<div class="callout"><strong>🏆 Recommendation:</strong> Start with CDN for static assets. Gradually add API caching with strict cache-control headers per endpoint. Never cache personalized responses.</div>
+
+<h2><span class="step-icon">💻</span> Step 7 — .NET 9 Code</h2>
+<pre class="code-csharp"><code>// Controller with correct cache headers
+[HttpGet("/api/public/products")]
+[ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)] // CDN can cache
+public IActionResult GetProducts() => Ok(_products);
+
+[HttpGet("/api/user/profile")]
+[ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)] // Never cache
+public IActionResult GetProfile() => Ok(_currentUser);
+
+// Cache-Control header middleware for CDN compliance
+app.Use(async (ctx, next) => {
+    await next();
+    if (ctx.Response.Headers.ContainsKey("Set-Cookie"))
+        ctx.Response.Headers["Cache-Control"] = "private, no-store"; // Don't cache auth responses
+});</code></pre>
+<h2><span class="step-icon">🎙️</span> Step 9 — Interview Script</h2>
+<div class="principal-signal">🧠 <strong>L7 Signal:</strong> "I distinguish between CDN-as-latency-reducer and CDN-as-origin-offloader because the caching strategies are different. For latency, I cache close to users with short TTLs and accept more origin requests. For cost savings, I use longer TTLs and cache at fewer edge locations. The mistake most teams make is using aggressive caching for everything, then leaking personalized data. My rule: any endpoint that returns user-specific data gets Cache-Control: private, no-store. No exceptions. I'd rather serve it slower from origin than serve the wrong user's data fast from CDN."</div>
+<h2><span class="step-icon">⚓</span> Step 12 — Memory Anchor</h2>
+<p><strong>Analogy:</strong> Newspaper printing presses worldwide — front page same everywhere, local section different per city.</p>
+<p><strong>Numbers:</strong> 90% = CDN cache hit ratio target. 10ms = edge response time vs 150ms cross-continent. $500/month = CDN cost that saves $3,600.</p>
+<p><strong>Phrase:</strong> "CDN is for latency and cost, but never for personalized data — serving the wrong user fast is worse than serving the right user slow."</p>
+<hr><p class="topic-end">End of Topic 08 · Principal Engineer Edition</p>
+</section> 
 </body>
 </html>
