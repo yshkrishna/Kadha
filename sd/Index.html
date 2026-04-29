@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L7 System Design Guide · Principal Engineer · .NET 9</title>
+    <meta name="description" content="Principal Engineer (L7) System Design Interview Guide — .NET 9 Edition. 57 topics with production-grade depth.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#08080d',
+                        card: '#111118',
+                        sidebar: '#0c0c14',
+                        border: '#1f1f2e',
+                        accent: '#2dd4bf',
+                        'accent-blue': '#60a5fa',
+                        muted: '#8b8ba0',
+                        'code-bg': '#0a0a14',
+                    },
+                    fontFamily: {
+                        body: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .topic-content { display: none; }
+        .topic-content.active { display: block; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        pre.ascii { font-size: 0.7rem; line-height: 1.4; }
+    </style>
+</head>
+<body class="font-body bg-bg text-gray-200 antialiased min-h-screen" style="background-image: radial-gradient(ellipse at 20% 0%, rgba(45,212,191,0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(96,165,250,0.03) 0%, transparent 50%);">
+
+<!-- Mobile Toggle & Header -->
+<header class="sticky top-0 z-50 bg-bg/90 backdrop-blur-lg border-b border-border px-4 py-3 flex items-center gap-3">
+    <button id="menuBtn" class="text-gray-300 hover:text-white p-1 lg:hidden" aria-label="Toggle sidebar">☰</button>
+    <span class="font-extrabold text-white tracking-tight text-lg flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-accent to-accent-blue rounded-md text-black font-mono font-extrabold text-sm">L7</span>
+        System Design Guide
+    </span>
+    <span class="ml-auto text-xs text-muted hidden sm:inline" id="progressTop">0/57</span>
+</header>
+
+<div class="flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-sidebar border-r border-border transform -translate-x-full lg:translate-x-0 transition-transform duration-200 pt-16 overflow-y-auto pb-20">
+        <div class="px-4 py-3 border-b border-border">
+            <p class="text-xs text-muted uppercase tracking-wider font-semibold">📋 57 Topics</p>
+            <p class="text-xs text-muted mt-0.5" id="progressSide">0 / 57 completed</p>
+        </div>
+        <nav class="py-2" id="sidebarNav">
+            <!-- Categories populated below -->
+        </nav>
+    </aside>
+    <!-- Overlay -->
+    <div id="overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 lg:ml-72 p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto w-full pt-20">
+        <!-- Search -->
+        <div class="relative mb-6">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm">🔍</span>
+            <input type="search" id="searchInput" placeholder="Search topics... (e.g., cache, payment, sharding)" class="w-full bg-card border border-border rounded-full py-2.5 pl-10 pr-4 text-sm text-gray-200 placeholder-muted focus:outline-none focus:border-accent transition-colors">
+            <div id="searchResults" class="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-xl z-20 hidden max-h-60 overflow-y-auto"></div>
+        </div>
+
+        <!-- Topics Container -->
+        <div id="topicsContainer">
+            <!-- Topic cards injected here -->
+        </div>
+    </main>
+</div>
+
+<script>
+// ────────────────── DATA ──────────────────
+const TOPICS = [
+    { id:'t1', n:'01', cat:'foundations', title:'How to Start the Interview', content:'full' },
+    { id:'t2', n:'02', cat:'foundations', title:'Back-of-Envelope Math', content:'full' },
+    { id:'t3', n:'03', cat:'foundations', title:'Scaling — Vertical vs Horizontal', content:'full' },
+    { id:'t4', n:'04', cat:'foundations', title:'Load Balancer', content:'full' },
+    { id:'t5', n:'05', cat:'foundations', title:'Database Basics — SQL vs NoSQL', content:'full' },
+    { id:'t6', n:'06', cat:'foundations', title:'Caching', content:'full' },
+    { id:'t7', n:'07', cat:'foundations', title:'API Gateway', content:'full' },
+    { id:'t8', n:'08', cat:'foundations', title:'CDN', content:'full' },
+];
+// Generate remaining 49 placeholder topics
+const cats = ['intermediate','intermediate','intermediate','intermediate','intermediate','intermediate','intermediate','intermediate','intermediate','intermediate',
+    'advanced','advanced','advanced','advanced','advanced','advanced','advanced','advanced','advanced','advanced',
+    'classic','classic','classic','classic','classic','classic','classic','classic','classic','classic','classic','classic',
+    'principal','principal','principal','principal','principal','principal','principal','principal','principal','principal','principal','principal',
+    'final','final','final','final','final'];
+const titles = ['Microservices','Message Queues','Sharding','Replication','CAP Theorem','Consistent Hashing','Rate Limiting','Idempotency','Logging & Observability','Security Basics',
+    'Saga Pattern','CQRS','Event Sourcing','Circuit Breaker','Service Discovery','Distributed Tracing','Observability Stack','Multi-Region Architecture','WebSockets & Real-Time','Job Scheduling',
+    'URL Shortener','Chat Application','YouTube / Video Platform','Twitter Feed','Uber / Food Delivery','Amazon Order System','Rate Limiter System','Google Search','Netflix','Notification System','Recommendation System','Distributed Task Scheduler',
+    'Capacity Planning Under Constraints','API Versioning Strategy','Zero-Downtime Data Migration','Distributed Locking — Redlock','Optimistic vs Pessimistic Locking','Two-Phase Commit vs Saga','Multi-Tenant SaaS Architecture','Payment System Design','Search Autocomplete System','Non-Engineer Communication','Handling Disagreement','Architectural Failure — STAR',
+    'Latency Engineering & Tail Latency','Backpressure & Load Shedding','Data Modeling at Scale','Incident Management & Postmortems','Cost Optimization per Decision'];
+for(let i=0;i<49;i++){
+    const n=i+9;
+    TOPICS.push({id:`t${n}`,n:String(n).padStart(2,'0'),cat:cats[i],title:titles[i],content:'placeholder'});
+}
+const CAT_LABELS = {
+    foundations:{label:'🟢 Foundations',dot:'bg-green-400'},
+    intermediate:{label:'🟡 Intermediate',dot:'bg-yellow-400'},
+    advanced:{label:'🔴 Advanced',dot:'bg-red-400'},
+    classic:{label:'🎨 Classic Designs',dot:'bg-purple-400'},
+    principal:{label:'🏆 Principal Gaps',dot:'bg-blue-400'},
+    final:{label:'🔬 Final Tier',dot:'bg-pink-400'}
+};
+const completed = new Set(JSON.parse(localStorage.getItem('l7completed')||'[]'));
+function save(){localStorage.setItem('l7completed',JSON.stringify([...completed]));}
+let activeId = null;
+
+// ────────────────── BUILD SIDEBAR ──────────────────
+function buildSidebar(){
+    const nav=document.getElementById('sidebarNav');
+    nav.innerHTML='';
+    const grouped={};
+    TOPICS.forEach(t=>{if(!grouped[t.cat])grouped[t.cat]=[];grouped[t.cat].push(t);});
+    Object.entries(CAT_LABELS).forEach(([key,meta])=>{
+        const topics=grouped[key];if(!topics)return;
+        const div=document.createElement('div');div.className='mb-3';
+        div.innerHTML=`<p class="text-[0.6rem] uppercase tracking-widest font-bold text-muted px-3 mb-1 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full ${meta.dot}"></span>${meta.label}</p>`;
+        topics.forEach(t=>{
+            const btn=document.createElement('button');
+            btn.className='w-full text-left px-3 py-1.5 text-xs rounded text-muted hover:bg-white/5 hover:text-gray-200 transition-colors truncate block';
+            if(completed.has(t.id))btn.classList.add('text-green-700');
+            if(completed.has(t.id))btn.innerHTML=t.n+'. '+t.title+' <span class="text-[0.55rem] text-accent">✓</span>';
+            else btn.textContent=t.n+'. '+t.title;
+            btn.onclick=()=>{activate(t.id);closeSidebar();};
+            nav.appendChild(btn);
+        });
+    });
+}
+
+// ────────────────── BUILD TOPICS ──────────────────
+function getContent(t){
+    if(t.content==='placeholder')return `<div class="bg-card border border-border rounded-2xl p-6"><h1 class="text-xl font-extrabold text-white flex items-center gap-3"><span class="inline-flex items-center justify-center w-9 h-9 bg-gradient-to-br from-accent to-accent-blue rounded-lg text-black font-mono font-extrabold text-sm">${t.n}</span>${t.title}</h1><p class="text-muted mt-4">🚧 Content coming soon. This topic is under development.</p></div>`;
+    // Full content topics (01-08)
+    const contents = {
+        t1: `<div class="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-lg"><h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-3 flex-wrap"><span class="inline-flex items-center justify-center w-9 h-9 bg-gradient-to-br from-accent to-accent-blue rounded-lg text-black font-mono font-extrabold text-sm">01</span>How to Start the Interview<span class="text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">L7 SIGNAL</span></h1><p class="text-sm text-muted mt-2 border-l-2 border-border pl-3"><strong class="text-gray-200">Principal signal:</strong> You define the scope rather than accept whatever the interviewer implies.</p><h2 class="text-base font-bold text-accent mt-6">📖 Step 1 — Story</h2><p class="text-sm text-muted">Airport architect: asks about passengers, budget, soil before sketching. Un-scoped design = guaranteed failure.</p><h2 class="text-base font-bold text-accent mt-5">💥 Step 2 — What Breaks</h2><p class="text-sm text-muted">Wrong assumptions → wrong architecture → lost confidence → time runs out. Amazon US-EAST-1 2021: unscoped scaling event took down multiple services.</p><h2 class="text-base font-bold text-accent mt-5">🧮 Step 3 — Math</h2><div class="bg-code-bg border border-teal-900/30 rounded-lg p-4 font-mono text-xs text-gray-300 my-3">10M DAU → 17,400 peak QPS<br>Single DB: ~2K QPS → <span class="line-through opacity-50">eliminated</span><br>Redis absorbing 91%: $800/mo vs replicas $5,400/mo → <strong class="text-accent">Redis 6.75× cheaper</strong></div><h2 class="text-base font-bold text-accent mt-5">❓ Step 4 — Clarifying Questions</h2><p class="text-sm text-muted"><strong>Q1:</strong> Latency vs consistency? <em>ASSUMPTION:</em> p99<20ms, eventual ok.<br><strong>Q2:</strong> Global or single-region? <em>ASSUMPTION:</em> Single.<br><strong>Q3:</strong> Write/read ratio? <em>ASSUMPTION:</em> 1:50.<br><strong>Q4:</strong> GDPR constraints? <em>ASSUMPTION:</em> None.<br><strong>Q5:</strong> Which failure costs more — downtime or stale reads?</p><h2 class="text-base font-bold text-accent mt-5">⚖️ Step 6 — Trade-offs</h2><p class="text-sm text-muted">Option A (draw immediately) <span class="line-through opacity-50">eliminated</span>. Option B (5-question framework) ✅ <strong>Recommended.</strong></p><h2 class="text-base font-bold text-accent mt-5">💻 Step 7 — .NET 9 Code</h2><pre class="bg-code-bg border-l-2 border-accent rounded-r-lg p-4 font-mono text-xs text-gray-300 overflow-x-auto my-3">public record InterviewScope(int PeakQps, int LatencyBudgetMsP99);\nbuilder.Services.AddSingleton(ScopeCalculator.FromDau(10_000_000, 50));</pre><h2 class="text-base font-bold text-accent mt-5">🎙️ Step 9 — Interview Script</h2><p class="text-sm text-muted"><strong>Opening:</strong> "Before I draw, I'll define non-functional requirements. I'll state assumptions — stop me if wrong."</p><div class="bg-purple-900/10 border-l-2 border-purple-400 rounded-r-lg p-4 italic text-sm text-purple-200 my-3">🧠 <strong class="text-purple-300 not-italic">L7 Signal:</strong> "I validate SLO budget before DB choice. 99.99% = 52 min/year. Postgres async hits that without multi-primary."</div><h2 class="text-base font-bold text-accent mt-5">🔥 Step 10 — Failure Modes</h2><div class="space-y-2 my-2"><div class="bg-red-900/5 border border-red-900/20 rounded-lg p-3"><h4 class="text-red-400 text-xs font-bold">1. Constraint Shift</h4><p class="text-xs text-muted">Interviewer changes requirements mid-design. <strong>Fix:</strong> "Let me re-scope."</p></div></div><h2 class="text-base font-bold text-accent mt-5">💬 Step 11 — Follow-ups</h2><p class="text-sm text-muted"><strong>Curveball:</strong> "30 seconds to CFO?" → "For $3,200/month, serves 17K req/sec at 99.99% uptime."</p><h2 class="text-base font-bold text-accent mt-5">⚓ Step 12 — Memory Anchor</h2><p class="text-sm text-muted"><strong>Analogy:</strong> Airport architect. <strong>Numbers:</strong> 17K QPS, 52 min/year, 5 questions.</p><h2 class="text-base font-bold text-accent mt-5">🕒 Step 13 — 3AM Reality</h2><p class="text-sm text-muted"><code class="bg-red-900/20 text-red-300 px-1 rounded text-xs">api_p99 >2s</code> — bad deploy doubled cache key size. Rollback, fix CI/CD pipeline.</p></div>`,
+        t2: `<div class="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-lg"><h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-3 flex-wrap"><span class="inline-flex items-center justify-center w-9 h-9 bg-gradient-to-br from-accent to-accent-blue rounded-lg text-black font-mono font-extrabold text-sm">02</span>Back-of-Envelope Math<span class="text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">L7 SIGNAL</span></h1><p class="text-sm text-muted mt-2 border-l-2 border-border pl-3"><strong class="text-gray-200">Principal signal:</strong> You use math to ELIMINATE options, not just size components.</p><h2 class="text-base font-bold text-accent mt-6">📖 Step 1 — Story</h2><p class="text-sm text-muted">Wedding cake: 500 guests × 1.5 slices = 750 slices. Fridge holds 10 tiers. Math reveals the problem before ordering. <strong>Intuition at scale is always wrong — math is the truth-teller.</strong></p><h2 class="text-base font-bold text-accent mt-5">💥 Step 2 — What Breaks</h2><p class="text-sm text-muted">MongoDB "scales" but 50TB doesn't fit RAM. 4 servers provisioned, needed 40. Obama 2012 campaign: missed "celebrity multiplier" — Oprah tweet crushed payment pipeline.</p><h2 class="text-base font-bold text-accent mt-5">🧮 Step 3 — Math + Latency Budget</h2><div class="bg-code-bg border border-teal-900/30 rounded-lg p-4 font-mono text-xs text-gray-300 my-3">100M MAU → 30% DAU = 30M DAU × 20 = 600M req → 6,944 avg QPS × 3 = <strong class="text-accent">20,833 peak</strong><br>Latency Budget (p99<100ms): Network 5ms + App 10ms + DB 5ms + Cache 1ms = 25ms budgeted (4× headroom)<br>Storage: 500M × 2KB × 3(repl) × 1.5(index) = 4.5TB → $1,125/mo<br>Egress: ~$1,200/mo → <strong>exceeds compute!</strong><br><span class="line-through opacity-50">Single DB (~2K QPS) eliminated</span> · <span class="line-through opacity-50">No-cache ($2,940 vs $600) eliminated</span> · <span class="line-through opacity-50">Serverless (p99>200ms) eliminated</span></div><h2 class="text-base font-bold text-accent mt-5">⚖️ Step 6 — Trade-offs</h2><p class="text-sm text-muted">Option A (over-provision): $18K/mo <span class="line-through opacity-50">eliminated (35% idle)</span>. Option B (math-driven): $5,245/mo ✅. Option C (serverless): <span class="line-through opacity-50">eliminated (p99>200ms)</span>.</p><h2 class="text-base font-bold text-accent mt-5">💻 Step 7 — .NET 9 Code</h2><pre class="bg-code-bg border-l-2 border-accent rounded-r-lg p-4 font-mono text-xs text-gray-300 overflow-x-auto my-3">public static CapacityPlan FromMau(int mau, double dauRate, int actions) {\n    int peakQps = (int)(mau * dauRate * actions) / 86400 * 3;\n    double requiredHR = 1.0 - (500.0 * 4 * 0.7 / peakQps);\n    return new(peakQps, 500, 4, requiredHR, (int)Math.Ceiling(peakQps/500.0)+10);\n}</pre><h2 class="text-base font-bold text-accent mt-5">🎙️ Step 9 — Interview Script</h2><div class="bg-purple-900/10 border-l-2 border-purple-400 rounded-r-lg p-4 italic text-sm text-purple-200 my-3">🧠 <strong class="text-purple-300 not-italic">L7 Signal:</strong> "I calculate cost crossover where managed beats self-managed. At $5K/mo, managed Postgres cheaper than patching our own. <span class="line-through opacity-50">Self-managed eliminated.</span>"</div><h2 class="text-base font-bold text-accent mt-5">🔥 Step 10 — Failure Modes</h2><div class="space-y-2 my-2"><div class="bg-red-900/5 border border-red-900/20 rounded-lg p-3"><h4 class="text-red-400 text-xs font-bold">1. Cache HR Collapse</h4><p class="text-xs text-muted"><code class="bg-red-900/20 text-red-300 px-1 rounded text-xs">redis_cache_hit_ratio < 50%</code> — DB load 5×. Fix: TTL + write-through.</p></div><div class="bg-red-900/5 border border-red-900/20 rounded-lg p-3"><h4 class="text-red-400 text-xs font-bold">2. Egress Surprise</h4><p class="text-xs text-muted">Bill $12K not $5.2K. Fix: gzip, CDN TTL. Budget alert at 80%.</p></div></div><h2 class="text-base font-bold text-accent mt-5">💬 Step 11 — Follow-ups</h2><p class="text-sm text-muted"><strong>Curveball:</strong> "CTO cut budget 40%" → "$5.2K→$3.1K: Drop CDN, 50→35 pods, Redis cluster→single. Present risks for sign-off."</p><h2 class="text-base font-bold text-accent mt-5">⚓ Step 12 — Memory Anchor</h2><p class="text-sm text-muted"><strong>Analogy:</strong> Wedding napkin. <strong>Numbers:</strong> 86,400 sec/day, 3× peak multiplier, 500 QPS per .NET pod.</p><h2 class="text-base font-bold text-accent mt-5">🕒 Step 13 — 3AM Reality</h2><p class="text-sm text-muted"><code class="bg-red-900/20 text-red-300 px-1 rounded text-xs">db_pool_wait_count >50</code> — background job holding 80 connections. Kill query, partition connections.</p></div>`,
+        t3: `<div class="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-lg"><h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-3 flex-wrap"><span class="inline-flex items-center justify-center w-9 h-9 bg-gradient-to-br from-accent to-accent-blue rounded-lg text-black font-mono font-extrabold text-sm">03</span>Scaling — Vertical vs Horizontal<span class="text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">L7 SIGNAL</span></h1><p class="text-sm text-muted mt-2 border-l-2 border-border pl-3"><strong class="text-gray-200">Principal signal:</strong> You know the exact cost crossover: ~32 vCPU on AWS.</p><h2 class="text-base font-bold text-accent mt-6">📖 Step 1 — Story</h2><p class="text-sm text-muted">Pizza shop: one giant oven vs five smaller ones. Giant costs more per pizza at scale and kills business when it breaks. <strong>Know exactly when to stop buying bigger ovens.</strong></p><h2 class="text-base font-bold text-accent mt-5">💥 Step 2 — What Breaks</h2><p class="text-sm text-muted">Vertically scale to 64 vCPU, $26K/month. Still I/O limited. Horizontal: $12K/month for 8 instances at 8K QPS with fault tolerance. GitHub 2018: hit AWS ceiling, 2-year migration.</p><h2 class="text-base font-bold text-accent mt-5">🧮 Step 3 — Cost Crossover</h2><div class="bg-code-bg border border-teal-900/30 rounded-lg p-4 font-mono text-xs text-gray-300 my-3">Cost/vCPU: 2vCPU=$15 · 8vCPU=$33 · 32vCPU=$43 · 64vCPU=$48 · 96vCPU=$50<br>Horizontal at 64vCPU: 8×c5.2xlarge = $2,160/mo ($33/vCPU)<br>vs 1×c5.18xlarge = $3,100/mo ($48/vCPU)<br><strong class="text-accent">Horizontal 30% cheaper + fault tolerance</strong><br><span class="line-through opacity-50">Vertical eliminated above 32 vCPU</span></div><h2 class="text-base font-bold text-accent mt-5">⚖️ Step 6 — Trade-offs</h2><p class="text-sm text-muted">Option A (all vertical) <span class="line-through opacity-50">eliminated >32 vCPU</span>. Option B (horizontal day 1) <span class="line-through opacity-50">eliminated <10K QPS (K8s tax)</span>. Option C (gradual migration) ✅.</p><h2 class="text-base font-bold text-accent mt-5">💻 Step 7 — .NET 9 Code</h2><pre class="bg-code-bg border-l-2 border-accent rounded-r-lg p-4 font-mono text-xs text-gray-300 overflow-x-auto my-3">app.Lifetime.ApplicationStopping.Register(() => Console.WriteLine("Draining..."));\napp.MapHealthChecks("/health/ready"); // K8s readiness probe</pre><h2 class="text-base font-bold text-accent mt-5">🎙️ Step 9 — Interview Script</h2><div class="bg-purple-900/10 border-l-2 border-purple-400 rounded-r-lg p-4 italic text-sm text-purple-200 my-3">🧠 <strong class="text-purple-300 not-italic">L7 Signal:</strong> "Cloud providers' largest instances are traps. Above 32 vCPU, horizontal is 30% cheaper AND gives zero-downtime deploys."</div><h2 class="text-base font-bold text-accent mt-5">🔥 Step 10 — Failure Modes</h2><div class="space-y-2 my-2"><div class="bg-red-900/5 border border-red-900/20 rounded-lg p-3"><h4 class="text-red-400 text-xs font-bold">1. Hit Instance Ceiling</h4><p class="text-xs text-muted"><code class="bg-red-900/20 text-red-300 px-1 rounded text-xs">vm_cpu >85% & instance_type == max</code>. Fix: Emergency horizontal migration.</p></div></div><h2 class="text-base font-bold text-accent mt-5">⚓ Step 12 — Memory Anchor</h2><p class="text-sm text-muted"><strong>Analogy:</strong> Pizza ovens. <strong>Numbers:</strong> 32 vCPU crossover, 500 QPS/pod, 60% planning trigger.</p></div>`,
+        t4: `<div class="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-lg"><h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-3 flex-wrap"><span class="inline-flex items-center justify-center w-9 h-9 bg-gradient-to-br from-accent to-accent-blue rounded-lg text-black font-mono font-extrabold text-sm">04</span>Load Balancer<span class="text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">L7 SIGNAL</span></h1><p class="text-sm text-muted mt-2 border-l-2 border-border pl-3"><strong class="text-gray-200">Principal signal:</strong> Connection draining and graceful shutdown unprompted — you've been paged when someone forgot them.</p><h2 class="text-base font-bold text-accent mt-6">📖 Step 1 — Story</h2><p class="text-sm text-muted">Hotel line manager directing guests, letting clerks finish before break. That's connection draining. Skip it = guests turned away mid-check-in.</p><h2 class="text-base font-bold text-accent mt-5">💥 Step 2 — What Breaks</h2><p class="text-sm text-muted">Deploy kills pods immediately. 200 in-flight requests terminated. Orders half-saved. Cascade: no graceful shutdown → clients retry → new pods overwhelmed.</p><h2 class="text-base font-bold text-accent mt-5">🧮 Step 3 — Math</h2><div class="bg-code-bg border border-teal-900/30 rounded-lg p-4 font-mono text-xs text-gray-300 my-3">L4 (NLB): millions QPS · L7 (YARP): ~100K QPS/instance<br><10K QPS: Single L7 LB ($50/mo) · >100K QPS: L4 in front of L7<br><span class="line-through opacity-50">Single LB eliminated above 100K QPS</span></div><h2 class="text-base font-bold text-accent mt-5">💻 Step 7 — .NET 9 Code</h2><pre class="bg-code-bg border-l-2 border-accent rounded-r-lg p-4 font-mono text-xs text-gray-300 overflow-x-auto my-3">builder.Services.AddReverseProxy().LoadFromConfig(...);\nbuilder.WebHost.ConfigureKestrel(o => o.Limits.MaxConcurrentConnections = 10000);</pre><h2 class="text-base font-bold text-accent mt-5">🎙️ Step 9 — Interview Script</h2><div class="bg-purple-900/10 border-l-2 border-purple-400 rounded-r-lg p-4 italic text-sm text-purple-200 my-3">🧠 <strong class="text-purple-300 not-italic">L7 Signal:</strong> "Connection draining is not optional — difference between graceful deploy and 502 spike. Set timeout to 2× longest request."</div><h2 class="text-base font-bold text-accent mt-5">🔥 Step 10 — Failure Modes</h2><div class="space-y-2 my-2"><div class="bg-red-900/5 border border-red-900/20 rounded-lg p-3"><h4 class="text-red-400 text-xs font-bold">1. LB Becomes Bottleneck</h4><p class="text-xs text-muted"><code class="bg-red-900/20 text-red-300 px-1 rounded text-xs">lb_connection_count >80% max</code>. Fix: Add NLB in front.</p></div></div><h2 class="text-base font-bold text-accent mt-5">⚓ Step 12 — Memory Anchor</h2><p class="text-sm text-muted"><strong>Analogy:</strong> Hotel line manager. <strong>Numbers:</strong> 100K QPS ceiling, 60s draining, 5s health check. <strong>Phrase:</strong> "Connection draining = graceful deploy vs 502 spike."</p></div>`,
+        t5: `<div class="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-lg"><h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-3 flex-wrap"><span class="inline-flex items-center justify-center w-9 h-9 bg-gradient-to-br from-accent to-accent-blue rounded-lg text-black font-mono font-extrabold text-sm">05</span>Database Basics — SQL vs NoSQL<span class="text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">L7 SIGNAL</span></h1><p class="text-sm text-muted mt-2 border-l-2 border-border pl-3"><strong class="text-gray-200">Principal signal:</strong> Operational cost: "Cassandra adds 2 weeks on-call training per engineer."</p><h2 class="text-base font-bold text-accent mt-6">📖 Step 1 — Story</h2><p class="text-sm text-muted">Library catalog (SQL — structured, complex queries) vs warehouse (NoSQL — fast by ID, no complex searches). Choose wrong = can't answer business questions or can't handle load.</p><h2 class="text-base font-bold text-accent mt-5">💥 Step 2 — What Breaks</h2><p class="text-sm text-muted">Postgres feed melts at 50M users. Migration to Cassandra takes 6 months. Uber: Postgres → MySQL → custom Schemaless — took years.</p><h2 class="text-base font-bold text-accent mt-5">🧮 Step 3 — Math</h2><div class="bg-code-bg border border-teal-900/30 rounded-lg p-4 font-mono text-xs text-gray-300 my-3">Postgres: 2-5K read QPS, 1-2K write QPS, ACID<br>NoSQL: unlimited QPS, no JOINs, eventual consistency<br>Need ACID? → <span class="line-through opacity-50">NoSQL eliminated</span><br>>5K writes + simple queries? → <span class="line-through opacity-50">SQL eliminated</span></div><h2 class="text-base font-bold text-accent mt-5">⚖️ Step 6 — Trade-offs</h2><p class="text-sm text-muted">Hybrid ✅: Postgres for payments (ACID), DynamoDB for feed (scale). Justify each DB's operational cost.</p><h2 class="text-base font-bold text-accent mt-5">💻 Step 7 — .NET 9 Code</h2><pre class="bg-code-bg border-l-2 border-accent rounded-r-lg p-4 font-mono text-xs text-gray-300 overflow-x-auto my-3">builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connStr));\nbuilder.Services.AddAWSService<IAmazonDynamoDB>();</pre><h2 class="text-base font-bold text-accent mt-5">🎙️ Step 9 — Interview Script</h2><div class="bg-purple-900/10 border-l-2 border-purple-400 rounded-r-lg p-4 italic text-sm text-purple-200 my-3">🧠 <strong class="text-purple-300 not-italic">L7 Signal:</strong> "I choose per data domain. Payment needs ACID → Postgres. Feed needs scale → DynamoDB. Operational cost of two DBs justified because access patterns genuinely differ."</div></div>`,
+        t6: `<div class="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-lg"><h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-3 flex-wrap"><span class="inline-flex items-center justify-center w-9 h-9 bg-gradient-to-br from-accent to-accent-blue rounded-lg text-black font-mono font-extrabold text-sm">06</span>Caching<span class="text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">L7 SIGNAL</span></h1><p class="text-sm text-muted mt-2 border-l-2 border-border pl-3"><strong class="text-gray-200">Principal signal:</strong> Quantify cache hit ratio needed to justify Redis cost — you've seen caches cost more than the DB they protect.</p><h2 class="text-base font-bold text-accent mt-6">📖 Step 1 — Story</h2><p class="text-sm text-muted">Librarian's desk with top 50 books. Worth it if 85% requests hit those 50. If only 10%, the desk is wasted space. <strong>Caching = economic decision, not performance one.</strong></p><h2 class="text-base font-bold text-accent mt-5">💥 Step 2 — What Breaks</h2><p class="text-sm text-muted">Cache stampede: Redis down 30s → 20K QPS hit DB → pool exhausts in 2s. Reddit 2021: TTL change dropped HR from 95% to 30%, DB melted.</p><h2 class="text-base font-bold text-accent mt-5">🧮 Step 3 — Economics</h2><div class="bg-code-bg border border-teal-900/30 rounded-lg p-4 font-mono text-xs text-gray-300 my-3">Redis HA: $400/mo · DB replica: $350/mo (~2K QPS)<br>At 85% HR: 3K DB QPS (2 replicas, $700) — Redis saves $300/mo<br>At 50% HR: 10K DB QPS (6 replicas, $2,100) — Redis wasted money<br><span class="line-through opacity-50">Caching eliminated if sustained HR below 70%</span></div><h2 class="text-base font-bold text-accent mt-5">💻 Step 7 — .NET 9 Code</h2><pre class="bg-code-bg border-l-2 border-accent rounded-r-lg p-4 font-mono text-xs text-gray-300 overflow-x-auto my-3">builder.Services.AddStackExchangeRedisCache(o => o.Configuration = "redis:6379");\n// Stampede prevention: distributed lock on cache miss\nif (await _lock.AcquireAsync($"lock:{key}")) { /* fetch, cache, release */ }</pre><h2 class="text-base font-bold text-accent mt-5">🎙️ Step 9 — Interview Script</h2><div class="bg-purple-900/10 border-l-2 border-purple-400 rounded-r-lg p-4 italic text-sm text-purple-200 my-3">🧠 <strong class="text-purple-300 not-italic">L7 Signal:</strong> "I don't add caching because 'it's faster.' I add it because math shows it saves $2,300/month. If HR drops below 70%, Redis is losing money. I monitor HR per endpoint."</div></div>`,
+        t7: `<div class="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-lg"><h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-3 flex-wrap"><span class="inline-flex items-center justify-center w-9 h-9 bg-gradient-to-br from-accent to-accent-blue rounded-lg text-black font-mono font-extrabold text-sm">07</span>API Gateway<span class="text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">L7 SIGNAL</span></h1><p class="text-sm text-muted mt-2 border-l-2 border-border pl-3"><strong class="text-gray-200">Principal signal:</strong> Gateway HA and rolling deploy risks — you've caused an outage deploying the gateway.</p><h2 class="text-base font-bold text-accent mt-6">📖 Step 1 — Story</h2><p class="text-sm text-muted">Corporate security desk: checks ID, routes visitors. If security desk closes, nobody enters — even if every office is fully staffed. <strong>Gateway = failure domain for everything behind it.</strong></p><h2 class="text-base font-bold text-accent mt-5">💥 Step 2 — What Breaks</h2><p class="text-sm text-muted">Gateway deploy kills all instances simultaneously. Zero gateways for 30s. Every API call fails. AWS us-east-1 2021: API Gateway went down, everything behind it unreachable.</p><h2 class="text-base font-bold text-accent mt-5">🧮 Step 3 — Math</h2><div class="bg-code-bg border border-teal-900/30 rounded-lg p-4 font-mono text-xs text-gray-300 my-3">YARP: ~50K QPS/instance · 20K QPS → 2 instances HA<br>Adds 2-5ms latency · Rate limiting adds ~1ms<br><span class="line-through opacity-50">Single gateway eliminated — SPOF for entire system</span></div><h2 class="text-base font-bold text-accent mt-5">💻 Step 7 — .NET 9 Code</h2><pre class="bg-code-bg border-l-2 border-accent rounded-r-lg p-4 font-mono text-xs text-gray-300 overflow-x-auto my-3">builder.Services.AddReverseProxy();\nbuilder.Services.AddRateLimiter(o => o.AddFixedWindowLimiter("global", c => { c.PermitLimit = 10000; }));</pre><h2 class="text-base font-bold text-accent mt-5">🎙️ Step 9 — Interview Script</h2><div class="bg-purple-900/10 border-l-2 border-purple-400 rounded-r-lg p-4 italic text-sm text-purple-200 my-3">🧠 <strong class="text-purple-300 not-italic">L7 Signal:</strong> "Most dangerous component to deploy. I run 3 instances minimum with PodDisruptionBudget max 1 unavailable. I test deploys by intentionally killing instances."</div></div>`,
+        t8: `<div class="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-lg"><h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-3 flex-wrap"><span class="inline-flex items-center justify-center w-9 h-9 bg-gradient-to-br from-accent to-accent-blue rounded-lg text-black font-mono font-extrabold text-sm">08</span>CDN<span class="text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">L7 SIGNAL</span></h1><p class="text-sm text-muted mt-2 border-l-2 border-border pl-3"><strong class="text-gray-200">Principal signal:</strong> Distinguish CDN goals — latency vs offload. Naively combining them = stale personalized data incidents.</p><h2 class="text-base font-bold text-accent mt-6">📖 Step 1 — Story</h2><p class="text-sm text-muted">Newspaper worldwide: front page (same everywhere) printed locally. Local news (different per city) must be customized. Cache the front page, never the local section. Tokyo doesn't want New York local news.</p><h2 class="text-base font-bold text-accent mt-5">💥 Step 2 — What Breaks</h2><p class="text-sm text-muted">CDN caches personalized dashboard → User A's data served to User B → PII incident. Steam 2015: cached other users' account pages.</p><h2 class="text-base font-bold text-accent mt-5">🧮 Step 3 — Math</h2><div class="bg-code-bg border border-teal-900/30 rounded-lg p-4 font-mono text-xs text-gray-300 my-3">Origin: 20K QPS → $4,200/mo (compute + egress)<br>CDN absorbing 90%: 2K QPS origin → $1,400/mo total<br><strong class="text-accent">CDN saves $2,800/month. Pays for itself 5.6×.</strong><br><span class="line-through opacity-50">No CDN eliminated above 5K QPS with global users</span></div><h2 class="text-base font-bold text-accent mt-5">💻 Step 7 — .NET 9 Code</h2><pre class="bg-code-bg border-l-2 border-accent rounded-r-lg p-4 font-mono text-xs text-gray-300 overflow-x-auto my-3">[ResponseCache(Duration=60, Location=Any)] public IActionResult Products() // CDN can cache\n[ResponseCache(NoStore=true, Location=None)] public IActionResult Profile() // Never cache</pre><h2 class="text-base font-bold text-accent mt-5">🎙️ Step 9 — Interview Script</h2><div class="bg-purple-900/10 border-l-2 border-purple-400 rounded-r-lg p-4 italic text-sm text-purple-200 my-3">🧠 <strong class="text-purple-300 not-italic">L7 Signal:</strong> "Any endpoint returning user-specific data gets Cache-Control: private, no-store. No exceptions. I'd rather serve slower from origin than serve wrong user fast from CDN."</div></div>`
+    };
+    return contents[t.id] || '';
+}
+
+// ────────────────── ACTIVATE TOPIC ──────────────────
+function activate(id, push=true){
+    const container = document.getElementById('topicsContainer');
+    // Check if already built
+    if(!document.getElementById(id)){
+        const t = TOPICS.find(x=>x.id===id);
+        if(!t) return;
+        const wrapper = document.createElement('div');
+        wrapper.id = id;
+        wrapper.className = 'topic-content';
+        wrapper.innerHTML = getContent(t);
+        // Complete button
+        const btn = document.createElement('button');
+        btn.className = 'mt-4 px-4 py-2 border rounded-full text-sm font-semibold transition-colors ' + (completed.has(id) ? 'bg-accent/15 border-green-700 text-green-400' : 'border-accent text-accent hover:bg-accent/10');
+        btn.textContent = completed.has(id) ? '✓ Completed' : 'Mark Complete';
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            if(completed.has(id)){ completed.delete(id); } else { completed.add(id); }
+            save();
+            buildSidebar();
+            activate(id, false);
+        };
+        wrapper.appendChild(btn);
+        container.appendChild(wrapper);
+    }
+    // Show/hide
+    document.querySelectorAll('.topic-content').forEach(el=>el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    activeId = id;
+    // Sidebar highlight
+    document.querySelectorAll('#sidebarNav button').forEach(b=>{
+        b.classList.toggle('text-accent', b.dataset.topic===id);
+        b.classList.toggle('font-semibold', b.dataset.topic===id);
+        b.classList.toggle('border-l-2', b.dataset.topic===id);
+        b.classList.toggle('border-accent', b.dataset.topic===id);
+        b.classList.toggle('bg-accent/5', b.dataset.topic===id);
+    });
+    localStorage.setItem('l7activeTopic', id);
+    if(push) history.pushState({topicId:id}, '', `#${id}`);
+    updateProgress();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateProgress(){
+    const c = completed.size, t = TOPICS.length;
+    document.getElementById('progressTop').textContent = `${c}/${t}`;
+    document.getElementById('progressSide').textContent = `${c} / ${t} completed`;
+}
+
+// ────────────────── SIDEBAR TOGGLE ──────────────────
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+function openSidebar(){ sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); document.body.style.overflow='hidden'; }
+function closeSidebar(){ sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); document.body.style.overflow=''; }
+document.getElementById('menuBtn').onclick = ()=> sidebar.classList.contains('-translate-x-full') ? openSidebar() : closeSidebar();
+overlay.onclick = closeSidebar;
+
+// ────────────────── SEARCH ──────────────────
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+searchInput.addEventListener('input', function(){
+    const q = this.value.trim().toLowerCase();
+    if(!q){ searchResults.classList.add('hidden'); return; }
+    const matches = TOPICS.filter(t=>t.title.toLowerCase().includes(q)||t.n.includes(q));
+    if(matches.length===0){
+        searchResults.innerHTML = '<p class="p-3 text-sm text-muted">No matches</p>';
+    } else {
+        searchResults.innerHTML = matches.slice(0,8).map(t=>
+            `<button class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 transition-colors border-b border-border last:border-0" data-topic="${t.id}">${t.n}. ${t.title} <span class="text-xs text-muted ml-1">${CAT_LABELS[t.cat].label}</span></button>`
+        ).join('');
+    }
+    searchResults.classList.remove('hidden');
+});
+document.addEventListener('click', e=>{ if(!e.target.closest('.search-bar, #searchInput, #searchResults')) searchResults.classList.add('hidden'); });
+searchResults.addEventListener('click', e=>{
+    const btn = e.target.closest('button[data-topic]');
+    if(btn){ activate(btn.dataset.topic); searchInput.value=''; searchResults.classList.add('hidden'); }
+});
+
+// ────────────────── INIT ──────────────────
+function init(){
+    buildSidebar();
+    updateProgress();
+    const hash = window.location.hash.replace('#','');
+    const saved = localStorage.getItem('l7activeTopic');
+    let initial = 't1';
+    if(hash && TOPICS.find(t=>t.id===hash)) initial = hash;
+    else if(saved && TOPICS.find(t=>t.id===saved)) initial = saved;
+    activate(initial, false);
+    history.replaceState({topicId:initial}, '', `#${initial}`);
+}
+window.addEventListener('popstate', e=>{ if(e.state?.topicId) activate(e.state.topicId, false); });
+init();
+</script>
+</body>
+</html>
